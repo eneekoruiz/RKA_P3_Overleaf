@@ -2,10 +2,6 @@
 %%  PRAKTIKA-TXOSTENA · Robotika eta Kontrol Adimendunak
 %%  Informatika Fakultateko GrAL txantiloian oinarritua (bertsio arina).
 %%  Konpilatzeko: pdfLaTeX + BibTeX (Overleaf-en lehenetsitakoa).
-%%
-%%  \bete{...}       -> zuek idatzi beharrekoa (grisez agertzen da)
-%%  \egiaztatu{...}  -> zuen kodearekin edo datuekin egiaztatu beharreko balioa (laranjaz)
-%%  Entregatu aurretik, bilatu "bete{" eta "egiaztatu{" (Ctrl+F): ez du bat ere geratu behar.
 %% ============================================================
 \documentclass[a4paper, 11pt, oneside]{memoir}
 \semiisopage
@@ -13,13 +9,13 @@
 % Euskaraz "3. kapitulua" esaten da, ez "Kapitulua 3": zenbakia bakarrik erakusten da.
 \renewcommand*{\printchaptername}{\chapnamefont}
 
-%% ---------- AZALEKO DATUAK (bete) ----------
+%% ---------- AZALEKO DATUAK ----------
 \newcommand{\egileak}{Eneko Ruiz \\[0.4em] Eneko Pardavila \\[0.4em] Omar Ouinas}
 \newcommand{\ikasketak}{Informatika Ingeniaritzako Gradua}
 \newcommand{\irakasgaia}{Robotika eta Kontrol Adimendunak}
 \newcommand{\irakaslea}{Elena Lazkano}
-\newcommand{\izenburua}{3. Proiektua}
-\newcommand{\azpititulua}{\bete{Praktikaren izenburua edo azpititulua}}
+\newcommand{\izenburua}{Paretari jarraitzen atzeraelikadurazko kontrolaren bidez (PID)}
+\newcommand{\azpititulua}{Laser bidezko erregresio lineala eta PID kontrolagailua Gazeboko ingurune simulatuan}
 \newcommand{\data}{2026ko azaroa}
 
 \input config/makroak
@@ -63,7 +59,7 @@
 \input kapituluak/04_ondorioak
 
 \appendix
-\chapter{Eranskina}\label{ch:eranskina}
+\chapter{Eranskina: Kodea eta Exekuzioa}\label{ch:eranskina}
 \input kapituluak/05_eranskina
 
 \end{document}

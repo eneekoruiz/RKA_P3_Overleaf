@@ -1,5 +1,28 @@
-\bete{Eranskin honetan proba osagarriak, konfigurazio-fitxategien laburpenak edo datu tekniko gehigarriak gorde daitezke.}
+Eranskin honetan nodoa martxan jartzeko beharrezko aginduak eta parametro-egiturak zehazten dira.
 
 \needspace{6\baselineskip}
-\section{Konfigurazio-parametroak}\label{sec:eranskina-parametroak}
-\bete{Deskribatu hemen nodoen abiarazte-parametroak (launch parameters), gaien izenak edo kodearen antolaketa osagarria.}
+\section{Exekuzio-aginduak}\label{sec:exekuzioa}
+Simulazioa eta paretari jarraitzeko nodoa abiarazteko urratsak:
+\begin{enumerate}[leftmargin=2em, itemsep=0.3em]
+  \item \textbf{Gazebo simulatzailea abiarazi}:
+\begin{verbatim}
+ros2 launch gazebo_worlds gz_robot.launch.py world:=yahboom_track
+\end{verbatim}
+  \item \textbf{P kontrolagailua exekutatu} ($K_p = 1{,}20$):
+\begin{verbatim}
+ros2 launch wall_following wf_ls.launch.py kp:=1.2 ki:=0.0 kd:=0.0
+\end{verbatim}
+  \item \textbf{PID kontrolagailu osoa exekutatu} ($K_p = 1{,}10,\ K_i = 0{,}04,\ K_d = 0{,}12$):
+\begin{verbatim}
+ros2 launch wall_following wf_ls.launch.py kp:=1.1 ki:=0.04 kd:=0.12
+\end{verbatim}
+\end{enumerate}
+
+\needspace{6\baselineskip}
+\section{Paketearen fitxategi-egitura}\label{sec:fitxategiak}
+Garatutako soluzioaren fitxategi nagusiak:
+\begin{itemize}[leftmargin=2em, itemsep=0.3em]
+  \item \texttt{wall\_follow\_ls.py}: Kontrolagailu nagusia, proiekzio polar-kartesiarra, erregresio lineala eta PID algoritmo osoa jasotzen dituena.
+  \item \texttt{wf\_ls.launch.py}: Parametro dinamikoak (\texttt{kp}, \texttt{ki}, \texttt{kd}) komando-lerrotik pasatzeko konfigurazioa.
+  \item \texttt{results/}: Exekuzio bakoitzaren amaieran erroreen bilakaera eta distantziaren telemetria biltzen dituzten grafikoak gordetzen diren direktorioa.
+\end{itemize}

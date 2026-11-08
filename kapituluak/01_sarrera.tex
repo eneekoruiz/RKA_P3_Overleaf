@@ -1,18 +1,24 @@
-\bete{Praktika honen helburu nagusia 3. proiektuan proposatutako kontrol- eta nabigazio-arkitektura garatzea, inplementatzea eta esperimentalki ebaluatzea da. Sarrera honetan landutako sistemaren testuingurua, erabilitako tresneria eta jarraitutako oinarrizko printzipioak laburbiltzen dira.}
+Praktika honen helburu nagusia mugikorreko roboten kontrolerako oinarrizkoa den funtzio anitzen arrastoa eta atzeraelikadura lantzea da. Oraingoan, Gazeboko \texttt{yahboom\_track} zirkuitu simulatuan arituko gara, eta robotak zirkuitua inguratzen duen eskuineko paretari jarraitu beharko dio barrutik, mugimendua paretarekiko paralelo mantenduz eta aldi berean errepidearen gainetik egonkor zirkulatuz.
 
 \needspace{6\baselineskip}
 \section{Testuingurua eta motibazioa}\label{sec:testuingurua}
-\bete{Deskribatu hemen laburki proiektuaren testuingurua: zergatik den garrantzitsua ebazten den problema eta zein diren landutako eskakizunak. Azaldu robotak edo agenteak bete beharreko baldintzak eta simulazio edo ingurune errealean aurreikusitako erronka nagusiak.}
+Robotika mugikorrean, inguruneko egiturak (hala nola paretak, korridoreak edo barandak) erreferentzia gisa hartzea oso ohikoa da ibilbide gidatuak osatzeko. Aurreko praktikan kameraren bidezko bide-jarraipen bisuala aztertu genuen bezala, oraingoan LiDAR sentsoreak ematen duen distantzia-informazio geometrikoa erabiliko dugu. Erronka nagusia da sentsorearen irakurketa gordinetatik abiatuta paretaren orientazio erlatiboa modu sendoan kalkulatzea eta informazio horrekin atzeraelikadurazko kontrol-begizta bat ixtea, gainbultzada edo oszilaziorik gabe.
 
 \needspace{6\baselineskip}
 \section{Proiektuaren helburuak}\label{sec:helburuak}
-\bete{Zehaztu atal honetan lortu nahi diren helburu operatiboak:}
+Praktika honetan hiru lorpen tekniko nagusi definitu ditugu Elena Lazkano irakasleak ezarritako gidalerroei jarraituz:
 \begin{enumerate}[leftmargin=2em, itemsep=0.3em]
-  \item \bete{Lehenengo helburua: oinarrizko kontrol-arkitektura eta komunikazio-nodoak definitzea.}
-  \item \bete{Bigarren helburua: hautemandako informazioa prozesatzea eta ekintza-estrategia zehatzak diseinatzea.}
-  \item \bete{Hirugarren helburua: proba esperimentalak burutzea bai simulazioan bai plataforma errealean, emaitzak kuantifikatuz.}
+  \item \textbf{LiDAR izpien proiekzioa eta erregresio lineala}: Eskuineko laser-izpi hurbilenak hautatzea, koordenatu kartesiarretara bihurtzea eta karratu txikienen bidezko erregresio lineala aplikatzea paretaren maldaren ($\theta$) estimazio fidagarria lortzeko.
+  \item \textbf{Kontrol Proportzionalaren (P) ebaluazioa}: Paretarekiko paralelo egoteko errore angeluarra definitzea ($e = \theta - 0$) eta $K_p$ irabaziaren araberako ibilbidea eta egonkortasuna neurtzea.
+  \item \textbf{PID kontrolagailu osoaren diseinua}: Kontrolatzaileari osagai integrala ($K_i$) eta deribatua ($K_d$) gehitzea, errore estatikoa ezabatzeko, oszilazioak moteltzeko eta muturreko kurbetan erantzun azkarra bermatuz ibilbide leuna lortzeko.
 \end{enumerate}
 
 \needspace{6\baselineskip}
 \section{Dokumentuaren egitura}\label{sec:egitura}
-\bete{Txosten hau hurrengo ataletan egituratuta dago: \ref{ch:garapena}. kapituluan garatutako metodologia eta arkitektura teknikoa xehatzen dira; \ref{ch:emaitzak}. kapituluan lortutako emaitzak eta egindako ebaluazio esperimentala aurkezten dira; eta azkenik, \ref{ch:ondorioak}. kapituluan ondorio nagusiak eta etorkizuneko hobekuntzak laburbiltzen dira.}
+Txosten hau hurrengo ataletan egituratzen da lanaren garapena era argi eta ulergarrian aurkezteko:
+\begin{itemize}[leftmargin=2em, itemsep=0.3em]
+  \item \ref{ch:garapena}. kapituluan paretari jarraitzeko garatutako metodologia, LiDAR izpien proiekzio kartesiarra, erregresio-eredua eta PID algoritmoaren inplementazio zehatza aurkezten dira.
+  \item \ref{ch:emaitzak}. kapituluan simulazioan lortutako portaerak, parametro-balioen konparaketa ($K_p$, $K_i$, $K_d$) eta telemetria-grafikak aztertzen dira xehetasunez.
+  \item \ref{ch:ondorioak}. kapituluan kontrol-estrategien abantailak, aurkitutako mugak eta etorkizuneko hobekuntzak laburbiltzen dira.
+  \item Azkenik, \ref{ch:eranskina}. eranskinean simulazioa eta nodoak exekutatzeko agindu zehatzak eta paketearen fitxategi-egitura jasotzen dira.
+\end{itemize}

@@ -1,16 +1,56 @@
-\bete{Kapitulu honetan 3. proiekturako diseinatutako metodologia, hardware/software arkitektura eta kontrol-estrategia deskribatzen dira.}
+Kapitulu honetan paretari modu autonomoan jarraitzeko diseinatutako arkitektura teknikoa xehatzen da. Sistemak sentsore-mailako datu gordinak tratatu, informazio geometrikoa erauzi eta atzeraelikadurazko kontrol-begizta baten bidez eragingailuei abiadura-agindu egokiak bidaltzen dizkie.
 
 \needspace{6\baselineskip}
-\section{Arkitektura eta metodologia}\label{sec:arkitektura}
-\bete{Azaldu hemen sistemaren egitura globala: ROS~2 nodoak, gaiei (topic) buruzko komunikazioak, mezu motak eta datu-fluxua. Beharrezkoa denean, sartu diagramak edo eskemak funtzionamendua argitzeko.}
-
-\needspace{6\baselineskip}
-\section{Algoritmoen diseinua eta kontrola}\label{sec:algoritmoak}
-\bete{Deskribatu robotaren portaera gidatzen duten algoritmoak, parametro kritikoak eta hautemandako egoeren aurrean hartzen diren erabakiak. Formula matematikoak edo kontrol-ekuazioak txertatu daitezke beharrezkoa bada:}
-\begin{equation}\label{eq:kontrola}
-  \bete{v(t) = v_{\max} \cdot \left(1 - \frac{|e(t)|}{e_{\max}}\right), \quad \omega(t) = -K_p \cdot e(t)}
+\section{LiDAR neurketen hautaketa eta proiekzio geometrikoa}\label{sec:proiekzioa}
+Robotak gainean duen LiDAR sentsoreak $360^\circ$-ko distantzia-irakurketak eskaintzen ditu polarrean. Paretari jarraitzeko, eskuinaldean dauden izpiak bakarrik interesatzen zaizkigu. Robotaren mugimendu-ardatza $+x$ aurrerantz eta $+y$ ezkerrerantz definituta egonik, eskuineko angeluak negatiboak dira:
+\begin{equation}\label{eq:sektorea}
+  \alpha_i \in [-2{,}18\text{ rad},\ -0{,}52\text{ rad}] \quad (\approx [-125^\circ,\ -30^\circ]).
+\end{equation}
+Zirkuituaren zabalera kontuan hartuz, $d_i < 1{,}80\text{ m}$ baldintza betetzen duten puntuak bakarrik hartzen ditugu, beste aldeko paretak edo urrutiko elementuak baztertzeko. Ondoren, neurketa bakoitzari dagokion proiekzio kartesiarra kalkulatzen da:
+\begin{equation}\label{eq:kartesiarra}
+  x_i = d_i \cdot \cos(\alpha_i), \qquad y_i = d_i \cdot \sin(\alpha_i).
 \end{equation}
 
 \needspace{6\baselineskip}
-\section{Inplementazioaren xehetasunak}\label{sec:inplementazioa}
-\bete{Aipatu garapenean kontuan hartutako alderdi tekniko garrantzitsuenak (segurtasun-mekanismoak, salbuespenen kudeaketa eta nodoen sinkronizazioa).}
+\section{Erregresio lineala eta paretaren angeluaren estimazioa}\label{sec:erregresioa}
+Proiektatutako $(x_i, y_i)$ puntuekin karratu txikienen bidezko erregresio lineala aplikatzen da \texttt{numpy.polyfit} funtzioaren bidez:
+\begin{equation}\label{eq:zuzena}
+  y(x) = c_1 \cdot x + c_0.
+\end{equation}
+Ekuazio honetan $c_1 = \frac{\Delta y}{\Delta x}$ zuzenaren malda da, eta $c_0$ ordenatua jatorrian. Malda horretatik abiatuta, robotaren orientazioaren eta paretaren arteko angelua zuzenean kalkulatzen da:
+\begin{equation}\label{eq:theta}
+  \theta = \arctan(c_1).
+\end{equation}
+Paretarekiko mugimendu paraleloa lortzeko desiatutako balioa $\theta_{\text{desiatua}} = 0{,}0\text{ rad}$ da. Gainera, paretarainoko distantzia perpendikularra puntu baten eta zuzen baten arteko distantziaren formularen bidez lortzen da:
+\begin{equation}\label{eq:dist}
+  d_{\text{pareta}} = \frac{|c_0|}{\sqrt{1 + c_1^2}} \approx |c_0|.
+\end{equation}
+
+\needspace{6\baselineskip}
+\section{Kontrol Proportzionala (P kontrola)}\label{sec:kontrol-p}
+Lehenengo fasean, kontrol proportzional hutsa ezartzen da. Errore angeluarra $e(t) = \theta(t) - \theta_{\text{desiatua}} = \theta(t)$ izanik, biraketa-abiadura kalkulatzen da:
+\begin{equation}\label{eq:p-kontrola}
+  \omega(t) = K_p \cdot e(t).
+\end{equation}
+Robotak paretarantz jotzen duenean ($\theta > 0$), $\omega > 0$ aplikatzen da ezkerrerantz biratzeko; aitzitik, paretatik urruntzen denean ($\theta < 0$), $\omega < 0$ aplikatzen da eskuinerantz biratzeko.
+
+\needspace{6\baselineskip}
+\section{PID kontrolagailu osoaren formulazioa}\label{sec:kontrol-pid}
+Kontrol proportzional hutsak errore estatikoa eta inertziaren ondoriozko oszilazioak sor ditzakeenez, kontrolagailua zabaltzen da osagai integrala ($K_i$) eta deribatua ($K_d$) gehituz:
+\begin{equation}\label{eq:pid-legea}
+  \omega(t) = K_p \cdot e(t) + K_i \int_0^t e(\tau)\,d\tau + K_d \cdot \frac{de(t)}{dt}.
+\end{equation}
+Inplementazio diskretuan, $\Delta t$ kontrol-periodoa erabiliz:
+\begin{align}
+  I(t) &= I(t - \Delta t) + e(t)\cdot \Delta t, \label{eq:integral-diskretua} \\
+  D(t) &= \frac{e(t) - e(t - \Delta t)}{\Delta t}. \label{eq:deribatu-diskretua}
+\end{align}
+Integratzailearen gainezkatzea saihesteko (windup efektua), saturazio-muga zorrotza ezarri da ($|I(t)| \le 1{,}0$). Era berean, irteerako biraketa-abiadura $[\omega_{\min}, \omega_{\max}] = [-1{,}50, +1{,}50]\text{ rad/s}$ tartera mugatzen da.
+
+\needspace{6\baselineskip}
+\section{Abiadura linealaren modulazioa eta aurreko segurtasuna}\label{sec:abiadura-segurtasuna}
+Abiadura lineal konstante bati eusteak kurbetan irristatzea eragin dezake. Hori dela eta, abiadura lineala biraketa-abiadurarekiko alderantziz proportzionala izatea ezarri dugu:
+\begin{equation}\label{eq:v-modulazioa}
+  v(t) = v_{\max} \cdot \left(1 - 0{,}65 \cdot \frac{|\omega(t)|}{\omega_{\max}}\right).
+\end{equation}
+Modu honetan, lerro zuzenetan robotak abiadura handiena lortzen du ($v \approx 0{,}35\text{ m/s}$), eta biraketa zorrotzetan moteldu egiten da ($v \approx 0{,}12\text{ m/s}$) paretaren galerarik ez izateko. Gainera, aurrealdean $[-20^\circ, +20^\circ]$ tartean $0{,}45\text{ m}$ baino hurbilagoko oztoporik detektatzen bada, balaztatze eta ezkerrerako bira larria aktibatzen da aurrez aurreko talkak saihesteko.

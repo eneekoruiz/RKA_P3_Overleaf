@@ -1,14 +1,22 @@
-\bete{Kapitulu honek 3. proiektuan lortutako lorpen nagusiak, ateratako irakaspenak eta etorkizuneko lan-ildoak biltzen ditu.}
+Txosten honetan mugikorreko robot baten bidez paretari jarraitzeko kontrol-estrategia garatu, inplementatu eta ebaluatu dugu Gazebo simulatzailean.
 
 \needspace{6\baselineskip}
 \section{Lorpen nagusiak}\label{sec:lorpenak}
-\bete{Laburbildu lortutako emaitza esanguratsuenak eta bete diren helburuak:}
+Esperimentuen bidez ondorio hauek atera ditugu:
 \begin{itemize}[leftmargin=2em, itemsep=0.3em]
-  \item \bete{Helburu teknikoen betetze-maila eta diseinatutako kontrol-arkitekturaren sendotasuna.}
-  \item \bete{Simulazioaren eta plataforma errealaren arteko portaera-koherentzia.}
-  \item \bete{Sistemaren egonkortasuna baldintza desberdinetan.}
+  \item \textbf{Erregresio linealaren sendotasuna}: LiDAR neurketak polarretik kartesiarrera igarota eta karratu txikienen metodoa aplikatuz, paretaren orientazioa fidagarritasun handiz kalkulatzea lortu da, neurketa indibidualen zarata eta akats puntualak iragaziz.
+  \item \textbf{P kontrolaren mugak}: Kontrol proportzional hutsak oinarrizko ibilbidea bermatzen duen arren, ezin du aldi berean oszilaziorik eza eta kurbetako errore estatikoaren ezabapena lortu.
+  \item \textbf{PID erregulazioaren eraginkortasuna}: Osagai integrala eta deribatua gehitzean, sistemaren erantzuna errotik hobetzen da: integralak paretarekiko distantzia-desbideratzea murrizten du, eta deribatuak inertziaren eraginez sortzen diren oszilazioak leuntzen ditu.
+  \item \textbf{Abiadura egokitua}: Abiadura lineala biraketa-angeluaren arabera modulatzeak kurbetan irristatzea eta erreferentzia-galerak saihesten lagundu du.
 \end{itemize}
 
 \needspace{6\baselineskip}
 \section{Etorkizuneko lan-ildoak}\label{sec:etorkizuna}
-\bete{Aipatu aurrera begira egin litezkeen hobekuntzak: kontrol-algoritmo aurreratuagoak, sentsore-fusio konplexuagoa edo erantzun-abiaduraren optimizazioa.}
+Lan honek oinarri sendoa eskaintzen du etorkizuneko ikerketa eta garapenetarako:
+\begin{enumerate}[leftmargin=2em, itemsep=0.3em]
+  \item \textbf{Sentsore-fusioa}: LiDAR bidezko pareta-jarraipena eta aurreko praktikan garatutako ikusmen bidezko errepide-jarraipena (kameraren segmentazioa) bateratzea, robotak paretarik gabeko eremuetan ere bideari euts diezaion.
+  \item \textbf{Filtro moldagarriak}: Kalman iragazki baten bidez robotaren odometria eta LiDAR neurketak konbinatzea, posizio- eta orientazio-estimazio zehatzagoa lortzeko zarata handiko inguruneetan.
+  \item \textbf{Sistema errealean egiaztatzea}: Simulatzailean lortutako parametro optimoak ROSMASTER X3 robot errealean probatzea, motorren marruskadura eta sentsore errealaren atzerapenak ebaluatuz.
+  \item \textbf{Gainazal irregularren tratamendua}: Erregresio linealaz gain RANSAC algoritmoa txertatzea, paretan irtenguneak edo zutabeak daudenean lerro zuzena fidagarriago identifikatzeko.
+  \item \textbf{Bateriaren eta erantzun-denboraren kudeaketa}: Kontrol-begiztaren exekuzio-maiztasuna ($10\text{ Hz}$ vs $20\text{ Hz}$) doitzea prozesadorearen karga eta energia-kontsumoa optimizatzeko.
+\end{enumerate}

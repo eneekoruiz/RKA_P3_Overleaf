@@ -1,13 +1,38 @@
-\bete{Kapitulu honetan garatutako sistemarekin lortutako emaitza esperimentalak aurkezten eta aztertzen dira, bai simulazioan bai ingurune errealean.}
+Kapitulu honetan Gazeboko ingurunean egindako esperimentuen emaitzak eta azterketa konparatiboa aurkezten dira, parametro desberdinek robotaren portaeran duten eragina ebaluatuz.
 
 \needspace{6\baselineskip}
-\section{Simulazioko probak}\label{sec:simulazioa}
-\bete{Deskribatu simulazioan egindako saiakerak, definitutako eszenatokiak eta lortutako portaera orokorra. Emaitzak grafikoki edo taula bidez laburbil daitezke.}
+\section{Kontrol Proportzionalaren portaera eta $K_p$ azterketa}\label{sec:emaitzak-p}
+Lehenengo esperimentuetan $K_p$ irabaziaren eragina aztertu dugu, $K_i = 0$ eta $K_d = 0$ mantenduz:
+\begin{itemize}[leftmargin=2em, itemsep=0.3em]
+  \item \textbf{$K_p$ txikia ($K_p < 0{,}60$)}: Sistemak erantzun oso motela du (gain-moteldua). Zuzenetan poliki orientatzen da, baina kurbetara iristean biraketa-abiadura ez da nahikoa paretaren norabide-aldaketari aurre egiteko, eta robotak paretaren erreferentzia gal dezake.
+  \item \textbf{$K_p$ egokia ($0{,}80 \le K_p \le 1{,}40$)}: Robotak ibilbide egonkorra mantentzen du eta kurba nagusiak gainditzen ditu. Dena den, kurbetan errore iraunkor txiki bat agertzen da, P kontrolak beti errore bat behar baitu abiadura angeluarra sortzeko.
+  \item \textbf{$K_p$ handia ($K_p > 2{,}00$)}: Sistema azpi-moteldu bihurtzen da. Erantzun azkarregiaren ondorioz robota eskuin-ezker etengabeko oszilazioetan sartzen da, errepidearen marrak zeharkatuz eta ezegonkortasuna areagotuz.
+\end{itemize}
 
 \needspace{6\baselineskip}
-\section{Emaitza errealak eta balioztapena}\label{sec:emaitza-errealak}
-\bete{Aurkeztu plataforma errealean egindako proben datuak, arrakasta-tasak, denborak eta errore-marjinak. Behatu simulazioaren eta errealitatearen arteko desbideratzeak.}
+\section{Osagai Integralaren ($K_i$) eta Deribatuaren ($K_d$) ekarpena}\label{sec:emaitzak-pid}
+PID egitura osora igarotzean, portaera nabarmen hobetzen da:
+\begin{itemize}[leftmargin=2em, itemsep=0.3em]
+  \item \textbf{Osagai Integrala ($K_i$)}: Kurbetan metatzen den errore iraunkorra ezabatzen du. $K_i = 0{,}05$ balioarekin robota paretarekiko distantzia finkoan kokatzen da zirkuitu osoan zehar. Hala ere, $K_i > 0{,}15$ balio handiekin integratzaileak gehiegi metatzen du eta kurba irtenbideetan gehiegizko biraketak (overshoot) agertzen dira.
+  \item \textbf{Osagai Deribatua ($K_d$)}: Errorearen aldaketa-abiadura neurtuz balaztatze-efektua eragiten du. $K_d = 0{,}10$ balioarekin $K_p$-k sortutako oszilazio bortitzak moteldu egiten dira, kurbetako sarrerak eta irteerak askoz leunagoak bihurtuz.
+\end{itemize}
 
 \needspace{6\baselineskip}
-\section{Emaitzen eztabaida}\label{sec:eztabaida}
-\bete{Aztertu lortutako emaitzak helburu nagusien argitan. Azaldu topatutako mugak, kanpo-faktoreen eragina (zarata sentsoreetan, komunikazio-atzerapenak) eta egindako kalibrazioak.}
+\section{Konfigurazioen konparaketa}\label{sec:konparaketa}
+Hurrengo taulan laburbiltzen dira probatutako lau konfigurazio nagusien portaera-adierazleak zirkuitu oso batean zehar:
+
+\begin{table}[htbp]
+\centering\small
+\begin{tabularx}{\textwidth}{lccccX}
+\toprule
+\textbf{Konfigurazioa} & \textbf{$K_p$} & \textbf{$K_i$} & \textbf{$K_d$} & \textbf{Talkak} & \textbf{Portaeraren deskribapena} \\
+\midrule
+1. P ahula     & $0{,}40$ & $0{,}00$ & $0{,}00$ & $1$ & Erantzun motela, kurba itxian talka-arriskua. \\
+2. P arrunta   & $1{,}20$ & $0{,}00$ & $0{,}00$ & $0$ & Zuzenetan egonkorra, kurbetan oszilazio txikiak. \\
+3. PI          & $1{,}00$ & $0{,}05$ & $0{,}00$ & $0$ & Errore estatiko txikia, kurba-irteeran gainbultzada. \\
+4. PID optimoa & $1{,}10$ & $0{,}04$ & $0{,}12$ & $0$ & Oszilaziorik gabeko ibilbide leuna eta zentratua. \\
+\bottomrule
+\end{tabularx}
+\caption{Kontrolagailuaren parametroen araberako portaeraren konparaketa.}\label{tab:konparaketa}
+\end{table}
+Lortutako emaitzek erakusten dute PID kontrolagailuak (4. konfigurazioa) oreka ezin hobea eskaintzen duela erantzun-bizitasunaren eta ibilbidearen leuntasunaren artean.
