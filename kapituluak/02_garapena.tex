@@ -1,7 +1,7 @@
 Kapitulu honetan paretari modu autonomoan jarraitzeko diseinatutako arkitektura teknikoa xehatzen da. Sistemak sentsore-mailako datu gordinak tratatu, informazio geometrikoa erauzi eta atzeraelikadurazko kontrol-begizta baten bidez eragingailuei abiadura-agindu egokiak bidaltzen dizkie.
 
 \needspace{6\baselineskip}
-\section{LiDAR neurketen hautaketa eta proiekzio geometrikoa}\label{sec:proiekzioa}
+\section[LiDAR neurketak eta proiekzioa]{LiDAR neurketen hautaketa eta proiekzio geometrikoa}\label{sec:proiekzioa}
 Robotak gainean duen LiDAR sentsoreak $360^\circ$-ko distantzia-irakurketak eskaintzen ditu polarrean. Paretari jarraitzeko, eskuinaldean dauden izpiak bakarrik interesatzen zaizkigu. Robotaren mugimendu-ardatza $+x$ aurrerantz eta $+y$ ezkerrerantz definituta egonik, eskuineko angeluak negatiboak dira:
 \begin{equation}\label{eq:sektorea}
   \alpha_i \in [-2{,}18\text{ rad},\ -0{,}52\text{ rad}] \quad (\approx [-125^\circ,\ -30^\circ]).
@@ -12,7 +12,7 @@ Zirkuituaren zabalera kontuan hartuz, $d_i < 1{,}80\text{ m}$ baldintza betetzen
 \end{equation}
 
 \needspace{6\baselineskip}
-\section{Erregresio lineala eta paretaren angeluaren estimazioa}\label{sec:erregresioa}
+\section[Erregresio lineala eta angelua]{Erregresio lineala eta paretaren angeluaren estimazioa}\label{sec:erregresioa}
 Proiektatutako $(x_i, y_i)$ puntuekin karratu txikienen bidezko erregresio lineala aplikatzen da \texttt{numpy.polyfit} funtzioaren bidez:
 \begin{equation}\label{eq:zuzena}
   y(x) = c_1 \cdot x + c_0.
@@ -48,7 +48,7 @@ Inplementazio diskretuan, $\Delta t$ kontrol-periodoa erabiliz:
 Integratzailearen gainezkatzea saihesteko (windup efektua), saturazio-muga zorrotza ezarri da ($|I(t)| \le 1{,}0$). Era berean, irteerako biraketa-abiadura $[\omega_{\min}, \omega_{\max}] = [-1{,}50, +1{,}50]\text{ rad/s}$ tartera mugatzen da.
 
 \needspace{6\baselineskip}
-\section{Abiadura linealaren modulazioa eta aurreko segurtasuna}\label{sec:abiadura-segurtasuna}
+\section[Abiadura-modulazioa eta segurtasuna]{Abiadura linealaren modulazioa eta aurreko segurtasuna}\label{sec:abiadura-segurtasuna}
 Abiadura lineal konstante bati eusteak kurbetan irristatzea eragin dezake. Hori dela eta, abiadura lineala biraketa-abiadurarekiko alderantziz proportzionala izatea ezarri dugu:
 \begin{equation}\label{eq:v-modulazioa}
   v(t) = v_{\max} \cdot \left(1 - 0{,}65 \cdot \frac{|\omega(t)|}{\omega_{\max}}\right).
