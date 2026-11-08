@@ -1,0 +1,29 @@
+# Sync & credentials
+.olauth
+*.cookie
+cookies.txt
+*.zip
+*.docx
+
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+*.lof
+*.lot
+
+# Temporary artifacts & renders
+ol_page_*.png
+*.pdf
+debug_*.txt
+pdf_pages_dump.txt
+__pycache__/
+*.pyc

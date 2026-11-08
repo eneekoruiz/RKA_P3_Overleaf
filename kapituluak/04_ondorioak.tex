@@ -1,0 +1,34 @@
+\needspace{6\baselineskip}
+\section[Oztopoak saihestea ez da ingurune osoa esploratzea][Oztopoak saihestea eta esplorazioa]{Oztopoak saihestea ez da ingurune osoa esploratzea}
+
+LiDARreko arau erreaktiboek uneko oztopoei erantzuten diete, baina ez dakite zer geratzen den bisitatzeko. Horregatik, etengabe mugitzeak ez du ingurune osoaren esplorazioa bermatzen. Ausazko noraezak eta irekiguneetara biratzeko arauek bide berriak hartzeko probabilitatea handitzen dute, baina hiru hasierako posizioek erakutsi dute mapa osoa estaltzea neurri handi batean ausazko bilaketaren mende geratzen dela. Gainera, robotaren neurriek biraketetan hormak igurzteko arriskua sortzen dute; esplorazioa eta segurtasuna orekatu behar dira.
+
+\needspace{6\baselineskip}
+\section[Kameraren egonkortasuna eta sentsoreen bibrazioak][Kamera eta sentsoreen bibrazioak]{Kameraren egonkortasuna eta sentsoreen bibrazioak}
+
+Laborategiko probetan ikusi genuen robotaren mugimenduak eta zoruko irregulartasunek kameran eragindako bibrazioek hautematea aldatzen zutela. Kamera astintzean, errepidea beste errenkada batzuetan agertzen da eta mediana alferrik mugitzen da. Horrek biraketa oszilakorrak eragin ditzake, robota benetan bidetik hainbeste aldendu ez denean ere. Kontrol-irabaziak doitu aurretik, kameraren finkapen mekanikoa bermatzea ezinbestekoa da.
+
+\needspace{6\baselineskip}
+\section{Bateriaren egoera parametroen parte da}
+
+Bateria ahularekin robotaren portaera okertu zen, abisu-akustikoa entzun gabe ere. Bateria aldatu ondoren, kode berarekin portaera hobetu zen eta azken bost saiakerak ondo atera ziren. Horregatik, parametroak doitu eta probak egin aurretik bateriaren irakurketa egiaztatu behar dela ikasi genuen.
+
+\needspace{6\baselineskip}
+\section[Agindua eta benetako erantzun fisikoa bereizi behar dira][Agindua eta benetako erantzuna]{Agindua eta benetako erantzun fisikoa bereizi behar dira}
+
+Kontrol-nodoaren log-ak agindutako abiadurak ($v$ eta $\omega$) erakusten ditu, baina robotak ez ditu beti balio horiek berehala betetzen. Gurpilen irristatzeak, hormaren kontrako igurztiek eta inertziak aginduaren eta mugimendu errealaren arteko aldea sortzen dute. Simulazioan eta robot errealean portaera desberdina izan zen. Eguneratze-maiztasuna (simulazioan 9~Hz inguru eta robot errealean azken bost probetan 20{,}8--29{,}3~Hz artean) eta mugimenduaren erantzuna ere desberdinak ziren; horregatik probatu eta doitu genituen abiadurak ingurune bakoitzean.
+
+\needspace{6\baselineskip}
+\section[Robot fisikoen arteko desberdintasunak eta lehiaketako esperientzia][Robot fisikoen desberdintasunak]{Robot fisikoen arteko desberdintasunak eta lehiaketako esperientzia}
+
+Parametroak RKA6 robotarekin doitu genituen. Lehiaketaren egunean, RKA9rekin probatzean, kodeak ez zuen portaera bera eman. Ekipamendua partekatu behar izan genuenez, gure robota eta ordenagailua berreskuratu genituenerako ez genuen astirik izan funtzionamendua berriz egiaztatzeko. Ez genuen roboten arteko aldearen kausa zehatza bereizi, baina esperientziak erakutsi zigun proba aurretik erabiliko den robotarekin kodea egiaztatu behar dela.
+
+\needspace{6\baselineskip}
+\section{Etorkizuneko hobekuntzak}
+
+Hurrengo urrats logikoa kameraren pertzepzioa hobetzea litzateke: banda berdeko pixel zurien zutabeen mediana orokorra hartu beharrean, robotaren aurreko errepide-zati konektatua errenkadaz errenkada jarraitzea, alboetako adarrek kalkulua alferrik desbidera ez dezaten. LiDARrean, berriz, robotaren kaxa errektangularra kontuan hartuko lukeen segurtasun-eremu asimetriko bat probatuko genuke, alboetan eta atzealdean marjina handiagoa utziz.
+
+\needspace{6\baselineskip}
+\section[Simulazioaren eta errealitatearen arteko arrakala: bi kode-bertsio desberdin][Simulazioaren eta errealitatearen arrakala]{Simulazioaren eta errealitatearen arteko arrakala: bi kode-bertsio desberdin}
+
+Esperientzia honek argi erakutsi du simulagailuaren eta errealitate fisikoaren arteko distantzia (Sim-to-Real gap). Gazebon algoritmo garbi, geometriko eta sinple batek (\texttt{road\_following.py}) zirkuitua ezin hobeto betetzen du 40 segundotan, zoru lau idealaren eta zaratarik gabeko pertzepzio sintetikoaren babesean. Mundu errealera jauzi egitean eta abiadura bikoiztean ($0{,}60$~m/s lehiaketa-denborak lortzeko), ordea, eredu ideal hori berehala desorekatu zen. Robot fisikoak kontrol-lege askoz defentsiboagoa eskatu zuen (\texttt{road\_following\_final.py}): zarataren aurkako mediana, barruko uhartea ekiditeko +40 pixeleko desplazamendua, marruskadura estatikoa gainditzeko bultzada biraketa itsuetan eta beheko babes-eremua. Bi kode desberdin garatu eta erabiltzea ez zen kasualitatea izan: errealitate fisikoaren marruskadurara, inertziara eta zaratara egokitzeko ezinbesteko urratsa izan zen.

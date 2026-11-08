@@ -1,0 +1,78 @@
+%% ============================================================
+%%  PRAKTIKA-TXOSTENA · Robotika eta Kontrol Adimendunak
+%%  Informatika Fakultateko GrAL txantiloian oinarritua (bertsio arina).
+%%  Konpilatzeko: pdfLaTeX + BibTeX (Overleaf-en lehenetsitakoa).
+%%
+%%  \bete{...}       -> zuek idatzi beharrekoa (grisez agertzen da)
+%%  \egiaztatu{...}  -> zuen kodearekin edo datuekin egiaztatu beharreko balioa (laranjaz)
+%%  Entregatu aurretik, bilatu "bete{" eta "egiaztatu{" (Ctrl+F): ez du bat ere geratu behar.
+%% ============================================================
+\documentclass[a4paper, 11pt, oneside]{memoir}
+\semiisopage
+\chapterstyle{veelo}
+% Euskaraz "3. kapitulua" esaten da, ez "Kapitulua 3": zenbakia bakarrik erakusten da.
+\renewcommand*{\printchaptername}{\chapnamefont}
+
+%% ---------- AZALEKO DATUAK (bete) ----------
+\newcommand{\egileak}{Eneko Ruiz \\[0.4em] Eneko Pardavila \\[0.4em] Omar Ouinas}
+\newcommand{\ikasketak}{Informatika Ingeniaritzako Gradua}
+\newcommand{\irakasgaia}{Robotika eta Kontrol Adimendunak}
+\newcommand{\irakaslea}{Elena Lazkano}
+\newcommand{\izenburua}{Oztopoak ekiditen eta errepideari jarraitzen}
+\newcommand{\azpititulua}{Sentsoreen funtzionamendua lantzen: ROSMASTER X3 robotarekin egindako praktika}
+\newcommand{\data}{2026ko azaroaren 6a}
+
+\input config/makroak
+
+\title{\izenburua}
+\author{\egileak}
+\date{\data}
+
+\begin{document}
+
+%% ---------- AZALA ----------
+\input config/azala
+\clearpage
+
+%% ---------- HASIERAKO ORRIAK ----------
+\frontmatter
+\aliaspagestyle{chapter}{plain}
+\aliaspagestyle{cleared}{plain}
+\pagestyle{plain}
+
+\pdfbookmark[1]{\contentsname}{toc}
+\begin{KeepFromToc}
+  \tableofcontents
+\end{KeepFromToc}
+\clearpage
+\begingroup
+\listoffigures
+\vspace{2\baselineskip}
+\let\clearpage\relax
+\let\cleardoublepage\relax
+\let\chapter\section
+\listoftables
+\endgroup
+
+%% ---------- EDUKIA ----------
+\clearpage
+\mainmatter
+\pagestyle{ruled}
+
+\chapter{Sarrera}\label{ch:sarrera}
+\input kapituluak/01_sarrera
+
+\chapter{Oztopoak ekiditen}\label{ch:oztopoak}
+\input kapituluak/02_oztopoak
+
+\chapter{Errepideari jarraitzen}\label{ch:errepidea}
+\input kapituluak/03_errepidea
+
+\chapter{Ondorioak}\label{ch:ondorioak}
+\input kapituluak/04_ondorioak
+
+\appendix
+\chapter{Proba osagarriak}\label{ch:eranskina}
+\input kapituluak/05_eranskina
+
+\end{document}

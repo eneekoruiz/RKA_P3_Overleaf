@@ -1,0 +1,85 @@
+%% ---------- KODEKETA, LETRA-TIPOAK, HIZKUNTZA ----------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{libertine}
+\usepackage{inconsolata}
+\usepackage[basque]{babel}
+\addto\captionsbasque{%
+  \renewcommand{\contentsname}{Gaien aurkibidea}%
+  \renewcommand{\listfigurename}{Irudien aurkibidea}%
+  \renewcommand{\listtablename}{Taulen aurkibidea}%
+  \renewcommand{\bibname}{Bibliografia}%
+  \renewcommand{\figurename}{irudia}%
+  \renewcommand{\tablename}{taula}%
+}
+
+%% ---------- PAKETEAK (beharrezkoak bakarrik: azkar konpilatzen du) ----------
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{booktabs}          % taula txukunak
+\usepackage{tabularx}          % orriaren zabalerara egokitzen diren taulak
+\usepackage{amsmath}
+\usepackage{tikz}              % eskemak
+\usetikzlibrary{babel}         % TikZ eta babel bateragarri egiteko
+\usepackage{subcaption}        % irudi bat baino gehiago batera: (a), (b)
+\usepackage[font=small,labelfont=bf]{caption}
+\usepackage{float}             % [H] kokapen zorrotza
+\usepackage{listings}          % kodea (minted ez bezala, ez du shell-escape behar)
+\usepackage{enumitem}          % zerrenden tarteak doi kontrolatzeko
+\usepackage{needspace}         % atalak orriaren amaieran bakarrik ez geratzeko
+\usepackage[hyperindex,bookmarks,colorlinks=true,citecolor=blue,urlcolor=blue,linkcolor=blue]{hyperref}
+
+\graphicspath{{irudiak/}}
+\setsecnumdepth{subsection}
+\maxtocdepth{subsection}
+\nouppercaseheads
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{3em}   % kode-izen luzeek lerroa ez gainditzeko
+
+%% Orri-jauzien eta umezurtzen (widows/orphans) kontrol zorrotza
+\widowpenalty=10000
+\clubpenalty=10000
+\displaywidowpenalty=10000
+\brokenpenalty=10000
+\raggedbottom
+
+%% Elementu mugikorren (flotanteen) doikuntzak
+\renewcommand{\topfraction}{0.85}
+\renewcommand{\bottomfraction}{0.85}
+\renewcommand{\textfraction}{0.15}
+\renewcommand{\floatpagefraction}{0.7}
+
+%% Oinen formatua euskaraz: "2.1. irudia", "3.1. taula", "3.1. kode-zatia"
+\DeclareCaptionLabelFormat{euskaraz}{#2.~#1}
+\captionsetup{labelformat=euskaraz}
+\captionsetup[sub]{labelformat=parens}
+
+%% ---------- KODE-BLOKEAK ----------
+\definecolor{kodehondoa}{gray}{0.96}
+\definecolor{kodeiruzkina}{rgb}{0.25,0.5,0.25}
+\lstset{
+  language=Python, basicstyle=\ttfamily\footnotesize, backgroundcolor=\color{kodehondoa},
+  commentstyle=\color{kodeiruzkina}, keywordstyle=\color{blue!60!black},
+  numbers=left, numberstyle=\tiny\color{gray}, numbersep=6pt,
+  frame=single, rulecolor=\color{gray!40}, breaklines=true, tabsize=4, showstringspaces=false,
+  captionpos=t, xleftmargin=1.2em, framexleftmargin=1.2em,
+  inputencoding=utf8, extendedchars=true,
+  literate={á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1 {ñ}{{\~n}}1
+           {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1 {Ñ}{{\~N}}1 {ü}{{\"u}}1
+}
+\renewcommand{\lstlistingname}{kode-zatia}
+
+%% ---------- BETETZEKO LAGUNTZAK ----------
+% \bete{testua}: zuek idatzi beharrekoa (grisez). Ezabatu idatzi ondoren.
+\newcommand{\bete}[1]{{\color{gray}[#1]}}
+% \egiaztatu{balioa}: zuen kodearekin edo datuekin bat datorren egiaztatu (laranjaz).
+\definecolor{egiaztatukolorea}{rgb}{0.85,0.42,0}
+\newcommand{\egiaztatu}[1]{{\color{egiaztatukolorea}#1}}
+% \irudihutsa{oina}{etiketa}{zer jarri}: irudi hutsa. Ordezkatu laukia
+% \includegraphics[width=.8\textwidth]{fitxategia} komandoarekin (fitxategia irudiak/ karpetan).
+\newcommand{\irudihutsa}[3]{%
+  \begin{figure}[htbp]\centering
+    \fbox{\parbox[c][5.5cm][c]{.8\textwidth}{\centering\color{gray}[#3]}}
+    \caption{#1}\label{#2}
+  \end{figure}}
