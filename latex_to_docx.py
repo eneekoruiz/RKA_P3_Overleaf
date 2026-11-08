@@ -10,9 +10,7 @@ from docx.oxml.ns import nsdecls
 DRIVE_DIR = Path(r"G:\Mi unidad\Borrar - Dualismo filosófico - Eneko\Espiritualismo\Estudios\Euskal Herriko Unibertsitatea\Compartido Eneko\4. Kurtsoa\4. Kurtsoa 1. Lauhilekoa\RKA\rka_6\3. Proiektua")
 BASE_DIR = Path(__file__).resolve().parent
 
-OUTPUT_DOCX_PARALLEL = DRIVE_DIR / "Praktika_Txostena_RKA_P3_berrikusia.docx"
 OUTPUT_DOCX_MAIN = DRIVE_DIR / "Praktika_Txostena_RKA_P3.docx"
-LOCAL_DOCX_PARALLEL = BASE_DIR / "Praktika_Txostena_RKA_P3_berrikusia.docx"
 LOCAL_DOCX_MAIN = BASE_DIR / "Praktika_Txostena_RKA_P3.docx"
 
 REFS = {
@@ -705,26 +703,24 @@ def build_document():
         content = f_path.read_text(encoding="utf-8")
         parse_chapter_content(doc, content)
 
-    # Save to both local destinations
-    for loc_p in [LOCAL_DOCX_PARALLEL, LOCAL_DOCX_MAIN]:
-        if loc_p.exists():
-            try:
-                loc_p.unlink()
-            except Exception:
-                pass
-        doc.save(str(loc_p))
-        print(f"[OK] Guardado localmente: {loc_p.name}")
+    # Save to local destination
+    if LOCAL_DOCX_MAIN.exists():
+        try:
+            LOCAL_DOCX_MAIN.unlink()
+        except Exception:
+            pass
+    doc.save(str(LOCAL_DOCX_MAIN))
+    print(f"[OK] Guardado localmente: {LOCAL_DOCX_MAIN.name}")
 
     # Save to Google Drive
     if DRIVE_DIR.exists():
-        for drive_p in [OUTPUT_DOCX_PARALLEL, OUTPUT_DOCX_MAIN]:
-            try:
-                if drive_p.exists():
-                    drive_p.unlink()
-            except Exception:
-                pass
-            doc.save(str(drive_p))
-            print(f"[OK] Guardado en Google Drive: {drive_p.name}")
+        try:
+            if OUTPUT_DOCX_MAIN.exists():
+                OUTPUT_DOCX_MAIN.unlink()
+        except Exception:
+            pass
+        doc.save(str(OUTPUT_DOCX_MAIN))
+        print(f"[OK] Guardado en Google Drive: {OUTPUT_DOCX_MAIN.name}")
     else:
         print(f"[ALERTA] No se encontro la carpeta de Drive: {DRIVE_DIR}")
 
