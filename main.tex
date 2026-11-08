@@ -18,9 +18,9 @@
 \newcommand{\ikasketak}{Informatika Ingeniaritzako Gradua}
 \newcommand{\irakasgaia}{Robotika eta Kontrol Adimendunak}
 \newcommand{\irakaslea}{Elena Lazkano}
-\newcommand{\izenburua}{Oztopoak ekiditen eta errepideari jarraitzen}
-\newcommand{\azpititulua}{Sentsoreen funtzionamendua lantzen: ROSMASTER X3 robotarekin egindako praktika}
-\newcommand{\data}{2026ko azaroaren 6a}
+\newcommand{\izenburua}{3. Proiektua}
+\newcommand{\azpititulua}{\bete{Praktikaren izenburua edo azpititulua}}
+\newcommand{\data}{2026ko azaroa}
 
 \input config/makroak
 
@@ -45,34 +45,25 @@
   \tableofcontents
 \end{KeepFromToc}
 \clearpage
-\begingroup
-\listoffigures
-\vspace{2\baselineskip}
-\let\clearpage\relax
-\let\cleardoublepage\relax
-\let\chapter\section
-\listoftables
-\endgroup
 
 %% ---------- EDUKIA ----------
-\clearpage
 \mainmatter
 \pagestyle{ruled}
 
 \chapter{Sarrera}\label{ch:sarrera}
 \input kapituluak/01_sarrera
 
-\chapter{Oztopoak ekiditen}\label{ch:oztopoak}
-\input kapituluak/02_oztopoak
+\chapter{Metodologia eta Garapena}\label{ch:garapena}
+\input kapituluak/02_garapena
 
-\chapter{Errepideari jarraitzen}\label{ch:errepidea}
-\input kapituluak/03_errepidea
+\chapter{Emaitzak eta Ebaluazioa}\label{ch:emaitzak}
+\input kapituluak/03_emaitzak
 
 \chapter{Ondorioak}\label{ch:ondorioak}
 \input kapituluak/04_ondorioak
 
 \appendix
-\chapter{Proba osagarriak}\label{ch:eranskina}
+\chapter{Eranskina}\label{ch:eranskina}
 \input kapituluak/05_eranskina
 
 \end{document}

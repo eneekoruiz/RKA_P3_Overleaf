@@ -661,7 +661,7 @@ def build_document():
     p_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p_title.paragraph_format.space_before = Pt(12)
     p_title.paragraph_format.space_after = Pt(4)
-    r_title = p_title.add_run("Oztopoak ekiditen eta errepideari jarraitzen")
+    r_title = p_title.add_run("3. Proiektua")
     r_title.bold = True
     r_title.font.name = "Calibri"
     r_title.font.size = Pt(22)
@@ -671,7 +671,7 @@ def build_document():
     p_sub = doc.add_paragraph()
     p_sub.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p_sub.paragraph_format.space_after = Pt(14)
-    r_sub = p_sub.add_run("Sentsoreen funtzionamendua lantzen: ROSMASTER X3 robotarekin egindako praktika")
+    r_sub = p_sub.add_run("Praktikaren txostena")
     r_sub.italic = True
     r_sub.font.size = Pt(12)
     r_sub.font.color.rgb = RGBColor(71, 85, 105)
@@ -690,10 +690,10 @@ def build_document():
 
     chapters = [
         ("1. Sarrera", "01_sarrera.tex"),
-        ("2. Oztopoak ekiditen (LiDAR)", "02_oztopoak.tex"),
-        ("3. Errepideari jarraitzen (Kamera)", "03_errepidea.tex"),
+        ("2. Metodologia eta Garapena", "02_garapena.tex"),
+        ("3. Emaitzak eta Ebaluazioa", "03_emaitzak.tex"),
         ("4. Ondorioak", "04_ondorioak.tex"),
-        ("5. Eranskina: Proba osagarriak eta biltegia", "05_eranskina.tex"),
+        ("5. Eranskina", "05_eranskina.tex"),
     ]
 
     for ch_title, filename in chapters:

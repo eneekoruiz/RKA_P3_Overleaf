@@ -26,6 +26,7 @@ IGNORE_NAMES = {
     "overleaf_client.py",
     "sync.ps1",
     "__pycache__",
+    "overleaf_downloaded.pdf",
 }
 
 
@@ -190,7 +191,7 @@ def push(targets: list[str]):
     else:
         files = []
         for p in ROOT_DIR.rglob("*"):
-            if p.is_file() and not any(part in IGNORE_NAMES for part in p.relative_to(ROOT_DIR).parts):
+            if p.is_file() and not any(part in IGNORE_NAMES for part in p.relative_to(ROOT_DIR).parts) and not p.name.endswith(('.docx', '.pdf')):
                 files.append(p)
     for f in files:
         upload_file(cookie_header, csrf, root_folder, f)
