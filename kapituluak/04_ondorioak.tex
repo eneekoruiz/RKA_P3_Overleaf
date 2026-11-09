@@ -1,22 +1,21 @@
-Txosten honetan mugikorreko robot baten bidez paretari jarraitzeko kontrol-estrategia garatu, inplementatu eta ebaluatu dugu Gazebo simulatzailean.
+Txosten honetan paretari laser bidezko erregresio linealarekin eta PID kontrolagailuarekin jarraitzeko estrategia osoa garatu, inplementatu eta ebaluatu dugu.
 
 \needspace{6\baselineskip}
-\section{Lorpen nagusiak}\label{sec:lorpenak}
-Esperimentuen bidez ondorio hauek atera ditugu:
+\section{Lortutako ondorio nagusiak}\label{sec:ondorio-nagusiak}
+Esperimentuen bidez ondorio tekniko hauek atera ditugu:
 \begin{itemize}[leftmargin=2em, itemsep=0.3em]
-  \item \textbf{Erregresio linealaren sendotasuna}: LiDAR neurketak polarretik kartesiarrera igarota eta karratu txikienen metodoa aplikatuz, paretaren orientazioa fidagarritasun handiz kalkulatzea lortu da, neurketa indibidualen zarata eta akats puntualak iragaziz.
-  \item \textbf{P kontrolaren mugak}: Kontrol proportzional hutsak oinarrizko ibilbidea bermatzen duen arren, ezin du aldi berean oszilaziorik eza eta kurbetako errore estatikoaren ezabapena lortu.
-  \item \textbf{PID erregulazioaren eraginkortasuna}: Osagai integrala eta deribatua gehitzean, sistemaren erantzuna errotik hobetzen da: integralak paretarekiko distantzia-desbideratzea murrizten du, eta deribatuak inertziaren eraginez sortzen diren oszilazioak leuntzen ditu.
-  \item \textbf{Abiadura egokitua}: Abiadura lineala biraketa-angeluaren arabera modulatzeak kurbetan irristatzea eta erreferentzia-galerak saihesten lagundu du.
+  \item \textbf{P kontrola nahikoa da pareta zuzenetan}: 1. aldaerak (P hutsa) du paralelotasunik onena ($|\theta|$ mediana $0{,}40^\circ$), robotaren orientazioaren dinamika integratzailea delako ($\dot\theta = -\omega$) eta perturbazio konstante ezean ez dagoelako errore iraunkorrik.
+  \item \textbf{$K_i$ eta $K_d$ osagaiek kostua dute}: Osagai integralak perturbazio iraunkorrak ezabatzen ditu, eta deribatuak gainbultzada murrizten du $K_p$ handiekin. Hala ere, perturbazio kanpokorik ez dagoenean, integralak biraketetan energia metatu eta zuzenetako paralelotasuna kaskartzen du; deribatuak, berriz, sentsorearen zarata anplifikatzen du.
+  \item \textbf{Abiadura moteltzeak izkinak errazten ditu}: $K_p = 0{,}6$ eta $v_0 = 0{,}2\text{ m/s}$-rekin robotak talka egiten du hirugarren izkinan $k_v = 0$ denean; $k_v = 2$ erabilita, aldiz, izkina guztiak arrakastaz gainditzen ditu. Gainera, 3. aldaerak bide luzeagoa egiten du denbora berean ($41{,}7\text{ m}$ vs $24{,}0\text{ m}$).
+  \item \textbf{$d_{\max}$ parametroak finkatzen du distantzia}: Distantzia-kontrolik gabeko arkitektura garbian (HIPER-KISS), laserrak atzematen dituen puntuen $d_{\max}$ mugak definitzen du robotaren lerrokatze-distantzia: $D \approx d_{\max} - 0{,}25\text{ m}$.
 \end{itemize}
 
 \needspace{6\baselineskip}
-\section{Etorkizuneko lan-ildoak}\label{sec:etorkizuna}
-Lan honek oinarri sendoa eskaintzen du etorkizuneko ikerketa eta garapenetarako:
+\section{Gazeboko mundurako gomendioak}\label{sec:gomendioak}
+Simulatzaile zinematikoak marruskadurarik gabeko erreferentzia garbia eskaintzen du. Gazeboko \texttt{yahboom\_track} zirkuituan neurketak egiterakoan, alderdi hauek hartu beharko dira kontuan:
 \begin{enumerate}[leftmargin=2em, itemsep=0.3em]
-  \item \textbf{Sentsore-fusioa}: LiDAR bidezko pareta-jarraipena eta aurreko praktikan garatutako ikusmen bidezko errepide-jarraipena (kameraren segmentazioa) bateratzea, robotak paretarik gabeko eremuetan ere bideari euts diezaion.
-  \item \textbf{Filtro moldagarriak}: Kalman iragazki baten bidez robotaren odometria eta LiDAR neurketak konbinatzea, posizio- eta orientazio-estimazio zehatzagoa lortzeko zarata handiko inguruneetan.
-  \item \textbf{Sistema errealean egiaztatzea}: Simulatzailean lortutako parametro optimoak ROSMASTER X3 robot errealean probatzea, motorren marruskadura eta sentsore errealaren atzerapenak ebaluatuz.
-  \item \textbf{Gainazal irregularren tratamendua}: Erregresio linealaz gain RANSAC algoritmoa txertatzea, paretan irtenguneak edo zutabeak daudenean lerro zuzena fidagarriago identifikatzeko.
-  \item \textbf{Bateriaren eta erantzun-denboraren kudeaketa}: Kontrol-begiztaren exekuzio-maiztasuna ($10\text{ Hz}$ vs $20\text{ Hz}$) doitzea prozesadorearen karga eta energia-kontsumoa optimizatzeko.
+  \item \textbf{Laginketa-periodoa}: \texttt{ros2 topic hz /scan} aginduaren bidez benetako $T$ egiaztatzea, $K_p \le \frac{1}{4T}$ egonkortasun-muga teorikoa berresteko.
+  \item \textbf{Laserraren sektorea}: Lehenengo mezuan inprimatutako angelu-tartea aztertzea, $[-90^\circ, 0^\circ]$ eskuineko paretari dagokiola bermatzeko.
+  \item \textbf{Errepidearen gaineko kokapena}: Errepidearen eta paretaren arteko $D_{\text{bidea}}$ distantzia neurtu ondoren, $d_{\max} \approx D_{\text{bidea}} + 0{,}25\text{ m}$ doitzea robota asfaltoaren erditik gidatzeko.
+  \item \textbf{Aldaera onenaren aukeraketa}: Azken aukeraketa Gazebon bildutako CSV telemetriarekin eta \texttt{wf\_plot.py} bidez lortutako taularekin egingo da.
 \end{enumerate}

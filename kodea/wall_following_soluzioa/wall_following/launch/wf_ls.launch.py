@@ -1,41 +1,41 @@
-import os
-from ament_index_python.packages import get_package_share_directory
-from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
-from launch.substitutions import TextSubstitution, LaunchConfiguration
-from launch.launch_description_sources import PythonLaunchDescriptionSource
+# -*- coding: utf-8 -*-
+"""
+wall_follow_ls nodoa abiarazten du. Parametro guztiak komando-lerrotik alda daitezke:
 
+    ros2 launch wall_following wf_ls.launch.py kp:=2.0 ki:=0.05 kd:=0.1 v0:=0.2 kv:=0.0 d_max:=1.2
+"""
+from launch import LaunchDescription
+from launch.actions import DeclareLaunchArgument
+from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
-import os
+from launch_ros.parameter_descriptions import ParameterValue
+
+# Parametroen izenak eta balio lehenetsiak
+ARGUMENTUAK = {
+    'kp': '1.5',    # Irabazi proportzionala
+    'ki': '0.0',    # Irabazi integrala
+    'kd': '0.0',    # Irabazi deribatiboa
+    'v0': '0.2',    # Oinarrizko abiadura lineala (m/s)
+    'kv': '0.0',    # Biraketetan moteltzeko irabazia (0: abiadura konstantea)
+    'd_max': '1.2', # Irakurketa motzen muga (m); robotaren paretarako distantzia finkatzen du
+}
 
 
 def generate_launch_description():
-    kp_arg = DeclareLaunchArgument(
-        "kp", default_value=TextSubstitution(text="1.5")
-    )
-    ki_arg = DeclareLaunchArgument(
-        "ki", default_value=TextSubstitution(text="0.0")
-    )
-    kd_arg = DeclareLaunchArgument(
-        "kd", default_value=TextSubstitution(text="0.0")
-    )
+    # value_type=float: horrela "kp:=1" bezalako balio osoek ere balio dute
+    parametroak = {izena: ParameterValue(LaunchConfiguration(izena), value_type=float)
+                   for izena in ARGUMENTUAK}
+    parametroak['lidar_type'] = 's2'    # Aukerak: a1, s2, turtle
 
     wall_following_node = Node(
-        package="wall_following",
-		executable="wall_follow_ls",
+        package='wall_following',
+        executable='wall_follow_ls',
         name='wall_follow_ls',
-		parameters = [
-            {"kp": LaunchConfiguration('kp')},
-            {"ki": LaunchConfiguration('ki')},
-            {"kd": LaunchConfiguration('kd')},
-            {"lidar_type": "s2"}, # Options: a1, s2, turtle
-            ],
-        output = "screen"
+        parameters=[parametroak],
+        output='screen',
     )
 
-    return LaunchDescription([
-        kp_arg,
-        ki_arg,
-        kd_arg, 
-        wall_following_node,
-    ])
+    return LaunchDescription(
+        [DeclareLaunchArgument(izena, default_value=balioa)
+         for izena, balioa in ARGUMENTUAK.items()] + [wall_following_node]
+    )

@@ -1,56 +1,61 @@
-Kapitulu honetan paretari modu autonomoan jarraitzeko diseinatutako arkitektura teknikoa xehatzen da. Sistemak sentsore-mailako datu gordinak tratatu, informazio geometrikoa erauzi eta atzeraelikadurazko kontrol-begizta baten bidez eragingailuei abiadura-agindu egokiak bidaltzen dizkie.
+Kapitulu honetan paretari paraleloki jarraitzeko diseinatutako kontrol-arkitektura xehatzen da: LiDAR neurketen proiekzio kartesiarra, karratu txikienen bidezko erregresio lineala, kontrol proportzionalaren egonkortasun-azterketa eta PID algoritmo diskretu osoa.
 
 \needspace{6\baselineskip}
-\section[LiDAR neurketak eta proiekzioa]{LiDAR neurketen hautaketa eta proiekzio geometrikoa}\label{sec:proiekzioa}
-Robotak gainean duen LiDAR sentsoreak $360^\circ$-ko distantzia-irakurketak eskaintzen ditu polarrean. Paretari jarraitzeko, eskuinaldean dauden izpiak bakarrik interesatzen zaizkigu. Robotaren mugimendu-ardatza $+x$ aurrerantz eta $+y$ ezkerrerantz definituta egonik, eskuineko angeluak negatiboak dira:
-\begin{equation}\label{eq:sektorea}
-  \alpha_i \in [-2{,}18\text{ rad},\ -0{,}52\text{ rad}] \quad (\approx [-125^\circ,\ -30^\circ]).
-\end{equation}
-Zirkuituaren zabalera kontuan hartuz, $d_i < 1{,}80\text{ m}$ baldintza betetzen duten puntuak bakarrik hartzen ditugu, beste aldeko paretak edo urrutiko elementuak baztertzeko. Ondoren, neurketa bakoitzari dagokion proiekzio kartesiarra kalkulatzen da:
+\section[LiDAR neurketak eta proiekzioa]{LiDAR neurketak eta proiekzio kartesiarra}\label{sec:proiekzioa}
+Robotaren erreferentzia-sisteman, $+X$ ardatza aurrerantz doa eta $+Y$ ardatza ezkerrerantz. Sentsoreak ematen dituen izpien artean, eskuin-aurreko koadrantea hautatzen dugu: $\beta_i \in [-90^\circ, 0^\circ]$ (hots, $[-\pi/2, 0]\text{ rad}$) eta distantzia $d_i < d_{\max}$ duten neurketak. Irakurketa polar bakoitza robotaren plano lokaleko puntu kartesiar bihurtzen da:
 \begin{equation}\label{eq:kartesiarra}
-  x_i = d_i \cdot \cos(\alpha_i), \qquad y_i = d_i \cdot \sin(\alpha_i).
+  x_i = d_i \cdot \cos(\beta_i), \qquad y_i = d_i \cdot \sin(\beta_i).
 \end{equation}
+Sektorea aurrerantz $0^\circ$-raino zabaltzeak berebiziko garrantzia du: paretak izkina egiten duenean, aurrealdeko pareta $d_{\max}$ erradioan sartzen da, puntuek ``L'' itxura hartzen dute eta erregresioak berehala malda positiboa ematen du, robota talka egin aurretik ezkerrerantz biraraziz. Sektorea $-30^\circ$-ra mugatuz gero, robotak berandu ikusten du izkina eta talka ezinbestekoa gertatzen da $K_p \le 3$ balio guztiekin.
 
 \needspace{6\baselineskip}
-\section[Erregresio lineala eta angelua]{Erregresio lineala eta paretaren angeluaren estimazioa}\label{sec:erregresioa}
-Proiektatutako $(x_i, y_i)$ puntuekin karratu txikienen bidezko erregresio lineala aplikatzen da \texttt{numpy.polyfit} funtzioaren bidez:
+\section[Erregresio lineala eta angelua]{Erregresio lineala eta paretaren angelua}\label{sec:erregresioa}
+Proiektatutako $(x_i, y_i)$ puntuekin lehen mailako karratu txikienen erregresioa aplikatzen da \texttt{numpy.polyfit} funtzioaren bidez:
 \begin{equation}\label{eq:zuzena}
-  y(x) = c_1 \cdot x + c_0.
+  y = c_1 \cdot x + c_0.
 \end{equation}
-Ekuazio honetan $c_1 = \frac{\Delta y}{\Delta x}$ zuzenaren malda da, eta $c_0$ ordenatua jatorrian. Malda horretatik abiatuta, robotaren orientazioaren eta paretaren arteko angelua zuzenean kalkulatzen da:
+Hemen $c_1$ paretaren malda da, eta $c_0$ ordenatua jatorrian. Maldaren arkutangenteak robotaren eta paretaren arteko $\theta$ orientazio-angelua ematen du:
 \begin{equation}\label{eq:theta}
-  \theta = \arctan(c_1).
+  \theta = \arctan(c_1), \qquad \theta_{\text{desiatua}} = 0{,}0, \qquad e = \theta - \theta_{\text{desiatua}} = \theta.
 \end{equation}
-Paretarekiko mugimendu paraleloa lortzeko desiatutako balioa $\theta_{\text{desiatua}} = 0{,}0\text{ rad}$ da. Gainera, paretarainoko distantzia perpendikularra puntu baten eta zuzen baten arteko distantziaren formularen bidez lortzen da:
-\begin{equation}\label{eq:dist}
-  d_{\text{pareta}} = \frac{|c_0|}{\sqrt{1 + c_1^2}} \approx |c_0|.
-\end{equation}
+Pareta guztiz paraleloa bada, $c_1 = 0$ eta $\theta = 0$. Robota paretara hurbiltzen ari bada, aurrerago dauden puntuek $y$ balio handiagoa dute, $c_1 > 0$ eta $\theta > 0$ sortuz, eta $\omega > 0$ aginduak ezkerrera birarazten du. Metodo honek $(-\pi/2, +\pi/2)$ tartea estaltzen du, nahikoa dena erabilera arruntean $\theta$ ez baita $64^\circ$-tik pasatzen.
 
 \needspace{6\baselineskip}
-\section{Kontrol Proportzionala (P kontrola)}\label{sec:kontrol-p}
-Lehenengo fasean, kontrol proportzional hutsa ezartzen da. Errore angeluarra $e(t) = \theta(t) - \theta_{\text{desiatua}} = \theta(t)$ izanik, biraketa-abiadura kalkulatzen da:
-\begin{equation}\label{eq:p-kontrola}
-  \omega(t) = K_p \cdot e(t).
+\section[Kontrol Proportzionala]{Kontrol Proportzionala eta erantzun dinamikoa}\label{sec:kontrol-p}
+P kontrol hutsean biraketa-abiadura errorekiko proportzionala da zuzenean: $\omega = K_p \cdot e = K_p \cdot \theta$. Pareta zuzenean robotaren biraketak $\theta$ zuzenean aldatzen duenez ($\dot\theta = -\omega$), lehen mailako sistema dinamikoa dugu:
+\begin{equation}\label{eq:dinamika-p}
+  \dot\theta(t) = -K_p \cdot \theta(t) \;\implies\; \theta(t) = \theta_0 \cdot e^{-K_p t}, \qquad \tau = \frac{1}{K_p}.
 \end{equation}
-Robotak paretarantz jotzen duenean ($\theta > 0$), $\omega > 0$ aplikatzen da ezkerrerantz biratzeko; aitzitik, paretatik urruntzen denean ($\theta < 0$), $\omega < 0$ aplikatzen da eskuinerantz biratzeko.
+Hala ere, kontrol-agindua lagin bat beranduago gauzatzen denez kontrolagailu diskretuan ($T$ laginketa-periodoarekin), sistema diskretua ondorengo ekuazioak gidatzen du:
+\begin{equation}\label{eq:p-diskretua}
+  \theta_{k+1} = \theta_k - T K_p \theta_{k-1} \;\implies\; z^2 - z + T K_p = 0.
+\end{equation}
+Polinomio bereizgarriak bi muga teoriko zorrotz ezartzen ditu $T = 0{,}1\text{ s}$ denean:
+\begin{itemize}[leftmargin=2em, itemsep=0.3em]
+  \item \textbf{Oszilaziorik gabeko muga}: Erro errealak izateko diskriminanteak positiboa izan behar du: $1 - 4 T K_p \ge 0 \implies K_p \le \frac{1}{4T} = 2{,}5$.
+  \item \textbf{Egonkortasun absolutua}: Erroak unitate-zirkunferentziaren barruan egoteko: $T K_p < 1 \implies K_p < \frac{1}{T} = 10$.
+\end{itemize}
+Praktikan, gainbultzada $K_p = 3$-tik aurrera hazten da, eta $K_p = 12$-rekin sistema erabat ez-egonkor bihurtzen da.
 
 \needspace{6\baselineskip}
-\section{PID kontrolagailu osoaren formulazioa}\label{sec:kontrol-pid}
-Kontrol proportzional hutsak errore estatikoa eta inertziaren ondoriozko oszilazioak sor ditzakeenez, kontrolagailua zabaltzen da osagai integrala ($K_i$) eta deribatua ($K_d$) gehituz:
+\section[Abiadura lineala]{Abiadura lineala: konstantea eta moldatua}\label{sec:abiadura}
+Enuntziatuak eskatutako bi abiadura-legeak formula bakar baten bidez orokortu ditugu:
+\begin{equation}\label{eq:abiadura-legea}
+  v = \frac{v_0}{1 + k_v \cdot |\omega|}.
+\end{equation}
+$k_v = 0$ denean, abiadura konstantea da ($v = v_0$). $k_v > 0$ denean, abiadura $|\omega|$ biraketa-abiadurarekiko alderantziz proportzionala da. Biraketa-erradioa $R = v / |\omega|$ denez, biraketetan moteltzeak biraketa-erradioa murrizten du, robotak izkinak leunago hartzea ahalbidetuz eta $K_p$-ren beheko muga murriztuz.
+
+\needspace{6\baselineskip}
+\section[PID formulazio diskretua]{PID kontrolagailu osoaren formulazio diskretua}\label{sec:pid-garapena}
+Planta integratzaile bati osagai integrala ($K_i$) eta deribatua ($K_d$) gehituz, irteerako agindua honela kalkulatzen da:
 \begin{equation}\label{eq:pid-legea}
-  \omega(t) = K_p \cdot e(t) + K_i \int_0^t e(\tau)\,d\tau + K_d \cdot \frac{de(t)}{dt}.
+  \omega_n = K_p \cdot e_n + K_i \sum_{i=1}^n e_i \Delta t + K_d \frac{e_n - e_{n-1}}{\Delta t}.
 \end{equation}
-Inplementazio diskretuan, $\Delta t$ kontrol-periodoa erabiliz:
-\begin{align}
-  I(t) &= I(t - \Delta t) + e(t)\cdot \Delta t, \label{eq:integral-diskretua} \\
-  D(t) &= \frac{e(t) - e(t - \Delta t)}{\Delta t}. \label{eq:deribatu-diskretua}
-\end{align}
-Integratzailearen gainezkatzea saihesteko (windup efektua), saturazio-muga zorrotza ezarri da ($|I(t)| \le 1{,}0$). Era berean, irteerako biraketa-abiadura $[\omega_{\min}, \omega_{\max}] = [-1{,}50, +1{,}50]\text{ rad/s}$ tartera mugatzen da.
+Inplementazio praktikoan hiru xehetasun nagusik bermatzen dute sendotasuna:
+\begin{enumerate}[leftmargin=2em, itemsep=0.3em]
+  \item $\Delta t$ eskaneoaren denbora-zigilutik (\texttt{scan.header.stamp}) erauzten da zuzenean, simulazioaren denbora erreala errespetatuz.
+  \item Integrala $[-I_{\max}, +I_{\max}] = [-0{,}3, +0{,}3]\text{ rad}\cdot\text{s}$ tartera mugatzen da saturazio bidez (\textit{anti-windup}), kurbetan noranzko bereko biraketetan integrala neurrigabe metatu ez dadin.
+  \item Pareta ikusten ez denean aurreko errorea ahaztu egiten da (\texttt{prev\_error = None}), pareta berriz agertzean deribatu faltsu bortitzik ez sortzeko.
+\end{enumerate}
 
-\needspace{6\baselineskip}
-\section[Abiadura-modulazioa eta segurtasuna]{Abiadura linealaren modulazioa eta aurreko segurtasuna}\label{sec:abiadura-segurtasuna}
-Abiadura lineal konstante bati eusteak kurbetan irristatzea eragin dezake. Hori dela eta, abiadura lineala biraketa-abiadurarekiko alderantziz proportzionala izatea ezarri dugu:
-\begin{equation}\label{eq:v-modulazioa}
-  v(t) = v_{\max} \cdot \left(1 - 0{,}65 \cdot \frac{|\omega(t)|}{\omega_{\max}}\right).
-\end{equation}
-Modu honetan, lerro zuzenetan robotak abiadura handiena lortzen du ($v \approx 0{,}35\text{ m/s}$), eta biraketa zorrotzetan moteldu egiten da ($v \approx 0{,}12\text{ m/s}$) paretaren galerarik ez izateko. Gainera, aurrealdean $[-20^\circ, +20^\circ]$ tartean $0{,}45\text{ m}$ baino hurbilagoko oztoporik detektatzen bada, balaztatze eta ezkerrerako bira larria aktibatzen da aurrez aurreko talkak saihesteko.
+PI sistemaren ekuazio diferentziala $\ddot\theta + K_p \dot\theta + K_i \theta = 0$ da. Maiztasun naturala $\omega_n = \sqrt{K_i}$ eta moteltze-faktorea $\zeta = \frac{K_p}{2\sqrt{K_i}}$ izanik, oszilaziorik ez izateko $K_i \le K_p^2 / 4$ bete behar da ($K_p = 2$ denean, $K_i \le 1$). D osagaiak, aldiz, balaztatze-efektua eragiten du ($\tau = \frac{1 + K_d}{K_p}$), baina sentsore-zarata anplifikatzen duenez, muga diskretua $K_d < 1 - \frac{K_p T}{2} \approx 0{,}9$ da.

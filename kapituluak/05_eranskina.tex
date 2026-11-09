@@ -1,28 +1,43 @@
-Eranskin honetan nodoa martxan jartzeko beharrezko aginduak eta parametro-egiturak zehazten dira.
+Eranskin honetan simulazioa eta nodoak exekutatzeko beharrezko aginduak, telemetria grabatzeko argibideak eta paketearen fitxategi-egitura zehatza aurkezten dira.
 
 \needspace{6\baselineskip}
-\section{Exekuzio-aginduak}\label{sec:exekuzioa}
-Simulazioa eta paretari jarraitzeko nodoa abiarazteko urratsak:
+\section{Exekuzio- eta telemetria-aginduak}\label{sec:exekuzioa}
+Paketea konpilatu eta exekutatzeko urratsak:
 \begin{enumerate}[leftmargin=2em, itemsep=0.3em]
-  \item \textbf{Gazebo simulatzailea abiarazi}:
+  \item \textbf{Paketea konpilatu eta ingurunea kargatu}:
+\begin{verbatim}
+colcon build --packages-select wall_following
+source install/setup.bash
+\end{verbatim}
+  \item \textbf{Gazebo ingurunea abiarazi}:
 \begin{verbatim}
 ros2 launch gazebo_worlds gz_robot.launch.py world:=yahboom_track
 \end{verbatim}
-  \item \textbf{P kontrolagailua exekutatu} ($K_p = 1{,}20$):
+  \item \textbf{Lehen aldaera (P hutsa, abiadura konstantea)}:
 \begin{verbatim}
-ros2 launch wall_following wf_ls.launch.py kp:=1.2 ki:=0.0 kd:=0.0
+ros2 launch wall_following wf_ls.launch.py kp:=1.5 ki:=0.0 kd:=0.0 v0:=0.2 kv:=0.0
 \end{verbatim}
-  \item \textbf{PID kontrolagailu osoa exekutatu} ($K_p = 1{,}10,\ K_i = 0{,}04,\ K_d = 0{,}12$):
+  \item \textbf{Bigarren aldaera (PID, abiadura konstantea)}:
 \begin{verbatim}
-ros2 launch wall_following wf_ls.launch.py kp:=1.1 ki:=0.04 kd:=0.12
+ros2 launch wall_following wf_ls.launch.py kp:=2.0 ki:=0.05 kd:=0.1 v0:=0.2 kv:=0.0
+\end{verbatim}
+  \item \textbf{Hirugarren aldaera (PID, biraketetan moteltzen dena)}:
+\begin{verbatim}
+ros2 launch wall_following wf_ls.launch.py kp:=2.0 ki:=0.05 kd:=0.1 v0:=0.4 kv:=1.0
+\end{verbatim}
+  \item \textbf{Telemetria irudikatu eta taula sortu} (\texttt{Ctrl+C} sakatzean CSV-ak \texttt{results/} karpetan sortzen dira):
+\begin{verbatim}
+python3 wf_plot.py kp results/wf_kp0.60*.csv results/wf_kp1.50*.csv \
+                      results/wf_kp3.00*.csv results/wf_kp8.00*.csv
 \end{verbatim}
 \end{enumerate}
 
 \needspace{6\baselineskip}
-\section{Paketearen fitxategi-egitura}\label{sec:fitxategiak}
-Garatutako soluzioaren fitxategi nagusiak:
+\section[Paketearen katalogoa]{Garatutako paketearen fitxategi-katalogoa}\label{sec:fitxategiak}
+Garatutako irtenbideak fitxategi-egitura garbi eta moduluduna du:
 \begin{itemize}[leftmargin=2em, itemsep=0.3em]
-  \item \texttt{wall\_follow\_ls.py}: Kontrolagailu nagusia, proiekzio polar-kartesiarra, erregresio lineala eta PID algoritmo osoa jasotzen dituena.
-  \item \texttt{wf\_ls.launch.py}: Parametro dinamikoak (\texttt{kp}, \texttt{ki}, \texttt{kd}) komando-lerrotik pasatzeko konfigurazioa.
-  \item \texttt{results/}: Exekuzio bakoitzaren amaieran erroreen bilakaera eta distantziaren telemetria biltzen dituzten grafikoak gordetzen diren direktorioa.
+  \item \texttt{wall\_following/wall\_follow\_ls.py}: ROS 2 nodo nagusia. LiDAR irakurketak polarretik kartesiarrera transformatzen ditu, \texttt{np.polyfit} bidez paretaren $\theta$ kalkulatzen du, PID kontrolagailu osoa aplikatzen du eta telemetria gordetzen du.
+  \item \texttt{launch/wf\_ls.launch.py}: Launch fitxategia, parametro guztiak (\texttt{kp}, \texttt{ki}, \texttt{kd}, \texttt{v0}, \texttt{kv}, \texttt{d\_max}) mota egokian (\texttt{float}) onartzen dituena.
+  \item \texttt{wf\_plot.py}: CSV fitxategiak prozesatu, ibilbideen eta $\theta$ angeluaren grafikoak eraiki eta kontsolan laburpen-taulak kalkulatzen dituen script-a.
+  \item \texttt{pruebas/}: Gazebo gabeko proba-ingurunerako simulagailu zinematikoa (\texttt{fake\_gazebo.py}, \texttt{sim\_core.py}) eta parametro-barrido automatizatuak.
 \end{itemize}

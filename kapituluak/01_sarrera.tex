@@ -1,24 +1,30 @@
-Praktika honen helburu nagusia mugikorreko roboten kontrolerako oinarrizkoa den funtzio anitzen arrastoa eta atzeraelikadura lantzea da. Oraingoan, Gazeboko \texttt{yahboom\_track} zirkuitu simulatuan arituko gara, eta robotak zirkuitua inguratzen duen eskuineko paretari jarraitu beharko dio barrutik, mugimendua paretarekiko paralelo mantenduz eta aldi berean errepidearen gainetik egonkor zirkulatuz.
+Praktika honen helburu nagusia mugikorreko roboten kontrolerako oinarrizkoa den funtzio anitzen arrastoa eta atzeraelikadura lantzea da. Oraingoan, paretari jarraitzea aztertuko dugu laser bidezko erregresio linealarekin eta PID kontrolagailuarekin. Robota eskuineko paretari paraleloki jarraituz higituko da, erregresio bidez kalkulatutako $\theta$ orientazio-angelua $0^\circ$-ra eramanez.
 
 \needspace{6\baselineskip}
 \section{Testuingurua eta motibazioa}\label{sec:testuingurua}
-Robotika mugikorrean, inguruneko egiturak (hala nola paretak, korridoreak edo barandak) erreferentzia gisa hartzea oso ohikoa da ibilbide gidatuak osatzeko. Aurreko praktikan kameraren bidezko bide-jarraipen bisuala aztertu genuen bezala, oraingoan LiDAR sentsoreak ematen duen distantzia-informazio geometrikoa erabiliko dugu. Erronka nagusia da sentsorearen irakurketa gordinetatik abiatuta paretaren orientazio erlatiboa modu sendoan kalkulatzea eta informazio horrekin atzeraelikadurazko kontrol-begizta bat ixtea, gainbultzada edo oszilaziorik gabe.
+Robotika mugikor autonomoan, inguruneko egitura finkoak (hala nola paretak, korridoreak edo mugak) erreferentzia gisa hartzea ezinbesteko estrategia da ibilbide egonkorrak osatzeko. Aurreko praktikan kameraren bidezko bide-jarraipen bisuala aztertu genuen bezala, oraingoan 2D LiDAR sentsoreak ematen duen distantzia-informazio geometrikoa erabiliko dugu. Erronka nagusia da sentsorearen neurketa gordinetatik abiatuta paretaren orientazio erlatiboa modu sendoan estimatzea eta informazio horrekin atzeraelikadurazko kontrol-begizta bat ixtea, talkarik edo oszilaziorik gabe.
 
 \needspace{6\baselineskip}
-\section{Proiektuaren helburuak}\label{sec:helburuak}
-Praktika honetan hiru lorpen tekniko nagusi definitu ditugu Elena Lazkano irakasleak ezarritako gidalerroei jarraituz:
-\begin{enumerate}[leftmargin=2em, itemsep=0.3em]
-  \item \textbf{LiDAR izpien proiekzioa eta erregresio lineala}: Eskuineko laser-izpi hurbilenak hautatzea, koordenatu kartesiarretara bihurtzea eta karratu txikienen bidezko erregresio lineala aplikatzea paretaren maldaren ($\theta$) estimazio fidagarria lortzeko.
-  \item \textbf{Kontrol Proportzionalaren (P) ebaluazioa}: Paretarekiko paralelo egoteko errore angeluarra definitzea ($e = \theta - 0$) eta $K_p$ irabaziaren araberako ibilbidea eta egonkortasuna neurtzea.
-  \item \textbf{PID kontrolagailu osoaren diseinua}: Kontrolatzaileari osagai integrala ($K_i$) eta deribatua ($K_d$) gehitzea, errore estatikoa ezabatzeko, oszilazioak moteltzeko eta muturreko kurbetan erantzun azkarra bermatuz ibilbide leuna lortzeko.
-\end{enumerate}
+\section{Kontrol-estrategia eta printzipioak}\label{sec:estrategia}
+Praktika honetan \textbf{HIPER-KISS} metodologia zorrotza jarraitu dugu: irakasleak eskatutako oinarrizko baliabideak soilik erabili dira, alferrikako abstrakziorik eta mekanismo gehigarririk gabe:
+\begin{itemize}[leftmargin=2em, itemsep=0.3em]
+  \item \textbf{Errore garbia}: Kontrolatzailearen errorea $\theta$ angelua da soilik ($e = \theta - 0{,}0$), helburu bakarra paretarekiko paralelotasuna baita. Ez da distantzia-termino artifizialik sartu kontrol-legean.
+  \item \textbf{Segurtasun-arau frontalik gabe}: Ez da aurrealdeko balaztatze- edo biraketa-salbuespenik programatu; izkinak PID kontrolagailuak berak kudeatzen ditu hautatutako izpi-sektoreari esker.
+  \item \textbf{Izpien sektorea}: Eskuin-aurreko koadrantea hartu da ($-90^\circ$-tik $0^\circ$-ra). Sektorea aurrerantz $0^\circ$-raino iristen denez, aurreko pareta $d_{\max}$ distantziara iristean sartzen da erregresioan, puntuek ``L'' forma hartzen dute, malda positiboa sortzen da eta robotak berez ezkerrera biratzen du izkinetan.
+  \item \textbf{$d_{\max}$ muga}: Irakurketa motzen mugak erabakitzen du zein distantziatan jarraituko dion robotak paretari. Izkina bakoitzean $d_{\max}$ inguruan hasten du biraketa, eta distantzia $D \approx d_{\max} - 0{,}25\text{ m}$-tan egonkortzen da.
+  \item \textbf{Abiadura lineala}: $v = v_0 / (1 + k_v \cdot |\omega|)$ formula aplikatu da. $k_v = 0$ denean abiadura konstantea da; $k_v > 0$ denean, biraketetan moteltzen da.
+\end{itemize}
+
+\needspace{6\baselineskip}
+\section{Emaitzen jatorria}\label{sec:emaitzen-jatorria}
+Txosten honetako taula eta grafiko guztiak ROS 2 Humble nodo errealarekin eta proba-simulagailu zinematiko batekin neurtu dira ($5 \times 3{,}5\text{ m}$-ko pareta laukizuzena, $T = 0{,}1\text{ s}$ laginketa-periodoa). Emaitza hauek azterketa kualitatibo eta kuantitatibo sendoa ahalbidetzen dute, inertzia eta marruskadura konplexurik gabeko erreferentzia garbi gisa. Gazeboko mundu birtualean neurtzean, datuak \texttt{wf\_plot.py} script-aren bidez birsortu ahal izango dira.
 
 \needspace{6\baselineskip}
 \section{Dokumentuaren egitura}\label{sec:egitura}
-Txosten hau hurrengo ataletan egituratzen da lanaren garapena era argi eta ulergarrian aurkezteko:
+Txostena ondorengo ataletan banatzen da:
 \begin{itemize}[leftmargin=2em, itemsep=0.3em]
-  \item \ref{ch:garapena}. kapituluan paretari jarraitzeko garatutako metodologia, LiDAR izpien proiekzio kartesiarra, erregresio-eredua eta PID algoritmoaren inplementazio zehatza aurkezten dira.
-  \item \ref{ch:emaitzak}. kapituluan simulazioan lortutako portaerak, parametro-balioen konparaketa ($K_p$, $K_i$, $K_d$) eta telemetria-grafikak aztertzen dira xehetasunez.
-  \item \ref{ch:ondorioak}. kapituluan kontrol-estrategien abantailak, aurkitutako mugak eta etorkizuneko hobekuntzak laburbiltzen dira.
-  \item Azkenik, \ref{ch:eranskina}. eranskinean simulazioa eta nodoak exekutatzeko agindu zehatzak eta paketearen fitxategi-egitura jasotzen dira.
+  \item \ref{ch:garapena}. kapituluan LiDAR neurketen proiekzio kartesiarra, erregresio lineala, P kontrolaren dinamika diskretua eta PID kontrolagailu osoaren formulazio matematikoa aurkezten dira.
+  \item \ref{ch:emaitzak}. kapituluan parametro-barridoen emaitzak ($K_p$, $K_i$, $K_d$, abiadura-legeak), ibilbide-grafikak eta hiru aldaera nagusien arteko konparaketa zehatza azaltzen dira.
+  \item \ref{ch:ondorioak}. kapituluan lortutako ondorio nagusiak eta Gazeborako gomendio praktikoak laburbiltzen dira.
+  \item \ref{ch:eranskina}. eranskinean simulazio-aginduak eta garatutako fitxategien katalogoa jasotzen dira.
 \end{itemize}

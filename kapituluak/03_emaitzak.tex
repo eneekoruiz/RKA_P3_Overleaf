@@ -1,38 +1,155 @@
-Kapitulu honetan Gazeboko ingurunean egindako esperimentuen emaitzak eta azterketa konparatiboa aurkezten dira, parametro desberdinek robotaren portaeran duten eragina ebaluatuz.
+Kapitulu honetan proba-simulagailu zinematikoan ($5 \times 3{,}5\text{ m}$-ko pareta laukizuzena, $T = 0{,}1\text{ s}$) neurtutako emaitza esperimentalak, parametro-barridoak eta konparaketa-grafikoak aurkezten dira.
 
 \needspace{6\baselineskip}
-\section[P kontrola eta $K_p$ azterketa]{Kontrol Proportzionalaren portaera eta $K_p$ azterketa}\label{sec:emaitzak-p}
-Lehenengo esperimentuetan $K_p$ irabaziaren eragina aztertu dugu, $K_i = 0$ eta $K_d = 0$ mantenduz:
-\begin{itemize}[leftmargin=2em, itemsep=0.3em]
-  \item \textbf{$K_p$ txikia ($K_p < 0{,}60$)}: Sistemak erantzun oso motela du (gain-moteldua). Zuzenetan poliki orientatzen da, baina kurbetara iristean biraketa-abiadura ez da nahikoa paretaren norabide-aldaketari aurre egiteko, eta robotak paretaren erreferentzia gal dezake.
-  \item \textbf{$K_p$ egokia ($0{,}80 \le K_p \le 1{,}40$)}: Robotak ibilbide egonkorra mantentzen du eta kurba nagusiak gainditzen ditu. Dena den, kurbetan errore iraunkor txiki bat agertzen da, P kontrolak beti errore bat behar baitu abiadura angeluarra sortzeko.
-  \item \textbf{$K_p$ handia ($K_p > 2{,}00$)}: Sistema azpi-moteldu bihurtzen da. Erantzun azkarregiaren ondorioz robota eskuin-ezker etengabeko oszilazioetan sartzen da, errepidearen marrak zeharkatuz eta ezegonkortasuna areagotuz.
-\end{itemize}
-
-\needspace{6\baselineskip}
-\section[$K_i$ eta $K_d$ osagaien ekarpena]{Osagai Integralaren ($K_i$) eta Deribatuaren ($K_d$) ekarpena}\label{sec:emaitzak-pid}
-PID egitura osora igarotzean, portaera nabarmen hobetzen da:
-\begin{itemize}[leftmargin=2em, itemsep=0.3em]
-  \item \textbf{Osagai Integrala ($K_i$)}: Kurbetan metatzen den errore iraunkorra ezabatzen du. $K_i = 0{,}05$ balioarekin robota paretarekiko distantzia finkoan kokatzen da zirkuitu osoan zehar. Hala ere, $K_i > 0{,}15$ balio handiekin integratzaileak gehiegi metatzen du eta kurba irtenbideetan gehiegizko biraketak (overshoot) agertzen dira.
-  \item \textbf{Osagai Deribatua ($K_d$)}: Errorearen aldaketa-abiadura neurtuz balaztatze-efektua eragiten du. $K_d = 0{,}10$ balioarekin $K_p$-k sortutako oszilazio bortitzak moteldu egiten dira, kurbetako sarrerak eta irteerak askoz leunagoak bihurtuz.
-\end{itemize}
-
-\needspace{6\baselineskip}
-\section{Konfigurazioen konparaketa}\label{sec:konparaketa}
-Hurrengo taulan laburbiltzen dira probatutako lau konfigurazio nagusien portaera-adierazleak zirkuitu oso batean zehar:
+\section{Kontrol Proportzionalaren ebaluazioa}\label{sec:emaitzak-p}
+Lehen azterketan $K_p$ irabaziaren portaera ebaluatu dugu ($K_i = 0$, $K_d = 0$, $v_0 = 0{,}2\text{ m/s}$). Emaitzak \ref{tab:kp-sweep} taulan laburbiltzen dira.
 
 \begin{table}[htbp]
 \centering\small
-\begin{tabularx}{\textwidth}{lccccX}
+\begin{tabularx}{\textwidth}{rclcccc}
 \toprule
-\textbf{Konfigurazioa} & \textbf{$K_p$} & \textbf{$K_i$} & \textbf{$K_d$} & \textbf{Talkak} & \textbf{Portaeraren deskribapena} \\
+\textbf{$K_p$} & \textbf{Emaitza} & \textbf{$|\theta|$ mediana ($^\circ$)} & \textbf{$\theta_{\min}$ ($^\circ$)} & \textbf{$\omega_{\max}$ (rad/s)} & \textbf{Distantzia $D$ (m)} \\
 \midrule
-1. P ahula     & $0{,}40$ & $0{,}00$ & $0{,}00$ & $1$ & Erantzun motela, kurba itxian talka-arriskua. \\
-2. P arrunta   & $1{,}20$ & $0{,}00$ & $0{,}00$ & $0$ & Zuzenetan egonkorra, kurbetan oszilazio txikiak. \\
-3. PI          & $1{,}00$ & $0{,}05$ & $0{,}00$ & $0$ & Errore estatiko txikia, kurba-irteeran gainbultzada. \\
-4. PID optimoa & $1{,}10$ & $0{,}04$ & $0{,}12$ & $0$ & Oszilaziorik gabeko ibilbide leuna eta zentratua. \\
+$0{,}4$ & Talka 1. izkinan & $0{,}30$ & $-0{,}3$ & $0{,}39$ & --- \\
+$0{,}6$ & Talka 3. izkinan & $1{,}13$ & $-0{,}4$ & $0{,}56$ & --- \\
+$0{,}8$ & Ondo             & $0{,}48$ & $-0{,}7$ & $0{,}67$ & $0{,}68$ \\
+$1{,}0$ & Ondo             & $0{,}37$ & $-1{,}0$ & $0{,}85$ & $0{,}83$ \\
+$1{,}5$ & Ondo             & $0{,}40$ & $-1{,}2$ & $1{,}49$ & $0{,}98$ \\
+$2{,}0$ & Ondo             & $0{,}45$ & $-3{,}1$ & $2{,}03$ & $1{,}04$ \\
+$3{,}0$ & Ondo             & $0{,}61$ & $-3{,}6$ & $3{,}31$ & $1{,}11$ \\
+$5{,}0$ & Gainbultzada     & $0{,}77$ & $-16{,}8$ & $7{,}06$ & $1{,}29$ \\
+$8{,}0$ & Oszilazioa, pareta galdu & $0{,}37$ & $-23{,}4$ & $9{,}25$ & $1{,}44$ \\
+$12{,}0$& Ez-egonkorra     & $0{,}35$ & $-86{,}7$ & $18{,}16$& $1{,}31$ \\
 \bottomrule
 \end{tabularx}
-\caption{Kontrolagailuaren parametroen araberako portaeraren konparaketa.}\label{tab:konparaketa}
+\caption{$K_p$ parametroaren eragina errore angeluarrean, egonkortasunean eta paretarekiko distantzian.}\label{tab:kp-sweep}
 \end{table}
-Lortutako emaitzek erakusten dute PID kontrolagailuak (4. konfigurazioa) oreka ezin hobea eskaintzen duela erantzun-bizitasunaren eta ibilbidearen leuntasunaren artean.
+
+Portaera egokia $0{,}8 \le K_p \le 3{,}0$ tartean kokatzen da, eta doikuntzarik leunena $1{,}0 \le K_p \le 2{,}0$ tartean lortzen da. $K_p \le 0{,}6$ denean biraketa-erradioa handiegia da eta robotak izkinetan talka egiten du; aitzitik, $K_p \ge 5$ denean gainbultzada nabarmen handitzen da, eta $K_p = 8$-rekin robotak pareta galtzen du.
+
+\needspace{6\baselineskip}
+\section{Abiadura-legeen eragina}\label{sec:emaitzak-abiadura}
+Enuntziatuak proposatutako $v = v_0 / (1 + k_v \cdot |\omega|)$ formula probatu da abiadura konstantearekin ($k_v = 0$) eta abiadura modulatuarekin ($k_v = 2$), \ref{tab:abiadura-sweep} taulan ikus daitekeen bezala.
+
+\begin{table}[htbp]
+\centering\small
+\begin{tabularx}{\textwidth}{cccccc}
+\toprule
+\textbf{$K_p$} & \textbf{$v_0$ (m/s)} & \textbf{$k_v$} & \textbf{Emaitza} & \textbf{$|\theta|$ mediana ($^\circ$)} & \textbf{Distantzia $D$ (m)} \\
+\midrule
+$0{,}6$ & $0{,}2$ & $0$ & Talka 3. izkinan & $1{,}13$ & --- \\
+$0{,}6$ & $0{,}2$ & $2$ & Ondo             & $1{,}66$ & $0{,}81$ \\
+$0{,}6$ & $0{,}1$ & $0$ & Ondo             & $0{,}37$ & $0{,}91$ \\
+$0{,}8$ & $0{,}3$ & $0$ & Talka            & $2{,}39$ & --- \\
+$0{,}8$ & $0{,}3$ & $2$ & Ondo             & $1{,}88$ & $0{,}80$ \\
+\bottomrule
+\end{tabularx}
+\caption{Abiadura-legeen konparaketa: konstantea ($k_v = 0$) vs alderantziz proportzionala ($k_v = 2$).}\label{tab:abiadura-sweep}
+\end{table}
+
+Emaitzek argi erakusten dute lege alderantziz proportzionalak $K_p$-ren beheko muga txikitzen duela: izkinetan $\omega$ handia denez, robota moteldu egiten da eta biraketa-erradioa txikitzen da; zuzenetan, berriz, $\omega \approx 0$ denez, $v_0$ abiadura nominalean higitzen da.
+
+\needspace{6\baselineskip}
+\section[Ki eta Kd osagaiak]{Osagai Integrala ($K_i$) eta Deribatua ($K_d$)}\label{sec:emaitzak-pid}
+$K_p = 2$ oinarri hartuta, $K_i$ eta $K_d$ osagaien ekarpena aztertu dugu. \ref{tab:ki-sweep} taulan $K_i$-ren eragina laburbiltzen da ($K_d = 0$, $v_0 = 0{,}2\text{ m/s}$).
+
+\begin{table}[htbp]
+\centering\small
+\begin{tabularx}{\textwidth}{ccccc}
+\toprule
+\textbf{$K_i$} & \textbf{$|\theta|$ mediana ($^\circ$)} & \textbf{$\theta_{\min}$ ($^\circ$)} & \textbf{$\omega_{\max}$ (rad/s)} & \textbf{Distantzia $D$ (m)} \\
+\midrule
+$0{,}00$ & $0{,}45$ & $-3{,}1$ & $2{,}03$ & $1{,}04$ \\
+$0{,}02$ & $0{,}47$ & $-3{,}3$ & $1{,}98$ & $1{,}05$ \\
+$0{,}05$ & $0{,}56$ & $-3{,}7$ & $2{,}28$ & $1{,}07$ \\
+$0{,}10$ & $0{,}76$ & $-4{,}3$ & $2{,}27$ & $1{,}07$ \\
+$0{,}20$ & $1{,}16$ & $-5{,}0$ & $2{,}50$ & $1{,}08$ \\
+$0{,}50$ & $1{,}87$ & $-7{,}0$ & $2{,}90$ & $1{,}13$ \\
+$1{,}00$ & $2{,}27$ & $-10{,}9$& $3{,}04$ & $1{,}15$ \\
+$0{,}05$ (mugarik gabe) & $2{,}60$ & $-11{,}0$ & $2{,}98$ & $1{,}16$ \\
+$0{,}20$ (mugarik gabe) & $3{,}89$ & $-18{,}6$ & $3{,}46$ & $1{,}38$ \\
+\bottomrule
+\end{tabularx}
+\caption{$K_i$ osagaiaren eragina eta saturazio-mugaren ($I_{\max} = 0{,}3$) garrantzia.}\label{tab:ki-sweep}
+\end{table}
+
+Planta integratzailea denez ($\dot\theta = -\omega$), P hutsak ez du errore iraunkorrik sortzen zuzenetan. Ondorioz, $K_i$ handitzeak zuzenetako paralelotasuna okertu egiten du izkinetan pilatutako integrala askatu behar delako gero. Hala ere, $b = 0{,}05\text{ rad/s}$-ko perturbazio konstante baten aurrean, P hutsak $\theta = -1{,}45^\circ$-ko desbideratzea uzten du, eta $K_i = 0{,}2$ balioak erabat ezabatzen du errore iraunkor hori ($0{,}00^\circ$).
+
+\needspace{6\baselineskip}
+Bestalde, \ref{tab:kd-sweep} taulan $K_d$ osagaiaren eragina ageri da ($K_i = 0$). Hemen $\Delta\omega$-k lagin arteko biraketa-abiaduraren batez besteko aldaketa adierazten du.
+
+\begin{table}[htbp]
+\centering\small
+\begin{tabularx}{\textwidth}{ccccc>{\centering\arraybackslash}X}
+\toprule
+\textbf{$K_p$} & \textbf{$K_d$} & \textbf{$|\theta|$ med. ($^\circ$)} & \textbf{$\theta_{\min}$ ($^\circ$)} & \textbf{$\omega_{\max}$ (rad/s)} & \textbf{$\Delta\omega$ (rad/s)} \\
+\midrule
+$2{,}0$ & $0{,}0$ & $0{,}45$ & $-3{,}1$ & $2{,}03$ & $0{,}051$ \\
+$2{,}0$ & $0{,}1$ & $0{,}45$ & $-3{,}1$ & $2{,}49$ & $0{,}078$ \\
+$2{,}0$ & $0{,}3$ & $0{,}51$ & $-3{,}4$ & $3{,}68$ & $0{,}158$ \\
+$2{,}0$ & $0{,}5$ & $0{,}55$ & $-3{,}5$ & $5{,}07$ & $0{,}227$ \\
+$5{,}0$ & $0{,}0$ & $0{,}77$ & $-16{,}8$& $7{,}06$ & $0{,}180$ \\
+$5{,}0$ & $0{,}1$ & $0{,}98$ & $-13{,}9$& $7{,}27$ & $0{,}288$ \\
+$5{,}0$ & $0{,}3$ & $1{,}06$ & $-8{,}7$ & $7{,}71$ & $0{,}340$ \\
+\bottomrule
+\end{tabularx}
+\caption{$K_d$ osagaiaren eragina gainbultzadan eta biraketa-abiaduraren zarataren anplifikazioan.}\label{tab:kd-sweep}
+\end{table}
+
+$K_d$ osagaiak gainbultzada arintzen du $K_p$ handia denean ($K_p = 5$ kasuan $\theta_{\min}$ balioa $-16{,}8^\circ$-tik $-8{,}7^\circ$-ra hobetzen du), baina irakurketen zarata anplifikatzen duenez, balio baxuak hobesten dira ($K_d \le 0{,}3$).
+
+\needspace{6\baselineskip}
+\section{Ibilbideak eta orientazio-angeluak}\label{sec:grafikoak}
+Jarraian, \ref{fig:kp-grafikoak} irudian $K_p$ parametroaren araberako ibilbideak eta $\theta$ angeluaren bilakaera grafikoa aurkezten dira; eta \ref{fig:pid-grafikoak} irudian, berriz, PID konbinazioen portaera osoa.
+
+\begin{figure}[htbp]
+\centering
+\begin{subfigure}[b]{0.48\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{kp_ibilbideak.png}
+  \caption{Ibilbideak ($K_p = 0{,}6$-tik $8$-ra).}\label{fig:kp-ibilbideak}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.48\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{kp_angeluak.png}
+  \caption{$\theta$ angelua denboran zehar.}\label{fig:kp-angeluak}
+\end{subfigure}
+\caption{$K_p$ parametroaren eragina robotaren ibilbidean eta orientazio-angeluan: $K_p = 0{,}6$-k talka egiten du 3. izkinan, eta $K_p = 8$-k pareta galtzen du.}\label{fig:kp-grafikoak}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\begin{subfigure}[b]{0.48\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{pid_ibilbideak.png}
+  \caption{Ibilbideak PID konbinazioetarako.}\label{fig:pid-ibilbideak}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.48\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{pid_angeluak.png}
+  \caption{$\theta$ angelua denboran zehar.}\label{fig:pid-angeluak}
+\end{subfigure}
+\caption{PID kontrolagailuaren konbinazio nagusien portaera konparatua: $K_i$ eta $K_d$ osagaien eragina ibilbidean eta orientazio-angeluan.}\label{fig:pid-grafikoak}
+\end{figure}
+
+\needspace{6\baselineskip}
+\section{Hiru aldaera nagusien arteko konparaketa}\label{sec:aldaerak}
+Esperimentuen amaieran hiru konfigurazio nagusi prestatu eta neurtu dira $120\text{ s}$-ko denbora-leihoan, \ref{tab:aldaerak} taulan ikusten denez.
+
+\begin{table}[htbp]
+\centering\small
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}Xcccc}
+\toprule
+\textbf{Aldaera} & \textbf{Bidea 120\,s (m)} & \textbf{$|\theta|$ med. ($^\circ$)} & \textbf{$\theta_{\min}$ ($^\circ$)} & \textbf{$\Delta\omega$ (rad/s)} \\
+\midrule
+1. P hutsa ($K_p = 1{,}5$)                  & $24{,}0$ & $0{,}40$ & $-1{,}2$ & $0{,}032$ \\
+2. PID, $v$ konstantea ($K_p = 2{,}0$)      & $24{,}0$ & $0{,}56$ & $-3{,}6$ & $0{,}087$ \\
+3. PID, $v$ moteldua ($v_0 = 0{,}4, k_v = 1$) & $41{,}7$ & $0{,}77$ & $-3{,}6$ & $0{,}123$ \\
+\bottomrule
+\end{tabularx}
+\caption{Hiru aldaera nagusien konparaketa integrala.}\label{tab:aldaerak}
+\end{table}
+
+1. aldaerak paralelotasun onena eskaintzen du zuzenetan planta integratzailea delako. 3. aldaerak, aldiz, ia bikoitza den distantzia osatzen du ($41{,}7\text{ m}$) biraketetan motelduz izkinak erraz eta seguru gainditzeko gaitasunari esker.
