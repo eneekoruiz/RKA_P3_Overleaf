@@ -1,231 +1,226 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Robotika eta Kontrol Adimendunak. 3. praktika: paretari jarraitzea.
 
-Robotak eskuineko paretari jarraitzen dio, bere mugimendua paretarekiko
-paraleloa mantenduz. Ideia nagusia:
-
-    1. Eskuineko izpien proiekzio kartesiarra:  xi = di*cos(bi),  yi = di*sin(bi)
-    2. Paretaren zuzena erregresioz:            y = c0 + c1*x
-    3. Robotaren eta paretaren arteko angelua:  theta = arctan(c1)
-    4. Errorea:                                 e = theta - 0
-    5. PID diskretua:     w = Kp*e + Ki*batura(e*dt) + Kd*(e - e_aurrekoa)/dt
-    6. Abiadura lineala:  v = v0 / (1 + kv*|w|)   (kv=0 denean, konstantea)
-
-Egileak: Eneko Ruiz, Eneko Pardavila, Omar Ouinas
-Irakaslea: Elena Lazkano (UPV/EHU)
-"""
-
-import csv
-import math as m
-import os
-import signal
-from datetime import datetime
-
-import matplotlib.pyplot as plt
-import numpy as np
 import rclpy
-from geometry_msgs.msg import Twist
-from nav_msgs.msg import Odometry
 from rclpy.node import Node
+
 from sensor_msgs.msg import LaserScan
-
-# Paretako puntuak hautatzeko sektorea: eskuin-aurreko koadrantea (ikus enuntziatuaren
-# 1. irudia). Robotaren erreferentzian 0 = aurrera eta -90 gradu = eskuina. Aurrerantz
-# 0 graduraino iristen denez, aurreko pareta garaiz ikusten da eta izkina PID hutsarekin
-# hartzen da, beste mekanismorik gabe.
-SEKTORE_MIN = m.radians(-90.0)
-SEKTORE_MAX = m.radians(0.0)
-
-# Integralaren muga (anti-windup), rad*s-tan. Izkina guztietan errorea zeinu berekoa
-# denez, mugarik gabe integrala pilatu egiten da eta zuzenetan paralelotasuna galtzen da.
-I_MAX = 0.3
-
+from geometry_msgs.msg import Twist
+import numpy as np
+import math as m
+import matplotlib.pyplot as plt
+import os
+from datetime import datetime
 
 class Robot(Node):
     def __init__(self):
         super().__init__('wall_following_node')
-        # Kontrolaren parametroak: launch fitxategitik jasotzen dira
+        # kp, ki, kd value to use in the execution
         self.declare_parameters(
             namespace='',
             parameters=[
-                ('kp', 1.5),            # Irabazi proportzionala
-                ('ki', 0.0),            # Irabazi integrala
-                ('kd', 0.0),            # Irabazi deribatiboa
-                ('v0', 0.2),            # Oinarrizko abiadura lineala (m/s)
-                ('kv', 0.0),            # Biraketetan moteltzeko irabazia (0: v konstantea)
-                ('d_max', 1.2),         # Irakurketa "motzaren" muga (m)
-                ('lidar_type', 's2'),   # Aukerak: a1, s2, turtle
+                ('kp', 1.5),
+                ('ki', 0.0),
+                ('kd', 0.0),
+                ('output_filename', 'wf_ls'),
+                ('lidar_type', 's2') # Options: a1, s2, turtle
             ]
         )
         self.kp = self.get_parameter('kp').value
         self.ki = self.get_parameter('ki').value
         self.kd = self.get_parameter('kd').value
-        self.v0 = self.get_parameter('v0').value
-        self.kv = self.get_parameter('kv').value
-        self.d_max = self.get_parameter('d_max').value
+        
         self.lidar_type = self.get_parameter('lidar_type').value
 
         self.laser_sub = self.create_subscription(LaserScan, 'scan', self.follow_wall, 1)
-        self.odom_sub = self.create_subscription(Odometry, 'odom', self.save_pose, 1)
-        self.vel_pub = self.create_publisher(Twist, 'cmd_vel', 1)
-
+        self.vel_pub = self.create_publisher(Twist, "cmd_vel", 1)
+        
         self.scan_count = 0
-        self.scan_mid = 0
+        self.range_min = 0.0
+        self.scan_mid = 0.0
         self.max_range = 8.0
         self.bearings = []
         self.scan = []
         self.uninitialized = True
 
-        # PID kontrolaren memoria
-        self.error_sum = 0.0        # Errorearen integrala
-        self.prev_error = None      # Aurreko errorea (None: oraindik ez dago)
-        self.prev_stamp = None      # Aurreko eskaneoaren denbora
-
-        # Robotaren azken posizioa (odometriatik)
-        self.x = float('nan')
-        self.y = float('nan')
-
-        # Grafikoetarako datuak: lagin bat eskaneo bakoitzean
+        # Initialize variables
+        self.data_angular_error = []
         self.timestamps = []
-        self.data_x = []
-        self.data_y = []
-        self.data_theta = []
         self.data_angular_w = []
         self.data_linear_v = []
-
-        # Emaitzak gordetzeko karpeta
-        package_src_root = os.path.join(os.environ['HOME'], 'robotics_ws', 'src',
-                                        'behavior', 'wall_following')
+        self.start_time = self.get_clock().now()
+        # Paths for saving results
+        package_src_root = os.path.join(os.environ['HOME'], 'robotics_ws', 'src', 'behavior', 'wall_following')
         self.results_path = os.path.join(package_src_root, 'results')
-        self.get_logger().info('Emaitzak hemen gordeko dira: ' + self.results_path)
+        self.get_logger().info("Results will be saved in: " + self.results_path)
 
-    def save_pose(self, odom):
-        """Odometriaren azken posizioa gorde, ibilbidea irudikatzeko."""
-        self.x = odom.pose.pose.position.x
-        self.y = odom.pose.pose.position.y
 
-    def follow_wall(self, scan):
-        """Kontrol-begizta: eskaneo bakoitzean paretarekiko angelua erregulatzen du."""
-        cmd_vel_msg = Twist()
+        # PID
+        self.error_sum = 0.0
+        self.prev_error = 0.0
+        
 
-        # dt eskaneoaren denbora-zigilutik lortzen da: horrela simulazioaren
-        # denbora erabiltzen da, Gazebo denbora errealean ez badabil ere.
-        stamp = scan.header.stamp.sec + scan.header.stamp.nanosec * 1e-9
-        dt = 0.0 if self.prev_stamp is None else max(stamp - self.prev_stamp, 0.0)
-        self.prev_stamp = stamp
-
+    def follow_wall(self, scan): 
+        cmd_vel_msg = Twist()            
         if self.uninitialized:
-            self.uninitialized = False
+            self.uninitialized = 0
             self.scan_count = len(scan.ranges)
             self.scan_mid = self.scan_count // 2
             self.max_range = scan.range_max
-            # bearings: irakurketa bakoitzaren angelua (radianetan)
+            # Bearings stores the angle of each range measurement (radians)
             for i in range(0, self.scan_count):
                 self.bearings.append(scan.angle_min + scan.angle_increment * i)
-            # Egiaztapenerako: sektoreak (-90, 0) gradu artean espero ditu eskuineko izpiak
-            self.get_logger().info('Laserra: %d izpi, %.0f eta %.0f gradu artean' % (
-                self.scan_count, m.degrees(scan.angle_min), m.degrees(scan.angle_max)))
-
-        # Balio infinituak eta baliogabeak max_range-rekin ordezkatu
-        self.scan = [x if scan.range_min < x < self.max_range else self.max_range
-                     for x in scan.ranges]
-
-        # Indizeak berrantolatu: 0 indizea robotaren atzealdea da, bai scan-en
-        # bai bearings-en (irakasleak emandako kodea, aldatu gabe).
-        if self.lidar_type == 's2':
+            
+        # Replace infinity values with max_range 
+        self.scan = [x if x < self.max_range else self.max_range for x in scan.ranges]        
+        self.get_logger().info("scan len: %.2f "%(len(self.scan)))
+        # Reorganize scan indexes to make it easier to work with. 
+        # 0 index corresponds to the back side of the robot for both, scan and bearings.
+        if self.lidar_type == "s2":
+            self.get_logger().info("scan_mid: %.2f "%(self.scan_mid))
             self.scan = [self.scan[i - self.scan_mid] for i in range(self.scan_count)]
-        else:
-            self.scan = [self.scan[self.scan_mid - i] for i in range(self.scan_count)]
+            
 
-        # 1.- Irakurketa motzen proiekzio kartesiarra, robotaren erreferentzian:
-        #     X ardatza aurrerantz eta Y ardatza ezkerrerantz.
+        else:
+            self.scan = [self.scan[self.scan_mid-i] for i in range(self.scan_count)]
+       
+        
+        ## TODO Add code here
+        # Doikuntza-konstanteak (aldaerak probatzeko, hemen aldatu)
+        # Pareta robotaren EZKERRALDEAN: pistako geziak (erlojuaren norantza) eta hasierako pose lehenetsia
+        SEKTORE_MIN = m.radians(0.0)    # Sektorearen muga: aurrera (0 gradu)
+        SEKTORE_MAX = m.radians(90.0)   # Sektorearen muga: ezkerra (+90 gradu)
+        D_MAX = 0.5   # Irakurketa motzen muga (m); 0.5-ekin robota errepidearen erdian doa (~0.35 m paretatik)
+        V0 = 0.2      # Oinarrizko abiadura lineala (m/s)
+        KV = 0.0      # 0: abiadura konstantea; >0: |w|-ren alderantziz proportzionala
+        I_MAX = 0.3   # Integralaren muga (anti-windup), izkinetan pila ez dadin
+
+        # 1.- Compute the projection of short readings 
         xpos = []
         ypos = []
-        for d, beta in zip(self.scan, self.bearings):
-            if SEKTORE_MIN < beta < SEKTORE_MAX and d < self.d_max:
-                xpos.append(d * m.cos(beta))
-                ypos.append(d * m.sin(beta))
 
-        # 2.- Erregresio lineala: hautatutako puntuetatik paretaren zuzena
-        theta = float('nan')
-        if len(xpos) > 5:
+        # Select the short readings and calculate the corresponding points
+        # Ezker-aurreko sektoreko irakurketa motzak puntu kartesiar bihurtu
+        # (robotaren erreferentzia: X aurrerantz, Y ezkerrerantz)
+        for d, beta in zip(self.scan, self.bearings):
+            if SEKTORE_MIN < beta < SEKTORE_MAX and scan.range_min < d < D_MAX:
+                xpos.append(d * m.cos(beta))    # xi = di * cos(bi)
+                ypos.append(d * m.sin(beta))    # yi = di * sin(bi)
+        
+
+        # Store the values for plotting
+        elapsed = (self.get_clock().now() - self.start_time).nanoseconds / 1e9
+        self.timestamps.append(elapsed)
+
+        # dt laserraren denbora-zigilutik (simulazio-denbora, RTF < 1 denean ere sendoa)
+        stamp = scan.header.stamp.sec + scan.header.stamp.nanosec * 1e-9
+        dt = stamp - getattr(self, 'prev_stamp', stamp)
+        self.prev_stamp = stamp
+
+        # 2.- Linear regression: compute the line from the selected points   
+        if len(xpos) > 5: 
+            # Note: The len(xpos) value indicates the number of points used in the regression!!
             xcoord = np.array(xpos)
             ycoord = np.array(ypos)
-            c1, c0 = np.polyfit(xcoord, ycoord, 1)  # c1: malda; c0: ordenatua jatorrian
 
-            # Paretaren angelua robotaren X ardatzarekiko. Pareta paraleloa bada,
-            # malda 0 da. theta > 0: robota paretara hurbiltzen ari da, eta
-            # ezkerrera biratu behar du (w > 0). theta < 0: urruntzen ari da.
-            theta = float(np.arctan(c1))
-            desired_theta = 0.0
+            # Use Numpy polifyt for liner regression
+            c1, c0 = np.polyfit(xcoord, ycoord, 1) # c1: slope; c0:intercept
+
+	        # Fake value, needs to be defined
+            desired_theta = 0.0     # Helburua: paretarekiko paralelo joatea
+            # Calculate the angle between the robot and the wall
+            # theta < 0: robota ezkerreko paretara hurbiltzen ari da, eskuinera biratu behar du (w < 0)
+            theta = np.arctan(c1)
+            self.get_logger().info("Line slope: %.2f Angle: %.2f (%.2f degrees)"%(c1, theta, m.degrees(theta)))
+           
             error = theta - desired_theta
 
-            # 3.- PID diskretua
+            
+
+            # 3.- Set velocities proportionally
+            # PID diskretua (dt simulazio-denboraren araberakoa)
             # I: errorearen batura denboran zehar, I_MAX-en mugatuta
             self.error_sum = float(np.clip(self.error_sum + error * dt, -I_MAX, I_MAX))
-            if self.prev_error is None or dt <= 0.0:
-                derivative = 0.0           # Lehen laginean ez dago deribaturik
-            else:
-                derivative = (error - self.prev_error) / dt   # D: errorearen aldaketa
+            # D: errorearen aldaketa-abiadura (dt = 0 bada, 0)
+            derivative = (error - self.prev_error) / dt if dt > 0.0 else 0.0
             self.prev_error = error
-
             w = self.kp * error + self.ki * self.error_sum + self.kd * derivative
+            # Abiadura lineala: konstantea (KV = 0) edo |w|-ren alderantziz proportzionala (KV > 0)
+            v = V0 / (1.0 + KV * abs(w))
+            self.get_logger().info("Velocities: v = %.2f w = %.2f"%(v, w))
+            ## END TODO
 
-            # 4.- Abiadura lineala: konstantea (kv=0) edo |w|-ren alderantziz
-            #     proportzionala (kv>0), biraketa handietan motelago joateko.
-            v = self.v0 / (1.0 + self.kv * abs(w))
-
-            self.get_logger().info('theta: %+6.1f gradu | v = %.2f | w = %+.2f'
-                                   % (m.degrees(theta), v, w))
-            cmd_vel_msg.linear.x = v
+            cmd_vel_msg.linear.x  = v
+            cmd_vel_msg.linear.y  = 0.0
             cmd_vel_msg.angular.z = w
+
         else:
-            # Paretarik ez: zuzen jarraitu hura aurkitu arte. Aurreko errorea ahaztu
-            # egiten da, pareta berriz agertzean deribatu faltsurik ez kalkulatzeko.
-            self.get_logger().info('Ez dago puntu nahikorik erregresiorako')
-            self.prev_error = None
-            cmd_vel_msg.linear.x = self.v0
+            self.get_logger().info("Not enough points for applying the linear regression")
+            cmd_vel_msg.linear.x  = 0.2
+            cmd_vel_msg.linear.y  = 0.0
             cmd_vel_msg.angular.z = 0.0
 
-        # Lagina gorde eta agindua bidali
-        self.timestamps.append(stamp)
-        self.data_x.append(self.x)
-        self.data_y.append(self.y)
-        self.data_theta.append(theta)
-        self.data_angular_w.append(cmd_vel_msg.angular.z)
+        # Fake value, replace by calculated angular value
+        self.data_angular_error.append(8.97) 
+        self.data_angular_w.append(cmd_vel_msg.angular.z)   
         self.data_linear_v.append(cmd_vel_msg.linear.x)
-        self.vel_pub.publish(cmd_vel_msg)
+        self.vel_pub.publish( cmd_vel_msg)
 
     def save_error(self):
-        """Exekuzioaren datuak CSV batean gorde eta angeluaren grafikoa sortu."""
-        if not self.timestamps:
-            return
-        os.makedirs(self.results_path, exist_ok=True)
-        name = 'wf_kp%.2f_ki%.2f_kd%.2f_v%.2f_kv%.2f_%s' % (
-            self.kp, self.ki, self.kd, self.v0, self.kv,
-            datetime.now().strftime('%Y%m%d-%H%M%S'))
-        base = os.path.join(self.results_path, name)
-        t = np.array(self.timestamps) - self.timestamps[0]
+        # Calculate elapsed time
+        elapsed = self.get_clock().now() - self.start_time
+        total_ms = elapsed.nanoseconds // 1_000_000  # milisegundos totales
+        minutes = (total_ms // 1000) // 60
+        seconds = (total_ms // 1000) % 60
+        milliseconds = total_ms % 1000
+        formatted_time = f"{minutes:02}:{seconds:02}.{milliseconds:03}" # Format MM:SS.MS
 
-        # CSVa lehenik: wf_plot.py-k erabiliko du konparaketa-grafikoak egiteko
-        with open(base + '.csv', 'w', newline='') as f:
-            writer = csv.writer(f)
-            writer.writerow(['t', 'x', 'y', 'theta', 'w', 'v'])
-            writer.writerows(zip(t, self.data_x, self.data_y, self.data_theta,
-                                 self.data_angular_w, self.data_linear_v))
-
+        # Create the plot
         plt.figure()
-        plt.plot(t, np.degrees(self.data_theta), 'g', linewidth=0.8)
-        plt.axhline(0.0, color='gray', linewidth=0.5)
-        plt.xlabel('Denbora (s)')
-        plt.ylabel('theta (gradu)')
-        plt.title('Kp=%.2f  Ki=%.2f  Kd=%.2f' % (self.kp, self.ki, self.kd))
-        plt.grid(True, linestyle='--', alpha=0.6)
-        plt.savefig(base + '.png', dpi=150)
-        self.get_logger().info('Gordeta: ' + base + '.csv')
+        plt.ylim(-np.pi/2, np.pi/2)
+        plt.xlabel("Time (s)")
+        plt.ylabel("Error (pixels)")
+        plt.title(f"Error over time (Kp={self.kp:.2f}, Ki={self.ki:.2f}, Kd={self.kd:.2f}) \n")
+        
+        # Plot only the first 60 seconds
+        timestamps = np.array(self.timestamps)
+        error_x = np.array(self.data_angular_error)
+        angular_w = np.array(self.data_angular_w)
+        linear_v = np.array(self.data_linear_v)
+        mask = timestamps < 60.0
+        plt.plot(timestamps[mask], error_x[mask], linestyle='-', color='g', linewidth=0.5)
+        plt.plot(timestamps[mask], angular_w[mask], linestyle='-', color='r', linewidth=0.5)
+        plt.plot(timestamps[mask], linear_v[mask], linestyle='-', color='m', linewidth=0.5)
+        plt.grid(True, which='both', linestyle='--', color='gray', alpha=0.7)
+        # Draw the legend
+        plt.legend(['Error', 'w', 'v'])
 
+        # Draw elapsed time
+        fig = plt.gcf()
+        fig.text(
+            0.5, 0.9,  
+            f"Elapsed time: {formatted_time}",
+            ha='center',
+            va='top',
+            fontsize=10,
+            bbox=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=0.2')
+        )
+
+        # Check if results folder exists
+        if not os.path.exists(self.results_path):
+            os.makedirs(self.results_path)
+
+        # Get date and time
+        now = datetime.now()
+        dt_string = now.strftime("%d-%m-%Y-%H:%M:%S")
+        # Format kp and kd (replace dot with underscore for filename safety)
+        kp_str = f"{self.kp:.2f}".replace('.', '_')
+        kd_str = f"{self.kd:.2f}".replace('.', '_')
+        ki_str = f"{self.ki:.2f}".replace('.', '_')
+
+        # Build the filename
+        filename = f"error_{dt_string}-kp{kp_str}-kd{kd_str}-ki{ki_str}.png"
+        plt.savefig(self.results_path +'/' + filename)
+        plt.show()
 
 def main(args=None):
     rclpy.init(args=args)
@@ -233,14 +228,11 @@ def main(args=None):
     try:
         rclpy.spin(wf_node)
     except KeyboardInterrupt:
-        pass
-    finally:
-        # Bigarren Ctrl+C batek ez dezala datuen gordetzea eten
-        signal.signal(signal.SIGINT, signal.SIG_IGN)
-        wf_node.save_error()
         wf_node.destroy_node()
-        rclpy.try_shutdown()
-
+    finally:
+        wf_node.save_error()
+        wf_node.destroy_node()  
+        rclpy.shutdown()
 
 if __name__ == '__main__':
     main()
