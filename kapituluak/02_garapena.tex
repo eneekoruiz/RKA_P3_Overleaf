@@ -1,61 +1,53 @@
-Kapitulu honetan paretari paraleloki jarraitzeko diseinatutako kontrol-arkitektura xehatzen da: LiDAR neurketen proiekzio kartesiarra, karratu txikienen bidezko erregresio lineala, kontrol proportzionalaren egonkortasun-azterketa eta PID algoritmo diskretu osoa.
+Kapitulu honetan kontrolagailua nola diseinatu eta inplementatu dugun azaltzen dugu: laserraren irakurketak nola prozesatzen ditugun, paretaren angelua nola kalkulatzen dugun eta PID algoritmoa nola gauzatu dugun.
 
-\needspace{6\baselineskip}
-\section[LiDAR neurketak eta proiekzioa]{LiDAR neurketak eta proiekzio kartesiarra}\label{sec:proiekzioa}
-Robotaren erreferentzia-sisteman, $+X$ ardatza aurrerantz doa eta $+Y$ ardatza ezkerrerantz. Sentsoreak ematen dituen izpien artean, eskuin-aurreko koadrantea hautatzen dugu: $\beta_i \in [-90^\circ, 0^\circ]$ (hots, $[-\pi/2, 0]\text{ rad}$) eta distantzia $d_i < d_{\max}$ duten neurketak. Irakurketa polar bakoitza robotaren plano lokaleko puntu kartesiar bihurtzen da:
-\begin{equation}\label{eq:kartesiarra}
-  x_i = d_i \cdot \cos(\beta_i), \qquad y_i = d_i \cdot \sin(\beta_i).
-\end{equation}
-Sektorea aurrerantz $0^\circ$-raino zabaltzeak berebiziko garrantzia du: paretak izkina egiten duenean, aurrealdeko pareta $d_{\max}$ erradioan sartzen da, puntuek ``L'' itxura hartzen dute eta erregresioak berehala malda positiboa ematen du, robota talka egin aurretik ezkerrerantz biraraziz. Sektorea $-30^\circ$-ra mugatuz gero, robotak berandu ikusten du izkina eta talka ezinbestekoa gertatzen da $K_p \le 3$ balio guztiekin.
+\needspace{5\baselineskip}
+\section[LiDAR konfigurazioa]{Sentsorearen konfigurazioa eta ezkerreko pareta}\label{sec:geometria}
+Rosmaster robotak 2D RPLidar S2 sentsorea du gainean kokatuta. Ereduaren URDF fitxategiaren arabera (\texttt{rosmaster\_description}), sentsorea robotaren ardatzarekiko $180^\circ$ biratuta dago ($\text{yaw} = \pi$). Irakasleak emandako nodoak automatikoki zuzentzen du orientazio hori, datuen bektorea 1500 posizio mugituz (\texttt{scan[i - 1500]}). Horrela, \texttt{bearings} bektorea robotaren ardatzekin bat dator: $0^\circ$ aurrera, $+90^\circ$ ezkerrera eta $-90^\circ$ eskuinera.
 
-\needspace{6\baselineskip}
-\section[Erregresio lineala eta angelua]{Erregresio lineala eta paretaren angelua}\label{sec:erregresioa}
-Proiektatutako $(x_i, y_i)$ puntuekin lehen mailako karratu txikienen erregresioa aplikatzen da \texttt{numpy.polyfit} funtzioaren bidez:
-\begin{equation}\label{eq:zuzena}
-  y = c_1 \cdot x + c_0.
-\end{equation}
-Hemen $c_1$ paretaren malda da, eta $c_0$ ordenatua jatorrian. Maldaren arkutangenteak robotaren eta paretaren arteko $\theta$ orientazio-angelua ematen du:
-\begin{equation}\label{eq:theta}
-  \theta = \arctan(c_1), \qquad \theta_{\text{desiatua}} = 0{,}0, \qquad e = \theta - \theta_{\text{desiatua}} = \theta.
-\end{equation}
-Pareta guztiz paraleloa bada, $c_1 = 0$ eta $\theta = 0$. Robota paretara hurbiltzen ari bada, aurrerago dauden puntuek $y$ balio handiagoa dute, $c_1 > 0$ eta $\theta > 0$ sortuz, eta $\omega > 0$ aginduak ezkerrera birarazten du. Metodo honek $(-\pi/2, +\pi/2)$ tartea estaltzen du, nahikoa dena erabilera arruntean $\theta$ ez baita $64^\circ$-tik pasatzen.
+Pistako geziei jarraituz aurrera egitean, jarraitu beharreko kanpoko pareta robotaren \textbf{ezkerraldean} geratzen da. Horregatik, ezker-aurreko koadranteko izpiak hautatu ditugu erregresiorako: $\beta_i \in [0^\circ, +90^\circ]$ eta $d_i < D_{\max} = 0{,}5\text{ m}$.
 
-\needspace{6\baselineskip}
-\section[Kontrol Proportzionala]{Kontrol Proportzionala eta erantzun dinamikoa}\label{sec:kontrol-p}
-P kontrol hutsean biraketa-abiadura errorekiko proportzionala da zuzenean: $\omega = K_p \cdot e = K_p \cdot \theta$. Pareta zuzenean robotaren biraketak $\theta$ zuzenean aldatzen duenez ($\dot\theta = -\omega$), lehen mailako sistema dinamikoa dugu:
-\begin{equation}\label{eq:dinamika-p}
-  \dot\theta(t) = -K_p \cdot \theta(t) \;\implies\; \theta(t) = \theta_0 \cdot e^{-K_p t}, \qquad \tau = \frac{1}{K_p}.
-\end{equation}
-Hala ere, kontrol-agindua lagin bat beranduago gauzatzen denez kontrolagailu diskretuan ($T$ laginketa-periodoarekin), sistema diskretua ondorengo ekuazioak gidatzen du:
-\begin{equation}\label{eq:p-diskretua}
-  \theta_{k+1} = \theta_k - T K_p \theta_{k-1} \;\implies\; z^2 - z + T K_p = 0.
-\end{equation}
-Polinomio bereizgarriak bi muga teoriko zorrotz ezartzen ditu $T = 0{,}1\text{ s}$ denean:
-\begin{itemize}[leftmargin=2em, itemsep=0.3em]
-  \item \textbf{Oszilaziorik gabeko muga}: Erro errealak izateko diskriminanteak positiboa izan behar du: $1 - 4 T K_p \ge 0 \implies K_p \le \frac{1}{4T} = 2{,}5$.
-  \item \textbf{Egonkortasun absolutua}: Erroak unitate-zirkunferentziaren barruan egoteko: $T K_p < 1 \implies K_p < \frac{1}{T} = 10$.
-\end{itemize}
-Praktikan, gainbultzada $K_p = 3$-tik aurrera hazten da, eta $K_p = 12$-rekin sistema erabat ez-egonkor bihurtzen da.
-
-\needspace{6\baselineskip}
-\section[Abiadura lineala]{Abiadura lineala: konstantea eta moldatua}\label{sec:abiadura}
-Enuntziatuak eskatutako bi abiadura-legeak formula bakar baten bidez orokortu ditugu:
-\begin{equation}\label{eq:abiadura-legea}
-  v = \frac{v_0}{1 + k_v \cdot |\omega|}.
-\end{equation}
-$k_v = 0$ denean, abiadura konstantea da ($v = v_0$). $k_v > 0$ denean, abiadura $|\omega|$ biraketa-abiadurarekiko alderantziz proportzionala da. Biraketa-erradioa $R = v / |\omega|$ denez, biraketetan moteltzeak biraketa-erradioa murrizten du, robotak izkinak leunago hartzea ahalbidetuz eta $K_p$-ren beheko muga murriztuz.
-
-\needspace{6\baselineskip}
-\section[PID formulazio diskretua]{PID kontrolagailu osoaren formulazio diskretua}\label{sec:pid-garapena}
-Planta integratzaile bati osagai integrala ($K_i$) eta deribatua ($K_d$) gehituz, irteerako agindua honela kalkulatzen da:
-\begin{equation}\label{eq:pid-legea}
-  \omega_n = K_p \cdot e_n + K_i \sum_{i=1}^n e_i \Delta t + K_d \frac{e_n - e_{n-1}}{\Delta t}.
-\end{equation}
-Inplementazio praktikoan hiru xehetasun nagusik bermatzen dute sendotasuna:
-\begin{enumerate}[leftmargin=2em, itemsep=0.3em]
-  \item $\Delta t$ eskaneoaren denbora-zigilutik (\texttt{scan.header.stamp}) erauzten da zuzenean, simulazioaren denbora erreala errespetatuz.
-  \item Integrala $[-I_{\max}, +I_{\max}] = [-0{,}3, +0{,}3]\text{ rad}\cdot\text{s}$ tartera mugatzen da saturazio bidez (\textit{anti-windup}), kurbetan noranzko bereko biraketetan integrala neurrigabe metatu ez dadin.
-  \item Pareta ikusten ez denean aurreko errorea ahaztu egiten da (\texttt{prev\_error = None}), pareta berriz agertzean deribatu faltsu bortitzik ez sortzeko.
+\needspace{5\baselineskip}
+\section[Angeluaren kalkulua]{Paretaren angeluaren kalkulua eta zeinuen portaera}\label{sec:erregresioa}
+Enuntziatuaren lehen galderari erantzunez (\textit{Azaldu nola kalkulatzen duzun robota eta paretaren arteko angelua}), urrats hauek jarraitu ditugu:
+\begin{enumerate}[leftmargin=2em, itemsep=0.2em]
+  \item \textbf{Proiekzio kartesiarra}: Hautatutako izpi bakoitza robotaren plano lokaleko puntu bihurtzen dugu:
+  \begin{equation}\label{eq:kartesiarra}
+    x_i = d_i \cdot \cos(\beta_i), \qquad y_i = d_i \cdot \sin(\beta_i).
+  \end{equation}
+  \item \textbf{Erregresio lineala}: Puntu horiekin zuzen bat doitzen dugu \texttt{numpy.polyfit} bidez ($y = c_1 \cdot x + c_0$).
+  \item \textbf{Angelua eta errorea}: Maldaren arkutangenteak robotaren eta paretaren arteko $\theta$ angelua ematen du. Gure helburua paretarekiko paralelotasuna denez ($\theta_{\text{desiatua}} = 0{,}0$), errorea zuzenean $e = \theta$ da:
+  \begin{equation}\label{eq:theta}
+    \theta = \arctan(c_1), \qquad e = \theta - 0{,}0 = \theta.
+  \end{equation}
 \end{enumerate}
 
-PI sistemaren ekuazio diferentziala $\ddot\theta + K_p \dot\theta + K_i \theta = 0$ da. Maiztasun naturala $\omega_n = \sqrt{K_i}$ eta moteltze-faktorea $\zeta = \frac{K_p}{2\sqrt{K_i}}$ izanik, oszilaziorik ez izateko $K_i \le K_p^2 / 4$ bete behar da ($K_p = 2$ denean, $K_i \le 1$). D osagaiak, aldiz, balaztatze-efektua eragiten du ($\tau = \frac{1 + K_d}{K_p}$), baina sentsore-zarata anplifikatzen duenez, muga diskretua $K_d < 1 - \frac{K_p T}{2} \approx 0{,}9$ da.
+\textbf{Zeinuen portaera praktikoa}:
+\begin{itemize}[leftmargin=2em, itemsep=0.2em]
+  \item Robota paralelo badoa: $c_1 = 0 \implies \theta = 0^\circ \implies \omega = 0$.
+  \item Robota ezkerreko paretara hurbiltzen ari bada: aurrerago dauden puntuek $y$ txikiagoa dute, beraz malda negatiboa da ($c_1 < 0$). Ondorioz $\theta < 0$, eta agindua $\omega = K_p \theta < 0$ denez, robotak \textbf{eskuinera} biratzen du (paretatik urrunduz).
+  \item Robota paretatik urruntzen ari bada: malda positiboa da ($c_1 > 0$), beraz $\theta > 0$ eta agindua $\omega > 0$ da, robota \textbf{ezkerrera} biraraziz (paretara hurbilduz).
+  \item Izkinetan: aurreko pareta $0{,}5\text{ m}$-ko eremuan sartzen denean, puntuek ``L'' itxura hartzen dute, malda nabarmen negatibo bihurtzen da ($c_1 \ll 0$) eta robotak berez biratzen du eskuinera izkina hartzeko.
+\end{itemize}
+
+\needspace{5\baselineskip}
+\section[Kontrol-legeak]{Kontrol-legeak eta abiadura lineala}\label{sec:kontrol-legeak}
+P kontrol hutsean biraketa-abiadura errorekiko proportzionala da: $\omega = K_p \cdot \theta$. Zuzenetan robotaren orientazioaren aldaketa $\dot\theta = -\omega$ denez, P hutsak \textbf{ez du errore iraunkorrik} uzten zuzenetan: pareta zuzen batean $\theta$ berez egonkortzen da $0{,}0^\circ$-an.
+
+Abiadura linealari dagokionez, enuntziatuak eskatutako bi aukerak formula honekin kudeatzen ditugu:
+\begin{equation}\label{eq:abiadura-formula}
+  v = \frac{v_0}{1 + K_V \cdot |\omega|}, \qquad v_0 = 0{,}2\text{ m/s}.
+\end{equation}
+$K_V = 0$ denean abiadura konstantea da ($0{,}2\text{ m/s}$). $K_V = 2$ denean, berriz, abiadura $|\omega|$-ren alderantziz proportzionala da, izkinetan robota motelduz.
+
+\needspace{5\baselineskip}
+\section[PID inplementazioa]{PID osagaiak kodean nola gehitu ditugun}\label{sec:pid-inplementazioa}
+Enuntziatuaren galderari erantzunez (\textit{Nola gehitu duzue kodean osagai Integral eta Deribatiboa}), formula diskretu hau inplementatu dugu \texttt{TODO} blokean:
+\begin{equation}\label{eq:pid-diskretua}
+  \omega = K_p \cdot e + K_i \cdot \sum e \Delta t + K_d \cdot \frac{e - e_{\text{aurrekoa}}}{\Delta t}.
+\end{equation}
+Inplementazioan hiru puntu zaindu ditugu:
+\begin{enumerate}[leftmargin=2em, itemsep=0.2em]
+  \item $\Delta t$ kalkulua: azken bi eskaneoen arteko denbora-diferentzia neurtzen dugu.
+  \item Integralaren saturazioa (\textit{anti-windup}): integrala $[-0{,}3, +0{,}3]\text{ rad}\cdot\text{s}$ tartera mugatzen dugu \texttt{np.clip} bidez, izkinetan errorea gehiegi pilatu ez dadin.
+  \item Deribatua: $\Delta t > 0$ denean soilik kalkulatzen da. Paretarik ikusten ez denean aurreko errorea berrezarri egiten dugu, deribatu-kolperik ez sortzeko.
+\end{enumerate}

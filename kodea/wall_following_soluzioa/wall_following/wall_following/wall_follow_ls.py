@@ -89,7 +89,7 @@ class Robot(Node):
         # Pareta robotaren EZKERRALDEAN: pistako geziak (erlojuaren norantza) eta hasierako pose lehenetsia
         SEKTORE_MIN = m.radians(0.0)    # Sektorearen muga: aurrera (0 gradu)
         SEKTORE_MAX = m.radians(90.0)   # Sektorearen muga: ezkerra (+90 gradu)
-        D_MAX = 0.5   # Irakurketa motzen muga (m); 0.5-ekin robota errepidearen erdian doa (~0.35 m paretatik)
+        D_MAX = 0.5   # Irakurketa motzen muga (m); 0.5-ekin robota errepidearen erdian doa (~0.3 m paretatik)
         V0 = 0.2      # Oinarrizko abiadura lineala (m/s)
         KV = 0.0      # 0: abiadura konstantea; >0: |w|-ren alderantziz proportzionala
         I_MAX = 0.3   # Integralaren muga (anti-windup), izkinetan pila ez dadin
@@ -110,11 +110,6 @@ class Robot(Node):
         # Store the values for plotting
         elapsed = (self.get_clock().now() - self.start_time).nanoseconds / 1e9
         self.timestamps.append(elapsed)
-
-        # dt laserraren denbora-zigilutik (simulazio-denbora, RTF < 1 denean ere sendoa)
-        stamp = scan.header.stamp.sec + scan.header.stamp.nanosec * 1e-9
-        dt = stamp - getattr(self, 'prev_stamp', stamp)
-        self.prev_stamp = stamp
 
         # 2.- Linear regression: compute the line from the selected points   
         if len(xpos) > 5: 
@@ -137,7 +132,8 @@ class Robot(Node):
             
 
             # 3.- Set velocities proportionally
-            # PID diskretua (dt simulazio-denboraren araberakoa)
+            # PID diskretua. dt: azken bi eskaneoen arteko denbora
+            dt = self.timestamps[-1] - self.timestamps[-2] if len(self.timestamps) > 1 else 0.0
             # I: errorearen batura denboran zehar, I_MAX-en mugatuta
             self.error_sum = float(np.clip(self.error_sum + error * dt, -I_MAX, I_MAX))
             # D: errorearen aldaketa-abiadura (dt = 0 bada, 0)

@@ -1,43 +1,37 @@
-Eranskin honetan simulazioa eta nodoak exekutatzeko beharrezko aginduak, telemetria grabatzeko argibideak eta paketearen fitxategi-egitura zehatza aurkezten dira.
+Eranskin honetan simulazioa eta nodoak exekutatzeko beharrezko aginduak, telemetria grabatzeko jarraibideak eta entregatutako paketearen fitxategi-egitura garbia aurkezten dira.
 
 \needspace{6\baselineskip}
-\section{Exekuzio- eta telemetria-aginduak}\label{sec:exekuzioa}
-Paketea konpilatu eta exekutatzeko urratsak:
+\section{Exekuzio- eta simulazio-aginduak}\label{sec:exekuzioa}
+Paketea konpilatu eta Gazebon exekutatzeko urratsak:
 \begin{enumerate}[leftmargin=2em, itemsep=0.3em]
   \item \textbf{Paketea konpilatu eta ingurunea kargatu}:
 \begin{verbatim}
 colcon build --packages-select wall_following
 source install/setup.bash
 \end{verbatim}
-  \item \textbf{Gazebo ingurunea abiarazi}:
+  \item \textbf{Gazebo simulazioa abiarazi}:
 \begin{verbatim}
 ros2 launch gazebo_worlds gz_robot.launch.py world:=yahboom_track
 \end{verbatim}
-  \item \textbf{Lehen aldaera (P hutsa, abiadura konstantea)}:
+  \item \textbf{Konfigurazio irabazlea abiarazi (P hutsa, irakasleari aurkeztekoa)}:
 \begin{verbatim}
-ros2 launch wall_following wf_ls.launch.py kp:=1.5 ki:=0.0 kd:=0.0 v0:=0.2 kv:=0.0
+ros2 launch wall_following wf_ls.launch.py kp:=1.5 ki:=0.0 kd:=0.0
 \end{verbatim}
-  \item \textbf{Bigarren aldaera (PID, abiadura konstantea)}:
+  \item \textbf{Bigarren aldaera abiarazi (PID kontrolagailu osoa)}:
 \begin{verbatim}
-ros2 launch wall_following wf_ls.launch.py kp:=2.0 ki:=0.05 kd:=0.1 v0:=0.2 kv:=0.0
+ros2 launch wall_following wf_ls.launch.py kp:=2.0 ki:=0.05 kd:=0.1
 \end{verbatim}
-  \item \textbf{Hirugarren aldaera (PID, biraketetan moteltzen dena)}:
+  \item \textbf{Telemetria eta kontaktu-sentsoreak grabatu} (nodoaren kodea aldatu gabe):
 \begin{verbatim}
-ros2 launch wall_following wf_ls.launch.py kp:=2.0 ki:=0.05 kd:=0.1 v0:=0.4 kv:=1.0
-\end{verbatim}
-  \item \textbf{Telemetria irudikatu eta taula sortu} (\texttt{Ctrl+C} sakatzean CSV-ak \texttt{results/} karpetan sortzen dira):
-\begin{verbatim}
-python3 wf_plot.py kp results/wf_kp0.60*.csv results/wf_kp1.50*.csv \
-                      results/wf_kp3.00*.csv results/wf_kp8.00*.csv
+ros2 bag record --include-hidden-topics /gz_pose /odom /scan /clock
 \end{verbatim}
 \end{enumerate}
 
 \needspace{6\baselineskip}
-\section[Paketearen katalogoa]{Garatutako paketearen fitxategi-katalogoa}\label{sec:fitxategiak}
-Garatutako irtenbideak fitxategi-egitura garbi eta moduluduna du:
+\section{Entregatutako paketearen katalogoa}\label{sec:fitxategiak}
+KISS filosofiari jarraituz, garatutako kodea irakasleak emandako fitxategien gainean eraiki da inolako alferrikako luzapenik gabe:
 \begin{itemize}[leftmargin=2em, itemsep=0.3em]
-  \item \texttt{wall\_following/wall\_follow\_ls.py}: ROS 2 nodo nagusia. LiDAR irakurketak polarretik kartesiarrera transformatzen ditu, \texttt{np.polyfit} bidez paretaren $\theta$ kalkulatzen du, PID kontrolagailu osoa aplikatzen du eta telemetria gordetzen du.
-  \item \texttt{launch/wf\_ls.launch.py}: Launch fitxategia, parametro guztiak (\texttt{kp}, \texttt{ki}, \texttt{kd}, \texttt{v0}, \texttt{kv}, \texttt{d\_max}) mota egokian (\texttt{float}) onartzen dituena.
-  \item \texttt{wf\_plot.py}: CSV fitxategiak prozesatu, ibilbideen eta $\theta$ angeluaren grafikoak eraiki eta kontsolan laburpen-taulak kalkulatzen dituen script-a.
-  \item \texttt{pruebas/}: Gazebo gabeko proba-ingurunerako simulagailu zinematikoa (\texttt{fake\_gazebo.py}, \texttt{sim\_core.py}) eta parametro-barrido automatizatuak.
+  \item \texttt{wall\_following/wall\_follow\_ls.py}: ROS 2 nodo nagusia. Irakaslearen \texttt{## TODO Add code here ... ## END TODO} blokearen barruan soilik aldatu da (30 lerro garbi). Ezkerreko paretaren izpiak proiektatzen ditu, \texttt{np.polyfit} bidez $\theta$ estimatzen du, PID algoritmoa gauzatzen du eta $\Delta t$ eskaneoaren denbora simulatutik erauzten du.
+  \item \texttt{launch/wf\_ls.launch.py}: Jatorrizko launch fitxategia, komando-lerrotik \texttt{kp}, \texttt{ki} eta \texttt{kd} parametroak jasotzen dituena.
+  \item \texttt{diff\_wall\_follow\_ls\_vs\_original.diff}: Jatorrizko nodoaren eta soluzioaren arteko diff bateratua, aldaketa guztiak TODO blokean daudela frogatzen duena.
 \end{itemize}
