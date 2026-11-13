@@ -1,32 +1,30 @@
-Kapitulu honetan Gazeboko \texttt{yahboom\_track} zirkuituan lortutako emaitza esperimentalak aurkezten ditugu, enuntziatuko galdera bakoitzari puntuz puntu erantzunez.
+Kapitulu honetan Gazeboko \texttt{yahboom\_track} zirkuituan lortutako emaitza esperimentalak aurkezten ditugu.
 
-\needspace{5\baselineskip}
 \section[Angeluaren egiaztapena]{Angeluaren egiaztapena eta zutoinen iragazpena}\label{sec:angelu-egiaztapena}
 Ezkerreko paretaren angelua ondo kalkulatzen dela egiaztatzeko, log-eko $\theta$ angelua eta Gazeboko \texttt{/gz\_pose} topic-etik lortutako egiazko orientazioa alderatu ditugu: zuzenetan batez besteko desbideratzea $-0{,}4^\circ$-koa da soilik (desbideratze estandarra $2{,}1^\circ$, $\approx 350$ puntu erregresioan).
 
 Pistako seinaleak paretari atxikitako zutoin meheak dira ($0{,}04\text{ m}$). \ref{fig:diag-kp2} irudian ikusten denez, erregresio linealak berez iragazten ditu puntu horiek, eta seinale baten paretik pasatzean $\pm 5^\circ$-ko fluktuazio txiki bat baino ez da sortzen.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
-\includegraphics[width=0.80\textwidth]{diag_kp2.png}
+\includegraphics[width=\textwidth]{diag_kp2.png}
 \caption{Laserrak atzemandako puntuak eta doitutako zuzena seinale baten ondoan ($K_p = 2{,}0$). Erregresioak zutoina naturaltasunez iragazten du.}\label{fig:diag-kp2}
 \end{figure}
 
-\needspace{5\baselineskip}
-\section[Kontrol Proportzionala]{1. Kontrol Proportzionalaren emaitzak}\label{sec:emaitzak-p}
+\section[Kontrol Proportzionala]{Kontrol Proportzionalaren emaitzak}\label{sec:emaitzak-p}
 Lehen azterketan $K_p$ parametroaren eragina ebaluatu dugu ($K_i = 0$, $K_d = 0$, $v_0 = 0{,}2\text{ m/s}$, $K_V = 0$). Proba guztiak 3 buelta osoz luzatu dira ($3{,}32$ buelta). Emaitzak \ref{tab:kp-sweep} taulan laburbiltzen dira.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering\footnotesize
-\begin{tabularx}{\textwidth}{lcccc>{\raggedright\arraybackslash}X}
+\begin{tabularx}{\textwidth}{@{} l >{\raggedright\arraybackslash}X c c >{\centering\arraybackslash}p{2.6cm} >{\centering\arraybackslash}p{2.2cm} @{}}
 \toprule
 \textbf{Proba} & \textbf{Emaitza} & \textbf{Bueltak} & \textbf{Talkak} & \textbf{$d$ zuzenetan (m)} & \textbf{$\theta_{\text{RMS}}$ ($^\circ$)} \\
 \midrule
 $K_p = 0{,}3$ & Pareta galtzen du & $0{,}77$ & $4$  & $0{,}160 \pm 0{,}065$ & $19{,}7$ \\
 $K_p = 0{,}6$ & Bueltak osatu, talkekin & $3{,}32$ & $14$ & $0{,}172 \pm 0{,}060$ & $6{,}8$ \\
 $K_p = 1{,}0$ & Bueltak osatu, talkekin & $3{,}32$ & $10$ & $0{,}180 \pm 0{,}047$ & $3{,}4$ \\
-$K_p = 1{,}5$ & \textbf{Ondo (optimoa)} & $3{,}32$ & $\mathbf{0}$  & $\mathbf{0{,}307 \pm 0{,}013}$ & $\mathbf{1{,}7}$ \\
-$K_p = 2{,}0$ & \textbf{Ondo}           & $3{,}32$ & $\mathbf{0}$  & $0{,}362 \pm 0{,}028$ & $1{,}7$ \\
+$K_p = 1{,}5$ & Ondo (optimoa)          & $3{,}32$ & $0$  & $0{,}307 \pm 0{,}013$ & $1{,}7$ \\
+$K_p = 2{,}0$ & Ondo                    & $3{,}32$ & $0$  & $0{,}362 \pm 0{,}028$ & $1{,}7$ \\
 $K_p = 2{,}5$ & Bueltak osatu, talkekin & $3{,}21$ & $7$  & $0{,}502 \pm 0{,}270$ & $14{,}9$ \\
 $K_p = 3{,}0$ & Pareta galtzen du       & $0{,}60$ & $10$ & $0{,}621 \pm 0{,}295$ & $32{,}5$ \\
 $K_p = 4{,}0$ & Pareta galtzen du       & $0{,}83$ & $7$  & $0{,}551 \pm 0{,}225$ & $32{,}9$ \\
@@ -36,135 +34,123 @@ $K_p = 8{,}0$ & Pareta galtzen du       & $0{,}01$ & $1$  & $0{,}185 \pm 0{,}098
 \caption{$K_p$ parametroaren eragina Gazebon. Tarte egokia: $1{,}5 \le K_p \le 2{,}0$.}\label{tab:kp-sweep}
 \end{table}
 
-\textbf{Enuntziatuko galderen erantzun zehatzak}:
-\begin{itemize}[leftmargin=2em, itemsep=0.2em]
-  \item \textbf{Kp-ren zein tartetan da portaera egokia?}: Gure probetan \textbf{$1{,}5 \le K_p \le 2{,}0$} tartean soilik lortu dugu zirkuitua talkarik gabe osatzea. $K_p = 1{,}5$ balioarekin robota errepidearen erditik doa ($d = 0{,}307\text{ m}$), desbideratze minimoarekin ($\pm 0{,}013\text{ m}$) eta zero talkarekin.
-  \item \textbf{Zein da Kp handitzearen eta txikitzearen eragina? Zergatik?}:
-  \begin{itemize}[leftmargin=1.5em, itemsep=0.2em]
-    \item \textit{Kp txikitzean ($K_p \le 1{,}0$)}: biraketa motelagoa da ($R = v/\omega$ handia). Robotak izkinetan berandu biratzen du, paretatik oso hurbil amaitzen du ($d \approx 0{,}17\text{ m}$) eta seinaleak jotzen ditu ($14$ eta $10$ talka).
-    \item \textit{Kp handitzean ($K_p \ge 2{,}5$)}: laginketa-atzerapenagatik ($T \approx 0{,}1\text{ s}$), gainbultzada sortzen da. Robotak izkinetan gehiegi biratzen du eskuinera, paretatik urruntzen da ($d > 0{,}5\text{ m}$), laserrak pareta galtzen du eta robota barruko kaleetan galtzen da.
-  \end{itemize}
+Gure probetan $1{,}5 \le K_p \le 2{,}0$ tartean soilik lortu dugu zirkuitua talkarik gabe osatzea. $K_p = 1{,}5$ balioarekin robota errepidearen erditik doa ($d = 0{,}307\text{ m}$), desbideratze minimoarekin ($\pm 0{,}013\text{ m}$) eta zero talkarekin.
+
+Balioa handitu edo txikitzean portaera honako hau da:
+\begin{itemize}[leftmargin=1.5em, itemsep=0.15em]
+  \item $K_p$ txikitzean ($K_p \le 1{,}0$): biraketa motelagoa da ($R = v/\omega$ handia). Robotak izkinetan berandu biratzen du, paretatik oso hurbil amaitzen du ($d \approx 0{,}17\text{ m}$) eta seinaleak jotzen ditu ($14$ eta $10$ talka).
+  \item $K_p$ handitzean ($K_p \ge 2{,}5$): laginketa-atzerapenagatik ($T \approx 0{,}1\text{ s}$), gainbultzada sortzen da. Robotak izkinetan gehiegi biratzen du eskuinera, paretatik urruntzen da ($d > 0{,}5\text{ m}$), laserrak pareta galtzen du eta robota barruko kaleetan galtzen da.
 \end{itemize}
 
 Ibilbideak eta $\theta(t)$ orientazio-angelua \ref{fig:kp-grafikoak} irudian ikus daitezke.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
 \begin{subfigure}[b]{0.48\textwidth}
   \centering
-  \includegraphics[width=\textwidth]{kp_ibilbideak.png}
+  \includegraphics[height=5.2cm, keepaspectratio]{kp_ibilbideak.png}
   \caption{Ibilbideak zirkuituan (\texttt{/gz\_pose}).}\label{fig:kp-ibilbideak}
 \end{subfigure}
 \hfill
 \begin{subfigure}[b]{0.48\textwidth}
   \centering
-  \includegraphics[width=\textwidth]{kp_angeluak.png}
+  \includegraphics[height=5.2cm, keepaspectratio]{kp_angeluak.png}
   \caption{$\theta$ angelua denboran zehar.}\label{fig:kp-angeluak}
 \end{subfigure}
 \caption{$K_p$ parametroaren eragina ibilbidean eta angeluan: $K_p = 1{,}5$ eta $2{,}0$ dira egonkor bakarrak.}\label{fig:kp-grafikoak}
 \end{figure}
 
-\needspace{5\baselineskip}
 \section[Abiadura lineala]{Abiadura lineala: konstantea vs alderantziz proportzionala}\label{sec:emaitzak-abiadura}
-Enuntziatuak eskatutako bi legeak probatu ditugu: abiadura konstantea ($K_V = 0$) eta $|\omega|$-ren alderantziz proportzionala ($K_V = 2$). Emaitzak \ref{tab:abiadura-sweep} taulan eta \ref{fig:v-ibilbideak} irudian ageri dira.
+Abiadura konstantea ($K_V = 0$) eta $|\omega|$-ren alderantziz proportzionala ($K_V = 2$) konparatu ditugu. Emaitzak \ref{tab:abiadura-sweep} taulan eta \ref{fig:v-ibilbideak} irudian ageri dira.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering\footnotesize
-\begin{tabularx}{\textwidth}{llcccc>{\raggedright\arraybackslash}X}
+\begin{tabularx}{\textwidth}{@{} l >{\raggedright\arraybackslash}X c c >{\centering\arraybackslash}p{2.6cm} >{\centering\arraybackslash}p{2.2cm} @{}}
 \toprule
 \textbf{Konfigurazioa} & \textbf{Emaitza} & \textbf{Bueltak} & \textbf{Talkak} & \textbf{$d$ zuzenetan (m)} & \textbf{$\theta_{\text{RMS}}$ ($^\circ$)} \\
 \midrule
 $K_p = 0{,}6, K_V = 0$ & Talkak seinaleetan & $3{,}32$ & $14$ & $0{,}172 \pm 0{,}060$ & $6{,}8$ \\
 $K_p = 0{,}6, K_V = 2$ & Talkak seinaleetan & $3{,}24$ & $14$ & $0{,}166 \pm 0{,}050$ & $7{,}0$ \\
 $K_p = 1{,}0, K_V = 0$ & Talkak seinaleetan & $3{,}32$ & $10$ & $0{,}180 \pm 0{,}047$ & $3{,}4$ \\
-$K_p = 1{,}0, K_V = 2$ & \textbf{Ondo (lagundu)} & $3{,}32$ & $\mathbf{0}$  & $0{,}384 \pm 0{,}037$ & $2{,}6$ \\
-$K_p = 1{,}5, K_V = 0$ & \textbf{Ondo (optimoa)} & $3{,}32$ & $\mathbf{0}$  & $\mathbf{0{,}307 \pm 0{,}013}$ & $\mathbf{1{,}7}$ \\
-$K_p = 1{,}5, K_V = 2$ & Pareta galtzen du       & $0{,}20$ & $4$  & $0{,}646 \pm 0{,}340$ & $26{,}1$ \\
-$K_p = 2{,}0, K_V = 0$ & \textbf{Ondo}           & $3{,}32$ & $\mathbf{0}$  & $0{,}362 \pm 0{,}028$ & $1{,}7$ \\
-$K_p = 2{,}0, K_V = 2$ & Pareta galtzen du       & $0{,}83$ & $3$  & $0{,}674 \pm 0{,}328$ & $32{,}4$ \\
+$K_p = 1{,}0, K_V = 2$ & Ondo (lagundu)     & $3{,}32$ & $0$  & $0{,}384 \pm 0{,}037$ & $2{,}6$ \\
+$K_p = 1{,}5, K_V = 0$ & Ondo (optimoa)     & $3{,}32$ & $0$  & $0{,}307 \pm 0{,}013$ & $1{,}7$ \\
+$K_p = 1{,}5, K_V = 2$ & Pareta galtzen du  & $0{,}20$ & $4$  & $0{,}646 \pm 0{,}340$ & $26{,}1$ \\
+$K_p = 2{,}0, K_V = 0$ & Ondo               & $3{,}32$ & $0$  & $0{,}362 \pm 0{,}028$ & $1{,}7$ \\
+$K_p = 2{,}0, K_V = 2$ & Pareta galtzen du  & $0{,}83$ & $3$  & $0{,}674 \pm 0{,}328$ & $32{,}4$ \\
 \bottomrule
 \end{tabularx}
 \caption{Abiadura-legeen konparaketa: konstantea ($K_V = 0$) vs moldatua ($K_V = 2$).}\label{tab:abiadura-sweep}
 \end{table}
 
-\begin{figure}[htbp]
+Biraketetan moteltzeak kurbadura efektiboa handitzen du ($\kappa = \omega / v$). Horregatik, $K_p = 1{,}0$ balio txikiari lagundu egiten dio (10 talka izatetik 0 izatera pasatuz). Baina $K_p \ge 1{,}5$ balio egokietan, kurbadura gehiegi handitzen da: robotak izkinetan gehiegi biratzen du, pareta galdu eta pistatik kanpora doa. Beraz, $K_p = 1{,}5$-ekin abiadura konstantea ($K_V = 0$) da onena.
+
+\begin{figure}[H]
 \centering
-\includegraphics[width=0.55\textwidth]{v_ibilbideak.png}
+\includegraphics[height=5.2cm, keepaspectratio]{v_ibilbideak.png}
 \caption{Abiadura konstantearen ($K_V = 0$) eta moldatuaren ($K_V = 2$) arteko ibilbideak.}\label{fig:v-ibilbideak}
 \end{figure}
 
-\textbf{Zergatik gertatzen da hau?}: Biraketetan moteltzeak kurbadura efektiboa handitzen du ($\kappa = \omega / v$). Horregatik, $K_p = 1{,}0$ balio txikiari lagundu egiten dio (10 talka izatetik 0 izatera pasatuz). Baina $K_p \ge 1{,}5$ balio egokietan, kurbadura gehiegi handitzen da: robotak izkinetan gehiegi biratzen du, pareta galdu eta pistatik kanpora doa. Beraz, $K_p = 1{,}5$-ekin abiadura konstantea ($K_V = 0$) da onena.
+\section[PID kontrola]{PID kontrolaren emaitzak (Ki eta Kd)}\label{sec:emaitzak-pid}
+Aurreko ataleko $K_p = 2{,}0$ balio egonkorretik abiatuta, $K_i$ eta $K_d$ osagaiak probatu ditugu Gazebon (\ref{tab:pid-sweep} taula).
 
-\needspace{5\baselineskip}
-\section[PID kontrola]{2. PID kontrolaren emaitzak (Ki eta Kd)}\label{sec:emaitzak-pid}
-Aurreko ataleko $K_p = 2{,}0$ balio egonkorretik abiatuta, $K_i$ eta $K_d$ osagaiak probatu ditugu Gazebon (\ref{tab:ki-sweep} eta \ref{tab:kd-sweep} taulak).
-
-\begin{table}[htbp]
+\begin{table}[H]
 \centering\footnotesize
-\begin{tabularx}{\textwidth}{lcccc>{\raggedright\arraybackslash}X}
+\begin{tabularx}{\textwidth}{@{} l >{\raggedright\arraybackslash}X c c >{\centering\arraybackslash}p{2.6cm} >{\centering\arraybackslash}p{2.2cm} @{}}
 \toprule
 \textbf{Konfigurazioa} & \textbf{Emaitza} & \textbf{Bueltak} & \textbf{Talkak} & \textbf{$d$ zuzenetan (m)} & \textbf{$\theta_{\text{RMS}}$ ($^\circ$)} \\
 \midrule
-$K_i = 0{,}0$  & \textbf{Ondo}           & $3{,}32$ & $0$ & $0{,}362 \pm 0{,}028$ & $1{,}7$ \\
-$K_i = 0{,}05$ & \textbf{Ondo}           & $3{,}32$ & $0$ & $0{,}373 \pm 0{,}033$ & $1{,}7$ \\
-$K_i = 0{,}2$  & \textbf{Ondo}           & $3{,}32$ & $0$ & $0{,}393 \pm 0{,}046$ & $2{,}5$ \\
+\multicolumn{6}{l}{\textit{$K_i$ osagaiaren aldaketa ($K_p = 2{,}0, K_d = 0$)}} \\
+$K_i = 0{,}0$  & Ondo                    & $3{,}32$ & $0$ & $0{,}362 \pm 0{,}028$ & $1{,}7$ \\
+$K_i = 0{,}05$ & Ondo                    & $3{,}32$ & $0$ & $0{,}373 \pm 0{,}033$ & $1{,}7$ \\
+$K_i = 0{,}2$  & Ondo                    & $3{,}32$ & $0$ & $0{,}393 \pm 0{,}046$ & $2{,}5$ \\
 $K_i = 0{,}5$  & Pareta galtzen du unez  & $3{,}32$ & $4$ & $0{,}443 \pm 0{,}248$ & $14{,}3$ \\
 $K_i = 1{,}0$  & Pareta galtzen du       & $0{,}66$ & $2$ & $0{,}542 \pm 0{,}228$ & $38{,}8$ \\
+\midrule
+\multicolumn{6}{l}{\textit{$K_d$ osagaiaren aldaketa ($K_p = 2{,}0, K_i = 0$)}} \\
+$K_d = 0{,}05$ & Ondo              & $3{,}32$ & $0$ & $0{,}362 \pm 0{,}031$ & $1{,}7$ \\
+$K_d = 0{,}1$  & Ondo              & $3{,}32$ & $0$ & $0{,}368 \pm 0{,}031$ & $1{,}7$ \\
+$K_d = 0{,}3$  & Ondo              & $3{,}32$ & $0$ & $0{,}377 \pm 0{,}038$ & $1{,}7$ \\
+$K_d = 1{,}0$  & Trabatu egiten da  & $1{,}57$ & $4$ & $0{,}420 \pm 0{,}317$ & $20{,}3$ \\
+\midrule
+\multicolumn{6}{l}{\textit{PID konbinazio osoa}} \\
+PID ($2{,}0/0{,}05/0{,}1$) & Ondo & $3{,}32$ & $0$ & $0{,}372 \pm 0{,}033$ & $1{,}8$ \\
 \bottomrule
 \end{tabularx}
-\caption{$K_i$ osagaiaren eragina ($K_p = 2{,}0, K_d = 0$). Tarte egokia: $0 \le K_i \le 0{,}2$.}\label{tab:ki-sweep}
+\caption{$K_i$ eta $K_d$ osagaien eta PID konbinazioaren eragina ($K_p = 2{,}0$). Tarte egokiak: $0 \le K_i \le 0{,}2$ eta $0 \le K_d \le 0{,}3$.}\label{tab:pid-sweep}
 \end{table}
 
-\begin{table}[htbp]
-\centering\footnotesize
-\begin{tabularx}{\textwidth}{lcccc>{\raggedright\arraybackslash}X}
-\toprule
-\textbf{Konfigurazioa} & \textbf{Emaitza} & \textbf{Bueltak} & \textbf{Talkak} & \textbf{$d$ zuzenetan (m)} & \textbf{$\theta_{\text{RMS}}$ ($^\circ$)} \\
-\midrule
-$K_d = 0{,}0$  & \textbf{Ondo}           & $3{,}32$ & $0$ & $0{,}362 \pm 0{,}028$ & $1{,}7$ \\
-$K_d = 0{,}05$ & \textbf{Ondo}           & $3{,}32$ & $0$ & $0{,}362 \pm 0{,}031$ & $1{,}7$ \\
-$K_d = 0{,}1$  & \textbf{Ondo}           & $3{,}32$ & $0$ & $0{,}368 \pm 0{,}031$ & $1{,}7$ \\
-$K_d = 0{,}3$  & \textbf{Ondo}           & $3{,}32$ & $0$ & $0{,}377 \pm 0{,}038$ & $1{,}7$ \\
-$K_d = 1{,}0$  & Trabatu egiten da       & $1{,}57$ & $4$ & $0{,}420 \pm 0{,}317$ & $20{,}3$ \\
-\midrule
-PID ($2{,}0/0{,}05/0{,}1$) & \textbf{Ondo} & $3{,}32$ & $0$ & $0{,}372 \pm 0{,}033$ & $1{,}8$ \\
-\bottomrule
-\end{tabularx}
-\caption{$K_d$ osagaiaren eta PID konbinazioaren eragina ($K_p = 2{,}0$). Tarte egokia: $0 \le K_d \le 0{,}3$.}\label{tab:kd-sweep}
-\end{table}
+$K_p = 2{,}0$ hartuta, tarte egokiak $0 \le K_i \le 0{,}2$ eta $0 \le K_d \le 0{,}3$ dira. PID osoak ($2{,}0 / 0{,}05 / 0{,}1$) 3 bueltak talkarik gabe osatzen ditu.
 
-\textbf{Enuntziatuko galderen erantzun zehatzak}:
-\begin{itemize}[leftmargin=2em, itemsep=0.2em]
-  \item \textbf{Ki eta Kd-ren zein tartetan da portaera egokia?}: $K_p = 2{,}0$ hartuta, tarte egokiak \textbf{$0 \le K_i \le 0{,}2$} eta \textbf{$0 \le K_d \le 0{,}3$} dira. PID osoak ($2{,}0 / 0{,}05 / 0{,}1$) 3 bueltak talkarik gabe osatzen ditu.
-  \item \textbf{Zein da Ki handitzearen eragina? Zergatik?}: $K_i$ handitzean robota paretatik urrundu egiten da ($0{,}362\text{ m} \to 0{,}393\text{ m}$) eta $K_i \ge 0{,}5$ denean talkak agertzen dira. \textit{Zergatia}: zirkuituko biraketa guztiak eskuinerantz dira ($\theta < 0$); integratzaileak errore negatiboa pilatzen du izkina bakoitzean. Izkinatik irtetean, pilatutako integralak robota eskuinera biratzen jarraitzera behartzen du, paretatik urrunduz. Zuzenetan errore iraunkorrik ez dagoenez, $K_i$-k ez du ezer laguntzen.
-  \item \textbf{Zein da Kd handitzearen eragina? Zergatik?}: $K_d \le 0{,}3$ denean eragina oso txikia da; baina $K_d = 1{,}0$ denean robota trabatu egiten da. \textit{Zergatia}: izkinetan aurreko pareta bat-batean agertzen denean, errorea jauzika aldatzen da. Deribatuak biraketa-kolpe bortitzak sortzen ditu ($K_d / \Delta t$) eta laserraren zarata handitzen du.
+Osagai bakoitzaren portaera honela laburbiltzen da:
+\begin{itemize}[leftmargin=1.5em, itemsep=0.15em]
+  \item $K_i$ handitzean robota paretatik urrundu egiten da ($0{,}362\text{ m} \to 0{,}393\text{ m}$) eta $K_i \ge 0{,}5$ denean talkak agertzen dira. Zirkuituko biraketa guztiak eskuinerantz direnez ($\theta < 0$), integratzaileak errore negatiboa pilatzen du izkinetan. Izkinatik irtetean, pilatutako integralak robota eskuinera biratzen jarraitzera behartzen du, paretatik urrunduz.
+  \item $K_d \le 0{,}3$ denean eragina oso txikia da; baina $K_d = 1{,}0$ denean robota trabatu egiten da. Izkinetan aurreko pareta bat-batean agertzen denean errorea jauzika aldatzen denez, deribatuak biraketa-kolpe bortitzak sortzen ditu ($K_d / \Delta t$).
 \end{itemize}
 
 Ibilbideak eta $\theta(t)$ orientazio-angelua \ref{fig:pid-grafikoak} irudian ikus daitezke.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
 \begin{subfigure}[b]{0.48\textwidth}
   \centering
-  \includegraphics[width=\textwidth]{pid_ibilbideak.png}
+  \includegraphics[height=5.2cm, keepaspectratio]{pid_ibilbideak.png}
   \caption{Ibilbideak PID konbinazioetarako.}\label{fig:pid-ibilbideak}
 \end{subfigure}
 \hfill
 \begin{subfigure}[b]{0.48\textwidth}
   \centering
-  \includegraphics[width=\textwidth]{pid_angeluak.png}
+  \includegraphics[height=5.2cm, keepaspectratio]{pid_angeluak.png}
   \caption{$\theta$ angelua denboran zehar.}\label{fig:pid-angeluak}
 \end{subfigure}
 \caption{PID konbinazioen portaera ($K_p = 2{,}0$).}\label{fig:pid-grafikoak}
 \end{figure}
 
-\needspace{5\baselineskip}
 \section[Enuntziatuaren adibideak]{Enuntziatuaren adibideak ($K_p = 0{,}6$)}\label{sec:emaitzak-enuntziatua}
 Enuntziatuan adibide gisa emandako hiru komandoak probatu ditugu Gazebon (\ref{tab:enuntziatua-sweep} taula eta \ref{fig:enun-ibilbideak} irudia).
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering\footnotesize
-\begin{tabularx}{\textwidth}{lcccc>{\raggedright\arraybackslash}X}
+\begin{tabularx}{\textwidth}{@{} l >{\raggedright\arraybackslash}X c c >{\centering\arraybackslash}p{2.6cm} >{\centering\arraybackslash}p{2.2cm} @{}}
 \toprule
 \textbf{Agindua} & \textbf{Emaitza} & \textbf{Bueltak} & \textbf{Talkak} & \textbf{$d$ zuzenetan (m)} & \textbf{$\theta_{\text{RMS}}$ ($^\circ$)} \\
 \midrule
@@ -176,10 +162,10 @@ Enuntziatuan adibide gisa emandako hiru komandoak probatu ditugu Gazebon (\ref{t
 \caption{Enuntziatuko adibideen ebaluazioa Gazebon: hiruretan seinaleak jotzen ditu.}\label{tab:enuntziatua-sweep}
 \end{table}
 
-\begin{figure}[htbp]
+$K_p = 0{,}6$ txikiegia denez, robotak biraketa zabalegia egiten du eta paretako seinaleak jotzen ditu. $K_i$ eta $K_d$ gehitzeak ez du arazo hori konpontzen.
+
+\begin{figure}[H]
 \centering
-\includegraphics[width=0.55\textwidth]{enun_ibilbideak.png}
+\includegraphics[height=5.2cm, keepaspectratio]{enun_ibilbideak.png}
 \caption{Enuntziatuko hiru adibideen ibilbideak: hiruretan robotak kanpoko seinaleak jotzen ditu $K_p = 0{,}6$ txikiegia delako izkinak garbi hartzeko.}\label{fig:enun-ibilbideak}
 \end{figure}
-
-Irakasleak dioen bezala balio horiek lehen probetarako adibideak besterik ez dira: $K_p = 0{,}6$ txikiegia denez, robotak biraketa zabalegia egiten du eta paretako seinaleak jotzen ditu. $K_i$ eta $K_d$ gehitzeak ez du arazo hori konpontzen.

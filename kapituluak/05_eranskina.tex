@@ -1,37 +1,35 @@
 Eranskin honetan simulazioa eta nodoak exekutatzeko beharrezko aginduak, telemetria grabatzeko jarraibideak eta entregatutako paketearen fitxategi-egitura garbia aurkezten dira.
 
-\needspace{6\baselineskip}
 \section{Exekuzio- eta simulazio-aginduak}\label{sec:exekuzioa}
 Paketea konpilatu eta Gazebon exekutatzeko urratsak:
-\begin{enumerate}[leftmargin=2em, itemsep=0.3em]
-  \item \textbf{Paketea konpilatu eta ingurunea kargatu}:
+\begin{enumerate}[leftmargin=1.5em, itemsep=0.25em]
+  \item Paketea konpilatu eta ingurunea kargatu:
 \begin{verbatim}
 colcon build --packages-select wall_following
 source install/setup.bash
 \end{verbatim}
-  \item \textbf{Gazebo simulazioa abiarazi}:
+  \item Gazebo simulazioa abiarazi:
 \begin{verbatim}
 ros2 launch gazebo_worlds gz_robot.launch.py world:=yahboom_track
 \end{verbatim}
-  \item \textbf{Konfigurazio irabazlea abiarazi (P hutsa, irakasleari aurkeztekoa)}:
+  \item Konfigurazio optimoa abiarazi (P hutsa):
 \begin{verbatim}
 ros2 launch wall_following wf_ls.launch.py kp:=1.5 ki:=0.0 kd:=0.0
 \end{verbatim}
-  \item \textbf{Bigarren aldaera abiarazi (PID kontrolagailu osoa)}:
+  \item Bigarren aldaera abiarazi (PID osoa):
 \begin{verbatim}
 ros2 launch wall_following wf_ls.launch.py kp:=2.0 ki:=0.05 kd:=0.1
 \end{verbatim}
-  \item \textbf{Telemetria eta kontaktu-sentsoreak grabatu} (nodoaren kodea aldatu gabe):
+  \item Telemetria eta kontaktu-sentsoreak grabatu:
 \begin{verbatim}
 ros2 bag record --include-hidden-topics /gz_pose /odom /scan /clock
 \end{verbatim}
 \end{enumerate}
 
-\needspace{6\baselineskip}
 \section{Entregatutako paketearen katalogoa}\label{sec:fitxategiak}
-KISS filosofiari jarraituz, garatutako kodea irakasleak emandako fitxategien gainean eraiki da inolako alferrikako luzapenik gabe:
-\begin{itemize}[leftmargin=2em, itemsep=0.3em]
-  \item \texttt{wall\_following/wall\_follow\_ls.py}: ROS 2 nodo nagusia. Irakaslearen \texttt{## TODO Add code here ... ## END TODO} blokearen barruan soilik aldatu da (30 lerro garbi). Ezkerreko paretaren izpiak proiektatzen ditu, \texttt{np.polyfit} bidez $\theta$ estimatzen du, PID algoritmoa gauzatzen du eta $\Delta t$ eskaneoaren denbora simulatutik erauzten du.
-  \item \texttt{launch/wf\_ls.launch.py}: Jatorrizko launch fitxategia, komando-lerrotik \texttt{kp}, \texttt{ki} eta \texttt{kd} parametroak jasotzen dituena.
-  \item \texttt{diff\_wall\_follow\_ls\_vs\_original.diff}: Jatorrizko nodoaren eta soluzioaren arteko diff bateratua, aldaketa guztiak TODO blokean daudela frogatzen duena.
+Entregatutako paketearen osagai nagusiak honako hauek dira:
+\begin{itemize}[leftmargin=1.5em, itemsep=0.25em]
+  \item \texttt{wall\_following/wall\_follow\_ls.py}: ROS 2 nodo nagusia. Ezkerreko paretaren izpiak hautatu eta plano kartesiarrera proiektatzen ditu, \texttt{np.polyfit} bidez $\theta$ estimatzen du, PID algoritmoa kalkulatzen du eta $\Delta t$ denbora-diferentzia neurtzen du.
+  \item \texttt{launch/wf\_ls.launch.py}: Launch fitxategia, komando-lerrotik \texttt{kp}, \texttt{ki} eta \texttt{kd} parametroak jasotzeko gaitasuna ematen duena.
+  \item \texttt{diff\_wall\_follow\_ls\_vs\_original.diff}: Jatorrizko nodoaren eta azken bertsioaren arteko aldaketen diff fitxategia.
 \end{itemize}

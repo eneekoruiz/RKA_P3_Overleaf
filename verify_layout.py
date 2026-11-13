@@ -157,6 +157,56 @@ def audit_source_typography(tex_dir: Path) -> list[str]:
                 f"which causes LaTeX to print '1. 1. ...'. Use descriptive paragraphs or unnumbered headings."
             )
 
+        # Check 6: Unwanted numbered equations
+        if re.search(r'\\begin\{(?:equation|align|gather)\}(?!\*)', content):
+            defects.append(
+                f"[SOURCE LINT] {tf.name}: NUMBERED EQUATION DETECTED! "
+                f"Equations should be unnumbered display math '\\[ ... \\]' to avoid distracting marginal equation numbers."
+            )
+
+        # Check 7: Excessive bolding inside paragraphs (AI writing tell)
+        bold_matches = re.finditer(r'\\textbf\{([^}]+)\}', content)
+        for bm in bold_matches:
+            b_text = bm.group(1).strip()
+            if len(b_text.split()) > 5:
+                defects.append(
+                    f"[SOURCE LINT] {tf.name}: EXCESSIVE MID-PARAGRAPH BOLDING ('\\textbf{{{b_text[:30]}...}}'). "
+                    f"Mid-sentence bold text blocks (>5 words) read like AI emphasis. Use normal font weight."
+                )
+
+        # Check 8: Floats must use [H] to prevent floating onto separate pages from intro text
+        if "kapituluak" in str(tf.as_posix()):
+            non_h_floats = re.findall(r'\\begin\{(?:table|figure)\}(?!\[H\])', content)
+            if non_h_floats:
+                defects.append(
+                    f"[SOURCE LINT] {tf.name}: FLOAT WITHOUT [H] POSITIONING DETECTED! "
+                    f"All tables and figures must use [H] positioning to keep them strictly bound to their introducing paragraph and section heading."
+                )
+
+        # Check 9: Tabularx must include at least one expandable X column
+        for m_tabx in re.finditer(r'\\begin\{tabularx\}\s*\{[^}]+\}\s*\{((?:[^{}]|\{[^{}]*\})*)\}', content):
+            col_spec = m_tabx.group(1)
+            if 'X' not in col_spec:
+                defects.append(
+                    f"[SOURCE LINT] {tf.name}: TABULARX WITHOUT 'X' COLUMN SPECIFIER ('{col_spec.strip()}'). "
+                    f"Tabularx must use at least one expandable 'X' column to fill \\textwidth evenly without awkward margins."
+                )
+
+        # Check 10: AI meta-commentary detector
+        meta_ai_patterns = [
+            r'\bKISS\b',
+            r'TODO\s+bloke',
+            r'30\s+lerro\s+garbi',
+            r'adabaki\s+artifizial',
+            r'irakasleak\s+proposatutako\s+arkitektura\s+minimalari',
+        ]
+        for pat in meta_ai_patterns:
+            if re.search(pat, content, re.IGNORECASE):
+                defects.append(
+                    f"[SOURCE LINT] {tf.name}: AI META-COMMENTARY DETECTED matching '{pat}'! "
+                    f"Remove developer/AI self-referential phrases from student technical report."
+                )
+
     if has_bib and total_cites == 0:
         defects.append(
             "[SOURCE LINT] UNREFERENCED / DEAD BIBLIOGRAPHY DETECTED! '\\bibliography' is included but 0 '\\cite' calls exist in the document."
@@ -279,6 +329,25 @@ def audit_pdf_layout(pdf_path: Path, tex_dir: Path = None, render: bool = False,
         if page_num == 1:
             cover_defects = audit_cover_spacing(page)
             defects.extend(cover_defects)
+
+        # Check 6: Awkward table header unit wrap (isolated unit on its own line)
+        for l in lines:
+            if l in ("(°)", "(m)", "(rad/s)", r"(\circ)"):
+                defects.append(
+                    f"Page {page_num:2d}: AWKWARD TABLE HEADER WRAP -> isolated unit '{l}' on its own line. Widen column or compact header text."
+                )
+
+        # Check 7: Stranded introductory phrase or float split at page bottom
+        if lines and page_num > 1:
+            last_line = lines[-1]
+            if len(lines) > 1 and lines[-1].isdigit():
+                last_line = lines[-2]
+            intro_keywords = ["taulan", "taula", "irudian", "irudia", "grafikoan", "grafikoa"]
+            if any(k in last_line.lower() for k in intro_keywords):
+                if last_line.endswith(":") or any(v in last_line.lower() for v in ["agertzen", "ikus daite", "ikusten", "laburbiltzen"]):
+                    defects.append(
+                        f"Page {page_num:2d}: STRANDED INTRODUCTORY LINE AT PAGE BOTTOM -> '{last_line}'. Anchor float with [H] or keep with next paragraph to prevent float split."
+                    )
                 
         if render:
             img = page.render(scale=1.5).to_pil()

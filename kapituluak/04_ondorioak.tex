@@ -1,39 +1,30 @@
 Kapitulu honetan Yahboom zirkuituko 17 proba esperimentaletatik ateratako ondorio nagusiak eta gomendio argiak laburbiltzen ditugu.
 
-\needspace{5\baselineskip}
 \section[Hiru aldaerak]{Hiru aldaera nagusien arteko konparaketa}\label{sec:aldaerak}
 Esperimentuen emaitzak laburbiltzeko, \ref{tab:aldaerak} taulan hiru aukera nagusiak konparatu ditugu $K_p = 1{,}5$ oinarri hartuta.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering\footnotesize
-\begin{tabularx}{\textwidth}{lcccc>{\raggedright\arraybackslash}X}
+\begin{tabularx}{\textwidth}{@{} >{\raggedright\arraybackslash}p{5.0cm} >{\raggedright\arraybackslash}X c c c c @{}}
 \toprule
-\textbf{Aldaera} & \textbf{Emaitza} & \textbf{Bueltak} & \textbf{Talkak} & \textbf{$d$ zuzenetan (m)} & \textbf{$\theta_{\text{RMS}}$ ($^\circ$)} \\
+\textbf{Aldaera} & \textbf{Emaitza} & \textbf{Bueltak} & \textbf{Talkak} & \textbf{$d$ zuzenetan [m]} & \textbf{$\theta_{\text{RMS}}$ [$^\circ$]} \\
 \midrule
-1. P hutsa ($K_p = 1{,}5, K_V = 0$) & \textbf{Ondo (Irabazlea)} & $3{,}32$ & $\mathbf{0}$ & $\mathbf{0{,}307 \pm 0{,}013}$ & $\mathbf{1{,}7}$ \\
-2. PID osoa ($1{,}5/0{,}05/0{,}1, K_V = 0$) & \textbf{Ondo} & $3{,}32$ & $\mathbf{0}$ & $0{,}320 \pm 0{,}020$ & $1{,}9$ \\
+1. P hutsa ($K_p = 1{,}5, K_V = 0$) & Ondo (optimoa) & $3{,}32$ & $0$ & $0{,}307 \pm 0{,}013$ & $1{,}7$ \\
+2. PID osoa ($1{,}5/0{,}05/0{,}1, K_V = 0$) & Ondo & $3{,}32$ & $0$ & $0{,}320 \pm 0{,}020$ & $1{,}9$ \\
 3. PID moteldua ($1{,}5/0{,}05/0{,}1, K_V = 2$) & Pareta galtzen du & $0{,}18$ & $5$ & $0{,}778 \pm 0{,}338$ & $33{,}1$ \\
 \bottomrule
 \end{tabularx}
 \caption{Hiru aldaera nagusien konparaketa Gazeboko \texttt{yahboom\_track} zirkuituan.}\label{tab:aldaerak}
 \end{table}
 
-\needspace{5\baselineskip}
 \section[Ondorio nagusiak]{Gure ondorio nagusiak eta gomendioa}\label{sec:ondorio-nagusiak}
-Irakasleari aurkezteko aukeratutako konfigurazioa \textbf{1. aldaera da (P hutsa: $K_p = 1{,}5, K_i = 0{,}0, K_d = 0{,}0, v_0 = 0{,}2\text{ m/s}, K_V = 0{,}0$)}. Gure probetatik ondorio nagusi hauek atera ditugu:
+Aukeratutako konfigurazio nagusia 1. aldaera da: P kontrolagailu hutsa ($K_p = 1{,}5$, $K_i = 0{,}0$, $K_d = 0{,}0$, $v_0 = 0{,}2\text{ m/s}$ eta $K_V = 0{,}0$). Gure probetatik ondorio nagusi hauek atera ditugu:
 
-\begin{itemize}[leftmargin=2em, itemsep=0.25em]
-  \item \textbf{P kontrola nahikoa eta onena da}: Zuzenetan robotaren orientazio-aldaketa $\dot\theta = -\omega$ da. Robotaren biraketak berak ezabatzen du errorea; perturbazio finkorik ezean ez dago errore iraunkorrik eta P hutsak zirkuitua garbi osatzen du.
-  \item \textbf{Zergatik okertzen duen I osagaiak}: Zirkuituko biraketa guztiak eskuinerantz dira ($\theta < 0$). Integratzaileak errorea pilatzen du izkina bakoitzean; zuzenera irtetean integralak eskuinera biratzen jarraitzera bultzatzen du robota, paretatik urrunduz ($0{,}31\text{ m}$-tik $0{,}39\text{ m}$-ra) eta lerrokatzea motelduz.
-  \item \textbf{Zergatik ez duen laguntzen D osagaiak}: Izkinetan aurreko pareta bat-batean agertzen denez, deribatuak biraketa-kolpe handiak eragiten ditu ($K_d / \Delta t$) eta laserraren zarata handitzen du. $K_d = 1{,}0$ balioarekin robota desbideratu eta trabatu egiten da.
-  \item \textbf{Distantzia nola finkatzen den formula gabe}: Kontrol-legean ez dago distantzia-terminorik ($e = \theta$ soilik da). Distantzia izkinetan finkatzen da berez: $D_{\max} = 0{,}5\text{ m}$ mugak biraketaren hasiera ezartzen du, eta $K_p = 1{,}5$ irabaziak robota zuzenean errepidearen erdian uzten du ($d = 0{,}307\text{ m}$).
-  \item \textbf{Abiadura moldatuaren muga}: Biraketetan moteltzeak ($K_V = 2$) $K_p = 1{,}0$ bezalako irabazi ahulei laguntzen die (biraketa itxiagoa eginez); baina $K_p = 1{,}5$ kasuan gehiegizko biraketa eragiten du eta robotak pareta galtzen du.
-  \item \textbf{KISS printzipioaren indarra}: Kode minimalena (30 lerro irakaslearen \texttt{TODO} blokean, adabaki artifizialik gabe) konponbiderik sendoena eta fidagarriena dela frogatu dugu.
+\begin{itemize}[leftmargin=1.5em, itemsep=0.25em]
+  \item P kontrola nahikoa eta onena da: zuzenetan robotaren orientazio-aldaketa $\dot\theta = -\omega$ denez, robotaren biraketak berak ezabatzen du errorea; perturbazio finkorik ezean ez dago errore iraunkorrik eta P hutsak zirkuitua garbi osatzen du.
+  \item Zergatik okertzen duen I osagaiak: zirkuituko biraketa guztiak eskuinerantz dira ($\theta < 0$). Integratzaileak errorea pilatzen du izkina bakoitzean; zuzenera irtetean integralak eskuinera biratzen jarraitzera bultzatzen du robota, paretatik urrunduz ($0{,}31\text{ m}$-tik $0{,}39\text{ m}$-ra) eta lerrokatzea motelduz.
+  \item Zergatik ez duen laguntzen D osagaiak: izkinetan aurreko pareta bat-batean agertzen denez, deribatuak biraketa-kolpe handiak eragiten ditu ($K_d / \Delta t$) eta laserraren zarata handitzen du. $K_d = 1{,}0$ balioarekin robota desbideratu eta trabatu egiten da.
+  \item Distantzia nola finkatzen den formula gabe: kontrol-legean ez dago distantzia-terminorik ($e = \theta$ soilik da). Distantzia izkinetan finkatzen da berez: $D_{\max} = 0{,}5\text{ m}$ mugak biraketaren hasiera ezartzen du, eta $K_p = 1{,}5$ irabaziak robota zuzenean errepidearen erdian uzten du ($d = 0{,}307\text{ m}$).
+  \item Abiadura moldatuaren muga: biraketetan moteltzeak ($K_V = 2$) $K_p = 1{,}0$ bezalako irabazi ahulei laguntzen die (biraketa itxiagoa eginez); baina $K_p = 1{,}5$ kasuan gehiegizko biraketa eragiten du eta robotak pareta galtzen du.
+  \item Arkitektura sinplearen sendotasuna: alferrikako kontrol-adabakirik gabe, paretarekiko paralelotasun-errore garbia ($e = \theta$) P irabazi egoki batekin gidatzea izan da zirkuitua gainditzeko konponbiderik sendoena eta eraginkorrena.
 \end{itemize}
-
-\needspace{5\baselineskip}
-\section[Mugak]{Esperimentuaren mugak}\label{sec:mugak}
-\begin{enumerate}[leftmargin=2em, itemsep=0.2em]
-  \item Proba bakoitza behin egin dugu Gazebon (proba luzeak izanik, 3 buelta oso konfigurazio bakoitzeko).
-  \item Hormetako kontaktu-sentsoreek gurpil-lur kontaktuak ere ematen zituztenez, robotaren xasisaren talka errealak soilik zenbatu ditugu.
-\end{enumerate}
