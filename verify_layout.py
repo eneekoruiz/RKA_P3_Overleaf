@@ -207,6 +207,28 @@ def audit_source_typography(tex_dir: Path) -> list[str]:
                     f"Remove developer/AI self-referential phrases from student technical report."
                 )
 
+        # Check 11: Standalone Figure Sizing & Axis Legibility Lint
+        # Trajectory and diagnostic plots outside subfigures must have width >= 0.65\textwidth
+        standalone_figs = re.finditer(r'\\begin\{figure\}\[H\]\s*(?:\\centering\s*)?\\includegraphics\[([^\]]+)\]\{([^}]+)\}', content)
+        for sf in standalone_figs:
+            opts = sf.group(1)
+            fname = sf.group(2)
+            # If height is constrained below 6cm without adequate width
+            m_h = re.search(r'height=([0-9.]+)cm', opts)
+            if m_h and float(m_h.group(1)) < 6.0 and 'width' not in opts:
+                defects.append(
+                    f"[SOURCE LINT] {tf.name}: STANDALONE FIGURE '{fname}' CONSTRAINED TO MICRO-HEIGHT ('{opts}'). "
+                    f"Standalone trajectory plots must be displayed with width >= 0.65\\textwidth so axis labels and ticks remain fully legible."
+                )
+
+        # Check 12: Multi-parameter command formatting in tables
+        # Multi-variable commands like kp:=0.6 ki:=... in tables should break lines to avoid squashing text columns
+        for m_row in re.finditer(r'(\\texttt\{kp:=[^}]+\s+ki:=[^}]+\s+kd:=[^}]+\})', content):
+            defects.append(
+                f"[SOURCE LINT] {tf.name}: LONG INLINE COMMAND IN TABLE ('{m_row.group(1)}'). "
+                f"Break multi-parameter commands across multiple lines using '\\newline' so description columns have adequate breathing room."
+            )
+
     if has_bib and total_cites == 0:
         defects.append(
             "[SOURCE LINT] UNREFERENCED / DEAD BIBLIOGRAPHY DETECTED! '\\bibliography' is included but 0 '\\cite' calls exist in the document."
@@ -299,16 +321,16 @@ def audit_pdf_layout(pdf_path: Path, tex_dir: Path = None, render: bool = False,
                 f"Page {page_num:2d}: ALMOST BLANK / ORPHAN PAGE ({line_count} lines) -> '{' '.join(lines)[:60]}...'"
             )
             
-        # Check 2: Stranded section heading at the bottom of the page
-        if lines:
-            last_line = lines[-1]
-            if len(lines) > 1 and lines[-1].isdigit():
-                last_line = lines[-2]
-            if re.match(r"^\d+(\.\d+)*\s+[A-Z]", last_line):
-                defects.append(
-                    f"Page {page_num:2d}: SECTION HEADING STRANDED AT PAGE BOTTOM -> '{last_line}'"
-                )
-                
+        # Check 2: Stranded section heading at or near the bottom of the page
+        if len(lines) >= 3:
+            check_slice = lines[-5:-1] if lines[-1].isdigit() else lines[-4:]
+            for candidate in check_slice:
+                if re.match(r"^\d+(\.\d+)*\s+[A-Z]", candidate):
+                    defects.append(
+                        f"Page {page_num:2d}: SECTION HEADING STRANDED NEAR PAGE BOTTOM -> '{candidate}'. Move section with \\clearpage or \\needspace."
+                    )
+                    break
+
         # Check 3: Dangling hyphenation across page breaks
         if lines:
             last_line = lines[-1]
@@ -318,6 +340,16 @@ def audit_pdf_layout(pdf_path: Path, tex_dir: Path = None, render: bool = False,
                 defects.append(
                     f"Page {page_num:2d}: WORD HYPHENATED ACROSS PAGE BREAK -> '{last_line[-30:]}'"
                 )
+
+        # Check 3b: Awkward inline hyphenation inside table cells (e.g. 'seinalee-')
+        for l in lines:
+            if re.search(r'\b[a-zA-Z]{5,}-\s*$', l) and any(kw in text.lower() for kw in ["taula", "agindua", "emaitza"]):
+                # Catch awkward table breaks
+                m_hy = re.search(r'([a-zA-Z]{5,}-)\s*$', l)
+                if m_hy:
+                    defects.append(
+                        f"Page {page_num:2d}: AWKWARD HYPHENATION IN TABLE CELL -> '{m_hy.group(1)}'. Widen description column or break parameters into multiple lines."
+                    )
                 
         # Check 4: Frontmatter page bloat (e.g. single 2-line lists taking whole page)
         if page_num in (2, 3) and line_count < 4:

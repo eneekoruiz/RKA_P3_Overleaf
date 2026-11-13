@@ -11,14 +11,15 @@ Pistako seinaleak paretari atxikitako zutoin meheak dira ($0{,}04\text{ m}$). \r
 \caption{Laserrak atzemandako puntuak eta doitutako zuzena seinale baten ondoan ($K_p = 2{,}0$). Erregresioak zutoina naturaltasunez iragazten du.}\label{fig:diag-kp2}
 \end{figure}
 
+\clearpage
 \section[Kontrol Proportzionala]{Kontrol Proportzionalaren emaitzak}\label{sec:emaitzak-p}
 Lehen azterketan $K_p$ parametroaren eragina ebaluatu dugu ($K_i = 0$, $K_d = 0$, $v_0 = 0{,}2\text{ m/s}$, $K_V = 0$). Proba guztiak 3 buelta osoz luzatu dira ($3{,}32$ buelta). Emaitzak \ref{tab:kp-sweep} taulan laburbiltzen dira.
 
 \begin{table}[H]
 \centering\footnotesize
-\begin{tabularx}{\textwidth}{@{} l >{\raggedright\arraybackslash}X c c >{\centering\arraybackslash}p{2.6cm} >{\centering\arraybackslash}p{2.2cm} @{}}
+\begin{tabularx}{\textwidth}{@{} l >{\raggedright\arraybackslash}X c c >{\centering\arraybackslash}p{2.6cm} >{\centering\arraybackslash}p{2.0cm} @{}}
 \toprule
-\textbf{Proba} & \textbf{Emaitza} & \textbf{Bueltak} & \textbf{Talkak} & \textbf{$d$ zuzenetan (m)} & \textbf{$\theta_{\text{RMS}}$ ($^\circ$)} \\
+\textbf{Proba} & \textbf{Emaitza} & \textbf{Bueltak} & \textbf{Talkak} & \textbf{$d$ zuzenetan [m]} & \textbf{$\theta_{\text{RMS}}$ [$^\circ$]} \\
 \midrule
 $K_p = 0{,}3$ & Pareta galtzen du & $0{,}77$ & $4$  & $0{,}160 \pm 0{,}065$ & $19{,}7$ \\
 $K_p = 0{,}6$ & Bueltak osatu, talkekin & $3{,}32$ & $14$ & $0{,}172 \pm 0{,}060$ & $6{,}8$ \\
@@ -36,10 +37,10 @@ $K_p = 8{,}0$ & Pareta galtzen du       & $0{,}01$ & $1$  & $0{,}185 \pm 0{,}098
 
 Gure probetan $1{,}5 \le K_p \le 2{,}0$ tartean soilik lortu dugu zirkuitua talkarik gabe osatzea. $K_p = 1{,}5$ balioarekin robota errepidearen erditik doa ($d = 0{,}307\text{ m}$), desbideratze minimoarekin ($\pm 0{,}013\text{ m}$) eta zero talkarekin.
 
-Balioa handitu edo txikitzean portaera honako hau da:
+Balioa handitu edo txikitzean portaera fisikoa honako hau da:
 \begin{itemize}[leftmargin=1.5em, itemsep=0.15em]
-  \item $K_p$ txikitzean ($K_p \le 1{,}0$): biraketa motelagoa da ($R = v/\omega$ handia). Robotak izkinetan berandu biratzen du, paretatik oso hurbil amaitzen du ($d \approx 0{,}17\text{ m}$) eta seinaleak jotzen ditu ($14$ eta $10$ talka).
-  \item $K_p$ handitzean ($K_p \ge 2{,}5$): laginketa-atzerapenagatik ($T \approx 0{,}1\text{ s}$), gainbultzada sortzen da. Robotak izkinetan gehiegi biratzen du eskuinera, paretatik urruntzen da ($d > 0{,}5\text{ m}$), laserrak pareta galtzen du eta robota barruko kaleetan galtzen da.
+  \item $K_p$ txikitzean ($K_p \le 1{,}0$): biraketa-erradioa zabalegia da ($R = v/\omega$). Robotak berandu biratzen du izkinetan, kanpoko paretatik oso hurbil amaitzen du ($d \approx 0{,}17\text{ m}$) eta bertako seinaleak jotzen ditu ($14$ eta $10$ talka).
+  \item $K_p$ handitzean ($K_p \ge 2{,}5$): laginketa-atzerapenagatik ($T \approx 0{,}1\text{ s}$), biraketa bortitza sortzen da. Robotak izkinetan gehiegi biratzen du eskuinera, paretatik urruntzen da ($d > 0{,}5\text{ m}$), laserrak pareta galtzen du eta ibilbidea eteten da.
 \end{itemize}
 
 Ibilbideak eta $\theta(t)$ orientazio-angelua \ref{fig:kp-grafikoak} irudian ikus daitezke.
@@ -48,26 +49,27 @@ Ibilbideak eta $\theta(t)$ orientazio-angelua \ref{fig:kp-grafikoak} irudian iku
 \centering
 \begin{subfigure}[b]{0.48\textwidth}
   \centering
-  \includegraphics[height=5.2cm, keepaspectratio]{kp_ibilbideak.png}
+  \includegraphics[height=4.4cm, keepaspectratio]{kp_ibilbideak.png}
   \caption{Ibilbideak zirkuituan (\texttt{/gz\_pose}).}\label{fig:kp-ibilbideak}
 \end{subfigure}
 \hfill
 \begin{subfigure}[b]{0.48\textwidth}
   \centering
-  \includegraphics[height=5.2cm, keepaspectratio]{kp_angeluak.png}
+  \includegraphics[height=4.4cm, keepaspectratio]{kp_angeluak.png}
   \caption{$\theta$ angelua denboran zehar.}\label{fig:kp-angeluak}
 \end{subfigure}
 \caption{$K_p$ parametroaren eragina ibilbidean eta angeluan: $K_p = 1{,}5$ eta $2{,}0$ dira egonkor bakarrak.}\label{fig:kp-grafikoak}
 \end{figure}
 
+\clearpage
 \section[Abiadura lineala]{Abiadura lineala: konstantea vs alderantziz proportzionala}\label{sec:emaitzak-abiadura}
 Abiadura konstantea ($K_V = 0$) eta $|\omega|$-ren alderantziz proportzionala ($K_V = 2$) konparatu ditugu. Emaitzak \ref{tab:abiadura-sweep} taulan eta \ref{fig:v-ibilbideak} irudian ageri dira.
 
 \begin{table}[H]
 \centering\footnotesize
-\begin{tabularx}{\textwidth}{@{} l >{\raggedright\arraybackslash}X c c >{\centering\arraybackslash}p{2.6cm} >{\centering\arraybackslash}p{2.2cm} @{}}
+\begin{tabularx}{\textwidth}{@{} l >{\raggedright\arraybackslash}X c c >{\centering\arraybackslash}p{2.6cm} >{\centering\arraybackslash}p{2.0cm} @{}}
 \toprule
-\textbf{Konfigurazioa} & \textbf{Emaitza} & \textbf{Bueltak} & \textbf{Talkak} & \textbf{$d$ zuzenetan (m)} & \textbf{$\theta_{\text{RMS}}$ ($^\circ$)} \\
+\textbf{Konfigurazioa} & \textbf{Emaitza} & \textbf{Bueltak} & \textbf{Talkak} & \textbf{$d$ zuzenetan [m]} & \textbf{$\theta_{\text{RMS}}$ [$^\circ$]} \\
 \midrule
 $K_p = 0{,}6, K_V = 0$ & Talkak seinaleetan & $3{,}32$ & $14$ & $0{,}172 \pm 0{,}060$ & $6{,}8$ \\
 $K_p = 0{,}6, K_V = 2$ & Talkak seinaleetan & $3{,}24$ & $14$ & $0{,}166 \pm 0{,}050$ & $7{,}0$ \\
@@ -82,22 +84,23 @@ $K_p = 2{,}0, K_V = 2$ & Pareta galtzen du  & $0{,}83$ & $3$  & $0{,}674 \pm 0{,
 \caption{Abiadura-legeen konparaketa: konstantea ($K_V = 0$) vs moldatua ($K_V = 2$).}\label{tab:abiadura-sweep}
 \end{table}
 
-Biraketetan moteltzeak kurbadura efektiboa handitzen du ($\kappa = \omega / v$). Horregatik, $K_p = 1{,}0$ balio txikiari lagundu egiten dio (10 talka izatetik 0 izatera pasatuz). Baina $K_p \ge 1{,}5$ balio egokietan, kurbadura gehiegi handitzen da: robotak izkinetan gehiegi biratzen du, pareta galdu eta pistatik kanpora doa. Beraz, $K_p = 1{,}5$-ekin abiadura konstantea ($K_V = 0$) da onena.
+Biraketetan moteltzeak kurbadura efektiboa handitzen du ($\kappa = \omega / v$). Horregatik, $K_p = 1{,}0$ balio ahulari lagundu egiten dio (biraketa itxiagoa eginez 10 talka izatetik 0 izatera pasatzen da). Baina $K_p \ge 1{,}5$ balio egokietan, kurbadura gehiegi handitzen da: robotak izkinetan gehiegi biratzen du eskuinera, pareta galdu eta pistatik kanpora doa. Beraz, $K_p = 1{,}5$-ekin abiadura konstantea ($K_V = 0$) da egonkorrena.
 
 \begin{figure}[H]
 \centering
-\includegraphics[height=5.2cm, keepaspectratio]{v_ibilbideak.png}
+\includegraphics[width=0.68\textwidth]{v_ibilbideak.png}
 \caption{Abiadura konstantearen ($K_V = 0$) eta moldatuaren ($K_V = 2$) arteko ibilbideak.}\label{fig:v-ibilbideak}
 \end{figure}
 
+\clearpage
 \section[PID kontrola]{PID kontrolaren emaitzak (Ki eta Kd)}\label{sec:emaitzak-pid}
-Aurreko ataleko $K_p = 2{,}0$ balio egonkorretik abiatuta, $K_i$ eta $K_d$ osagaiak probatu ditugu Gazebon (\ref{tab:pid-sweep} taula).
+Aurreko ataleko $K_p = 2{,}0$ balio egonkorretik abiatuta, $K_i$ eta $K_d$ osagaiak probatu ditugu Gazebon (\ref{tab:pid-sweep} taula). Azterketa honen helburua da egiaztatzea ea kontrol proportzional hutsaren gainean integratzaileak edo deribatuak fidagarritasuna hobetzen duten.
 
 \begin{table}[H]
 \centering\footnotesize
-\begin{tabularx}{\textwidth}{@{} l >{\raggedright\arraybackslash}X c c >{\centering\arraybackslash}p{2.6cm} >{\centering\arraybackslash}p{2.2cm} @{}}
+\begin{tabularx}{\textwidth}{@{} l >{\raggedright\arraybackslash}X c c >{\centering\arraybackslash}p{2.6cm} >{\centering\arraybackslash}p{2.0cm} @{}}
 \toprule
-\textbf{Konfigurazioa} & \textbf{Emaitza} & \textbf{Bueltak} & \textbf{Talkak} & \textbf{$d$ zuzenetan (m)} & \textbf{$\theta_{\text{RMS}}$ ($^\circ$)} \\
+\textbf{Konfigurazioa} & \textbf{Emaitza} & \textbf{Bueltak} & \textbf{Talkak} & \textbf{$d$ zuzenetan [m]} & \textbf{$\theta_{\text{RMS}}$ [$^\circ$]} \\
 \midrule
 \multicolumn{6}{l}{\textit{$K_i$ osagaiaren aldaketa ($K_p = 2{,}0, K_d = 0$)}} \\
 $K_i = 0{,}0$  & Ondo                    & $3{,}32$ & $0$ & $0{,}362 \pm 0{,}028$ & $1{,}7$ \\
@@ -119,12 +122,13 @@ PID ($2{,}0/0{,}05/0{,}1$) & Ondo & $3{,}32$ & $0$ & $0{,}372 \pm 0{,}033$ & $1{
 \caption{$K_i$ eta $K_d$ osagaien eta PID konbinazioaren eragina ($K_p = 2{,}0$). Tarte egokiak: $0 \le K_i \le 0{,}2$ eta $0 \le K_d \le 0{,}3$.}\label{tab:pid-sweep}
 \end{table}
 
-$K_p = 2{,}0$ hartuta, tarte egokiak $0 \le K_i \le 0{,}2$ eta $0 \le K_d \le 0{,}3$ dira. PID osoak ($2{,}0 / 0{,}05 / 0{,}1$) 3 bueltak talkarik gabe osatzen ditu.
+Emaitzek argi uzten dute $K_p = 2{,}0$ oinarri hartuta, funtzionamendu erabilgarria $0 \le K_i \le 0{,}2$ eta $0 \le K_d \le 0{,}3$ tarteetara mugatzen dela. PID kontrolagailu osoak ($2{,}0 / 0{,}05 / 0{,}1$) zirkuituko 3 buelta osoak talkarik gabe osatzen ditu, baina P hutsarekin alderatuta ez du inolako hobekuntza adierazgarririk ekartzen.
 
-Osagai bakoitzaren portaera honela laburbiltzen da:
-\begin{itemize}[leftmargin=1.5em, itemsep=0.15em]
-  \item $K_i$ handitzean robota paretatik urrundu egiten da ($0{,}362\text{ m} \to 0{,}393\text{ m}$) eta $K_i \ge 0{,}5$ denean talkak agertzen dira. Zirkuituko biraketa guztiak eskuinerantz direnez ($\theta < 0$), integratzaileak errore negatiboa pilatzen du izkinetan. Izkinatik irtetean, pilatutako integralak robota eskuinera biratzen jarraitzera behartzen du, paretatik urrunduz.
-  \item $K_d \le 0{,}3$ denean eragina oso txikia da; baina $K_d = 1{,}0$ denean robota trabatu egiten da. Izkinetan aurreko pareta bat-batean agertzen denean errorea jauzika aldatzen denez, deribatuak biraketa-kolpe bortitzak sortzen ditu ($K_d / \Delta t$).
+\clearpage
+\noindent Portaera fisikoaren azterketa eta arrazoiak:
+\begin{itemize}[leftmargin=1.5em, itemsep=0.3em]
+  \item $K_i$ osagaiaren galera: Zirkuitu itxian biraketa guztiak eskuinerantz dira ($\theta < 0$). Integratzaileak errore negatiboa pilatzen du izkinetan; ondorioz, izkinatik zuzenera irtetean integralak robota eskuinera biratzen jarraitzera behartzen du. Horrek paretatik alferrik urruntzen du ($d = 0{,}362\text{ m}$-tik $0{,}393\text{ m}$-ra) eta $K_i \ge 0{,}5$ balioekin robotak pareta galtzen du. Gainera, zuzenetan $\theta$ berez zerora doanez, ez dago konpentsatu beharreko errore iraunkorrik.
+  \item $K_d$ osagaiaren ezegonkortasuna: $K_d \le 0{,}3$ denean sistemak egonkor jarraitzen du, baina $K_d = 1{,}0$ balioarekin robota trabatu egiten da. Izkinetan aurreko pareta bat-batean laserraren eremuan sartzean doikuntzaren malda jauzika aldatzen da; deribatuak biraketa-kolpe bortitzak sortzen ditu ($K_d \cdot \Delta e / \Delta t$) eta laserraren zarata biderkatu egiten du.
 \end{itemize}
 
 Ibilbideak eta $\theta(t)$ orientazio-angelua \ref{fig:pid-grafikoak} irudian ikus daitezke.
@@ -133,39 +137,42 @@ Ibilbideak eta $\theta(t)$ orientazio-angelua \ref{fig:pid-grafikoak} irudian ik
 \centering
 \begin{subfigure}[b]{0.48\textwidth}
   \centering
-  \includegraphics[height=5.2cm, keepaspectratio]{pid_ibilbideak.png}
+  \includegraphics[height=5.8cm, keepaspectratio]{pid_ibilbideak.png}
   \caption{Ibilbideak PID konbinazioetarako.}\label{fig:pid-ibilbideak}
 \end{subfigure}
 \hfill
 \begin{subfigure}[b]{0.48\textwidth}
   \centering
-  \includegraphics[height=5.2cm, keepaspectratio]{pid_angeluak.png}
+  \includegraphics[height=5.8cm, keepaspectratio]{pid_angeluak.png}
   \caption{$\theta$ angelua denboran zehar.}\label{fig:pid-angeluak}
 \end{subfigure}
 \caption{PID konbinazioen portaera ($K_p = 2{,}0$).}\label{fig:pid-grafikoak}
 \end{figure}
 
+\clearpage
 \section[Enuntziatuaren adibideak]{Enuntziatuaren adibideak ($K_p = 0{,}6$)}\label{sec:emaitzak-enuntziatua}
 Enuntziatuan adibide gisa emandako hiru komandoak probatu ditugu Gazebon (\ref{tab:enuntziatua-sweep} taula eta \ref{fig:enun-ibilbideak} irudia).
 
 \begin{table}[H]
 \centering\footnotesize
-\begin{tabularx}{\textwidth}{@{} l >{\raggedright\arraybackslash}X c c >{\centering\arraybackslash}p{2.6cm} >{\centering\arraybackslash}p{2.2cm} @{}}
+\begin{tabularx}{\textwidth}{@{} >{\raggedright\arraybackslash}p{2.4cm} >{\raggedright\arraybackslash}X c c >{\centering\arraybackslash}p{2.6cm} >{\centering\arraybackslash}p{2.0cm} @{}}
 \toprule
-\textbf{Agindua} & \textbf{Emaitza} & \textbf{Bueltak} & \textbf{Talkak} & \textbf{$d$ zuzenetan (m)} & \textbf{$\theta_{\text{RMS}}$ ($^\circ$)} \\
+\textbf{Agindua} & \textbf{Emaitza} & \textbf{Bueltak} & \textbf{Talkak} & \textbf{$d$ zuzenetan [m]} & \textbf{$\theta_{\text{RMS}}$ [$^\circ$]} \\
 \midrule
-\texttt{kp:=0.6 ki:=0.0 kd:=0.0}   & Talkak seinaleetan & $3{,}32$ & $14$ & $0{,}172 \pm 0{,}060$ & $6{,}8$ \\
-\texttt{kp:=0.6 ki:=0.05 kd:=0.0}  & Talkak seinaleetan & $3{,}32$ & $13$ & $0{,}167 \pm 0{,}048$ & $6{,}9$ \\
-\texttt{kp:=0.6 ki:=0.05 kd:=0.1}  & Talkak seinaleetan & $3{,}32$ & $13$ & $0{,}189 \pm 0{,}069$ & $7{,}0$ \\
+\texttt{kp:=0.6}\newline \texttt{ki:=0.0}\newline \texttt{kd:=0.0} & Talkak seinaleetan & $3{,}32$ & $14$ & $0{,}172 \pm 0{,}060$ & $6{,}8$ \\
+\addlinespace[0.2em]
+\texttt{kp:=0.6}\newline \texttt{ki:=0.05}\newline \texttt{kd:=0.0} & Talkak seinaleetan & $3{,}32$ & $13$ & $0{,}167 \pm 0{,}048$ & $6{,}9$ \\
+\addlinespace[0.2em]
+\texttt{kp:=0.6}\newline \texttt{ki:=0.05}\newline \texttt{kd:=0.1} & Talkak seinaleetan & $3{,}32$ & $13$ & $0{,}189 \pm 0{,}069$ & $7{,}0$ \\
 \bottomrule
 \end{tabularx}
 \caption{Enuntziatuko adibideen ebaluazioa Gazebon: hiruretan seinaleak jotzen ditu.}\label{tab:enuntziatua-sweep}
 \end{table}
 
-$K_p = 0{,}6$ txikiegia denez, robotak biraketa zabalegia egiten du eta paretako seinaleak jotzen ditu. $K_i$ eta $K_d$ gehitzeak ez du arazo hori konpontzen.
+$K_p = 0{,}6$ irabazia txikiegia da robotaren dinamikarako: biraketa motelak izkina zabalegiak eragiten ditu eta robotak paretako seinaleak jotzen ditu. $K_i$ edo $K_d$ gehitzeak ezin du oinarrizko kontrol proportzionalaren eskasia konpondu.
 
 \begin{figure}[H]
 \centering
-\includegraphics[height=5.2cm, keepaspectratio]{enun_ibilbideak.png}
+\includegraphics[width=0.68\textwidth]{enun_ibilbideak.png}
 \caption{Enuntziatuko hiru adibideen ibilbideak: hiruretan robotak kanpoko seinaleak jotzen ditu $K_p = 0{,}6$ txikiegia delako izkinak garbi hartzeko.}\label{fig:enun-ibilbideak}
 \end{figure}
