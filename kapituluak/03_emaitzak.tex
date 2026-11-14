@@ -17,6 +17,7 @@ Lehen azterketan $K_p$ parametroaren eragina ebaluatu dugu ($K_i = 0$, $K_d = 0$
 
 \begin{table}[H]
 \centering\footnotesize
+\renewcommand{\arraystretch}{0.90}
 \begin{tabularx}{\textwidth}{@{} l >{\raggedright\arraybackslash}X c c >{\centering\arraybackslash}p{2.6cm} >{\centering\arraybackslash}p{2.3cm} @{}}
 \toprule
 \textbf{Proba} & \textbf{Emaitza} & \textbf{Bueltak} & \textbf{Talkak} & \textbf{$d$ zuzenetan [m]} & \textbf{$\theta_{\text{RMS}}$ zuzenetan [$^\circ$]} \\
@@ -34,14 +35,16 @@ $K_p = 8{,}0$ & Pareta galtzen du       & $0{,}01$ & $1$  & $0{,}185 \pm 0{,}098
 \end{tabularx}
 \caption{$K_p$ parametroaren eragina Gazebon. Probatutako balioen artean, $K_p = 1{,}5$ eta $K_p = 2{,}0$ balioek soilik osatu dute zirkuitua talkarik gabe.}\label{tab:kp-sweep}
 \end{table}
+\vspace{-0.7em}
 
 \noindent\textit{Enuntziatuko galdera: Zein da Kp handitzeak/txikitzeak duen eragina robotak irudikatzen duen bidean? Zergatik?}\par\vspace{1pt}
 
 Probetan ikusitako portaeraren azalpen fisikoa:
-\begin{itemize}[leftmargin=1.5em, itemsep=0.0em, topsep=1pt]
+\begin{itemize}[leftmargin=1.5em, itemsep=0.0em, parsep=0pt, topsep=1pt]
   \item $K_p$ txikitzean ($K_p \le 1{,}0$): $\tau = 1/K_p$ denbora-konstantea handiegia da ($\tau \ge 1\text{ s}$). Biraketa-erradio zabalegia denez ($R = v/\omega$), robotak berandu biratzen du kurbetan, kanpoko paretatik hurbil geratzen da ($d \approx 0{,}17\text{ m}$) eta seinaleak jotzen ditu ($14$ eta $10$ talka).
-  \item $K_p$ handitzean ($K_p \ge 2{,}5$): laginketa-atzerapen diskretua $T \approx 0{,}1\text{ s}$ denez, $K_p \cdot T$ handiekin gainbultzada sortzen da. Robotak kurbetan gehiegi biratzen du eskuinera, paretatik urrundu ($d > 0{,}5\text{ m}$), laserrak pareta galdu eta trabatu egiten da.
+  \item $K_p$ handitzean: $K_p = 2{,}5$ erabilita, robotak hiru buelta baino gehiago osatu ditu ($3{,}21$), baina zazpi kontakturekin. Probatutako balio handiagoekin ($K_p \ge 3{,}0$), berriz, gainbultzadaren ondorioz robotak pareta galdu du ($d > 0{,}5\text{ m}$) eta ez du buelta osoa osatu.
 \end{itemize}
+\vspace{-0.7em}
 
 \noindent\textit{Enuntziatuko galdera: Jaso robotaren posizioa denboran zehar eta irudikatu jarraitutako ibilbideak Kp balio desberdinetarako:}\par\vspace{1pt}
 
@@ -49,13 +52,13 @@ Probetan ikusitako portaeraren azalpen fisikoa:
 \centering
 \begin{subfigure}[b]{0.48\textwidth}
   \centering
-  \includegraphics[height=3.8cm, keepaspectratio]{kp_ibilbideak.png}
+  \includegraphics[height=3.85cm, keepaspectratio]{kp_ibilbideak.png}
   \caption{Ibilbideak zirkuituan (\texttt{/gz\_pose}).}\label{fig:kp-ibilbideak}
 \end{subfigure}
 \hfill
 \begin{subfigure}[b]{0.48\textwidth}
   \centering
-  \includegraphics[height=3.8cm, keepaspectratio]{kp_angeluak.png}
+  \includegraphics[height=3.85cm, keepaspectratio]{kp_angeluak.png}
   \caption{$\theta$ angelua denboran zehar.}\label{fig:kp-angeluak}
 \end{subfigure}
 \caption{$K_p$ parametroaren eragina: $K_p = 1{,}5$ eta $2{,}0$ dira egonkor bakarrak.}\label{fig:kp-grafikoak}
@@ -131,7 +134,7 @@ PID ($2{,}0/0{,}05/0{,}1$) & Ondo & $3{,}32$ & $0$ & $0{,}372 \pm 0{,}033$ & $1{
 \clearpage
 \noindent\textit{Enuntziatuko galdera: Zein da Ki handitzeak/txikitzeak duen eragina robotak irudikatzen duen bidean? Zergatik?}\par\vspace{1pt}
 \begin{itemize}[leftmargin=1.5em, itemsep=0.2em]
-  \item $K_i$ osagaia: Zirkuitu itxian biraketa guztiak eskuinerantz dira ($\theta < 0$). Integratzaileak errore negatiboa pilatzen du kurbetan; ondorioz, zuzenera irtetean integralak robota eskuinera biratzen jarraitzera bultzatzen du. Horrek paretatik alferrik urruntzen du ($d = 0{,}362\text{ m}$-tik $0{,}393\text{ m}$-ra) eta $K_i \ge 0{,}5$ balioekin robotak pareta galtzen du. $K_i = 0{,}05$ balioak aldaketarik ez eragitearen arrazoia $I_{\max} = 0{,}3\text{ rad}\cdot\text{s}$ mugan dago: integrala saturatuta egonda ere, $K_i \cdot I_{\max} = 0{,}015\text{ rad/s}$ baino ezin du gehitu, eta ekarpen hori arbuiagarria da biraketen ondoan. Gainera, zuzenetan $\theta$ berez zerora doanez, ez dago konpentsatu beharreko errore iraunkorrik.
+  \item $K_i$ osagaia: Zirkuitu itxian biraketa guztiak eskuinerantz dira ($\theta < 0$). Integratzaileak errore negatiboa pilatzen du kurbetan; ondorioz, zuzenera irtetean integralak robota eskuinera biratzen jarraitzera bultzatzen du. $K_i = 0{,}05$ erabilita, zuzenetako angelu-errorea ia ez da aldatu ($1{,}7^\circ$), baina paretarekiko batez besteko distantzia pixka bat handitu da ($0{,}362\text{ m}$-tik $0{,}373\text{ m}$-ra). Integralaren eragina mugatua da $I_{\max} = 0{,}3\text{ rad}\cdot\text{s}$ saturazioagatik ($K_i \cdot I_{\max} = 0{,}015\text{ rad/s}$), eta balio handiagoekin ($K_i \ge 0{,}5$) robotak pareta galtzen du. Gainera, zuzenetan $\theta$ berez zerora doanez, ez dago konpentsatu beharreko errore iraunkorrik.
 \end{itemize}
 
 \noindent\textit{Enuntziatuko galdera: Zein da Kd handitzeak/txikitzeak duen eragina robotak irudikatzen duen bidean? Zergatik?}\par\vspace{1pt}
