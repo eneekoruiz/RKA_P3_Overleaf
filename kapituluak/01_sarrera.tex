@@ -1,13 +1,15 @@
 Praktika honen helburua Rosmaster robota Gazeboko \texttt{yahboom\_track} zirkuituan kanpoko paretari paraleloki gidatzea da, 2D LiDAR laser bidezko erregresio lineala eta PID kontrolagailua erabiliz.
 
 \section{Gure kontrol-estrategia}\label{sec:estrategia}
-Zirkuituan zehar ibilbide egonkorra lortzeko kontrol-estrategia zehaztu dugu:
-\begin{itemize}[leftmargin=1.5em, itemsep=0.0em, parsep=0pt, topsep=1pt]
-  \item Ezkerreko pareta: Enuntziatuaren sarrerak eskuinekoa aipatu arren, pistako geziek erlojuaren norantza adierazten dute. Hasierako posetitik ($(1{,}13, 0{,}33, -\pi/2)$) aurrera egitean kanpoko pareta ezkerrean geratzen da; laborategiko saioan baieztatutako aukera da eta arkitektura matematikoa guztiz baliokidea da.
-  \item Errore garbia: Kontrol-errorea $\theta$ orientazio-angelua da soilik ($e = \theta$). Helburua paretarekiko paralelotasuna denez, ez dugu distantzia-kontrolik gehitu.
-  \item Segurtasun-arau frontalik gabe: Kurbak kontrolagailuak berak kudeatzen ditu; ezker-aurreko koadrantea ($0^\circ$-tik $+90^\circ$-ra) hautatuta aurreko pareta garaiz sartzen da erregresioan.
-  \item Distantziaren mantentzea: Laserrak irakurketa motzak soilik hartzen ditu ($D_{\max} = 0{,}5\text{ m}$). Robotak paretarekiko distantzia egonkorra mantendu du zuzenetan: batez beste $0{,}307\text{ m}$.
+Zirkuituan ibilbide egonkorra lortzeko, kontrol-estrategia sinple eta zuzena definitu dugu:
+\begin{itemize}[leftmargin=1.2em, itemsep=0.0em, parsep=0pt, topsep=1pt]
+  \item Ezkerreko pareta: Enuntziatuaren sarrerak eskuinekoa aipatu arren, pistako geziek erlojuaren norantza markatzen dute. Hasierako posetitik ($(1{,}13, 0{,}33, -\pi/2)$) aurrera egitean, kanpoko pareta ezkerrean geratzen da; kontrolaren ikuspegitik kalkuluak berdinak dira, erreferentziaren zeinua egokituta.
+  \item Errore garbia: Kontrol-errorea $\theta$ orientazio-angelua da soilik ($e = \theta$). Paretarekiko paralelotasuna bilatzen denez, ez dugu distantzia-kontrol gehigarririk txertatu legean.
+  \item Kurben kudeaketa naturala: Ezker-aurreko koadrantea ($0^\circ$-tik $+90^\circ$-ra) hautatuta, aurreko pareta garaiz sartzen da laserraren eremuan eta kurbak berez kudeatzen ditu kontrolagailuak.
+  \item Distantziaren oreka: Laserrak irakurketa hurbilak soilik hartzen ditu ($D_{\max} = 0{,}5\text{ m}$). Robotak paretarekiko distantzia erregularra mantendu du: batez beste $0{,}307\text{ m}$.
 \end{itemize}
 
 \section{Esperimentuen prozesua}\label{sec:prozesua}
-Emaitza fidagarriak lortzeko, probak Gazebo simulagailu errealean burutu ditugu banan-banan (CPUa ez saturatzeko). Proben helburua hiru buelta oso osatzea izan da ($3{,}32$ buelta abiapuntutik). Konfigurazio batzuekin, ordea, robotak pareta galdu edo trabatu egin da helburu hori bete aurretik. Hainbat konfigurazio desberdin ebaluatu ditugu parametro-miaketa sistematikoan. Ibilbideen posizioak kanpotik erregistratu ditugu \texttt{ros2 bag} bidez (\texttt{/gz\_pose}, \texttt{/odom}, \texttt{/scan}, \texttt{/clock}). Talkak kalkulatzeko, robotaren oinatz osoaren neurriak ($0{,}30\text{ m} \times 0{,}20\text{ m}$, \texttt{base\_link}-ekiko $x \in [-0{,}181, +0{,}119]\text{ m}$ eta $y \in [\pm 0{,}0997]\text{ m}$) eta Gazeboko oztopoen posizioak erabili dira telemetriatik; kontaktu-tarte jarraitu bakoitza talka bakar gisa zenbatu da.
+Emaitza fidagarriak bermatzeko, probak Gazebo simulagailuan burutu ditugu banan-banan, ordenagailuaren CPUa ez gainkargatzeko. Proben helburua hiru buelta oso osatzea izan da ($3{,}32$ buelta abiapuntutik); konfigurazio batzuekin, ordea, robotak pareta galdu edo trabatu egin da helburu hori bete aurretik. Hainbat konfigurazio ebaluatu ditugu parametro-miaketa sistematikoan, irabazi bakoitzaren eragina bananduta neurtuz.
+
+Ibilbideak \texttt{ros2 bag} bidez erregistratu ditugu kanpotik (\texttt{/gz\_pose}, \texttt{/odom}, \texttt{/scan}, \texttt{/clock}). Talkak kalkulatzeko, robotaren oinatz osoaren neurriak ($0{,}30\text{ m} \times 0{,}20\text{ m}$) eta Gazeboko oztopoen posizioak erabili dira telemetriatik, kontaktu jarraitu bakoitza talka bakar gisa zenbatuz.

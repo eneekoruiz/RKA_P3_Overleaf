@@ -1,37 +1,44 @@
 \section{Exekuzio- eta simulazio-aginduak}\label{sec:exekuzioa}
-Paketea konpilatu eta Gazebon exekutatzeko urratsak:
-\begin{enumerate}[leftmargin=1.5em, itemsep=0.25em]
-  \item Paketea konpilatu eta ingurunea kargatu:
+Paketea konpilatu eta Gazebon probak modu errepikagarrian exekutatzeko urrats nagusiak hauek dira:
+
+\begin{enumerate}[leftmargin=1.5em, itemsep=0.3em]
+  \item Paketea konpilatu eta ROS 2 ingurunea kargatu:
 \begin{verbatim}
 colcon build --packages-select wall_following
 source install/setup.bash
 \end{verbatim}
-  \item Gazebo simulazioa abiarazi:
+  \item Gazebo simulazio-ingurunea abiarazi pistan:
 \begin{verbatim}
 ros2 launch gazebo_worlds gz_robot.launch.py world:=yahboom_track
 \end{verbatim}
-  \item Konfigurazio optimoa abiarazi (P hutsa):
+  \item Konfigurazio optimoa abiarazi (P kontrolagailu hutsa):
 \begin{verbatim}
 ros2 launch wall_following wf_ls.launch.py kp:=1.5 ki:=0.0 kd:=0.0
 \end{verbatim}
-  \item Bigarren aldaera abiarazi (PID osoa, $K_V = 0$):
+  \item Bigarren aldaera abiarazi (PID kontrolagailu osoa, $K_V = 0$):
 \begin{verbatim}
 ros2 launch wall_following wf_ls.launch.py kp:=1.5 ki:=0.05 kd:=0.1
 \end{verbatim}
-  \item Hirugarren aldaera abiarazi (PID moteldua, $K_V = 2$): \texttt{wall\_follow\_ls.py}-ko \texttt{follow\_wall()} funtzioan \texttt{KV = 2.0} konstantea ezarri eta abiarazi:
+  \item Hirugarren aldaera abiarazi (PID moteldua, $K_V = 2$): \texttt{wall\_follow\_ls.py}-ko \texttt{follow\_wall()} metodoan \texttt{KV = 2.0} parametroa ezarri eta martxan jarri:
 \begin{verbatim}
 ros2 launch wall_following wf_ls.launch.py kp:=1.5 ki:=0.05 kd:=0.1
 \end{verbatim}
-  \item Ibilbidea eta telemetria grabatu:
+  \item Telemetria eta benetako posizioak grabatu \texttt{ros2 bag} bidez:
 \begin{verbatim}
 ros2 bag record --include-hidden-topics /gz_pose /odom /scan /clock
 \end{verbatim}
 \end{enumerate}
 
+\clearpage
 \section{Entregatutako paketearen katalogoa}\label{sec:fitxategiak}
-Entregatutako paketearen osagai nagusiak:
-\begin{itemize}[leftmargin=1.5em, itemsep=0.25em]
-  \item \texttt{wall\_following/wall\_follow\_ls.py}: ROS 2 nodo nagusia. Ezkerreko paretaren izpiak hautatu eta plano kartesiarrera proiektatzen ditu, \texttt{np.polyfit} bidez $\theta$ estimatzen du, PID algoritmoa kalkulatzen du eta $\Delta t$ denbora-diferentzia neurtzen du.
-  \item \texttt{launch/wf\_ls.launch.py}: Launch fitxategia, komando-lerrotik \texttt{kp}, \texttt{ki} eta \texttt{kd} parametroak jasotzeko gaitasuna ematen duena.
-  \item \texttt{diff\_wall\_follow\_ls\_vs\_original.diff}: Jatorrizko nodoaren eta azken bertsioaren arteko aldaketen diff fitxategia.
+Entregatutako soluzioak fitxategi eta egitura hauek biltzen ditu:
+
+\begin{itemize}[leftmargin=1.5em, itemsep=0.35em]
+  \item \texttt{wall\_following/wall\_follow\_ls.py}: ROS 2 nodo nagusia. Laser bidezko neurketak ($0^\circ\dots+90^\circ$, $d < 0{,}5\text{ m}$) plano kartesiarrera proiektatzen ditu, \texttt{np.polyfit} erabiliz karratu txikienen zuzena doitzen du, orientazio-angelua ($\theta = \arctan(c_1)$) lortzen du, eta PID formulazio osoa kalkulatzen du anti-windup mugarekin ($I_{\max} = 0{,}3\text{ rad}\cdot\text{s}$) eta $\Delta t$ errealarekin.
+  \item \texttt{launch/wf\_ls.launch.py}: Launch fitxategia, exekuzio-aginduan \texttt{kp}, \texttt{ki} eta \texttt{kd} parametroak zuzenean pasatzeko aukera ematen duena simulazioa berriro konpilatu gabe.
+  \item \texttt{diff\_wall\_follow\_ls\_vs\_original.diff}: Irakasleak emandako hasierako txantiloiaren eta azken bertsioaren arteko aldaketen diff fitxategia. Argigarri uzten du jatorrizko egitura osorik errespetatu dela eta aldaketak \texttt{TODO} blokean bakarrik egin direla.
+  \item \texttt{pruebas/}: Gazebon burututako esperimentuen erregistroak, kalkulatutako telemetria eta grafikoak sortzeko script osagarriak (\texttt{plot\_wf.py}, \texttt{diag.py}).
 \end{itemize}
+
+\vspace{1.0em}
+\noindent Pakete osoa ROS 2 Humble eta Gazebo bertsioekin guztiz bateragarria da, eta ikasgelako laborategiko ingurune berean zuzenean exekutatzeko prestatuta dago.

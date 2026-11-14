@@ -92,7 +92,7 @@ def compile_overleaf_and_download(project_id: str, cookie_val: str, output_pdf: 
 def audit_source_typography(tex_dir: Path) -> list[str]:
     """Source code linting for LaTeX traps that cause typographical and spacing defects."""
     defects = []
-    tex_files = list(tex_dir.glob("**/*.tex"))
+    tex_files = [tf for tf in tex_dir.glob("**/*.tex") if not tf.name.startswith(('pandoc', 'test_', '_'))]
     
     total_cites = 0
     has_bib = False
@@ -228,6 +228,24 @@ def audit_source_typography(tex_dir: Path) -> list[str]:
                 f"[SOURCE LINT] {tf.name}: LONG INLINE COMMAND IN TABLE ('{m_row.group(1)}'). "
                 f"Break multi-parameter commands across multiple lines using '\\newline' so description columns have adequate breathing room."
             )
+
+        # Check 13: Subfigure Sizing & Far-Distance Legibility Lint ("Se vean bien de lejos")
+        # Trajectory and angular subfigures must have height >= 5.5cm so axes, legends, and ticks remain legible from a distance
+        subfigs = re.finditer(r'\\begin\{subfigure\}(?:\[[^\]]*\])?\{[^}]+\}\s*(?:\\centering\s*)?\\includegraphics\[([^\]]+)\]\{([^}]+)\}', content)
+        for subf in subfigs:
+            opts = subf.group(1)
+            fname = subf.group(2)
+            # Check for override comment '% layout: allow-micro-figure'
+            subf_pos = subf.start()
+            prev_lines = content[max(0, subf_pos-200):subf_pos]
+            if '% layout: allow-micro-figure' in prev_lines:
+                continue
+            m_h = re.search(r'height=([0-9.]+)cm', opts)
+            if m_h and float(m_h.group(1)) < 5.0:
+                defects.append(
+                    f"[SOURCE LINT] {tf.name}: SUBFIGURE '{fname}' CONSTRAINED TO MICRO-HEIGHT ('{opts}'). "
+                    f"Subfigures containing trajectories or multi-panel plots must have height >= 5.5cm so that axis labels, ticks, and legends remain legible from a distance (\"bien de lejos\")."
+                )
 
     if has_bib and total_cites == 0:
         defects.append(

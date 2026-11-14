@@ -1,8 +1,10 @@
 \section[Hiru aldaerak]{Hiru aldaera nagusien arteko konparaketa}\label{sec:aldaerak}
 Esperimentuen emaitzak laburbiltzeko, \ref{tab:aldaerak} taulan hiru aukera nagusiak konparatu ditugu $K_p = 1{,}5$ oinarri hartuta.
 
+\vspace{-0.4em}
 \begin{table}[H]
 \centering\footnotesize
+\renewcommand{\arraystretch}{0.85}
 \begin{tabularx}{\textwidth}{@{} >{\raggedright\arraybackslash}p{4.0cm} >{\raggedright\arraybackslash}X c c >{\centering\arraybackslash}p{2.5cm} >{\centering\arraybackslash}p{2.0cm} @{}}
 \toprule
 \textbf{Aldaera} & \textbf{Emaitza} & \textbf{Bueltak} & \textbf{Talkak} & \textbf{$d$ zuzenetan [m]} & \textbf{$\theta_{\text{RMS}}$ zuzenetan [$^\circ$]} \\
@@ -16,15 +18,11 @@ Esperimentuen emaitzak laburbiltzeko, \ref{tab:aldaerak} taulan hiru aukera nagu
 \end{tabularx}
 \caption{Hiru aldaera nagusien konparaketa Gazeboko \texttt{yahboom\_track} zirkuituan.}\label{tab:aldaerak}
 \end{table}
+\vspace{-0.6em}
 
 \section[Ondorio nagusiak]{Gure ondorio nagusiak}\label{sec:ondorio-nagusiak}
-Aukeratutako konfigurazio nagusia 1. aldaera da: P kontrolagailu hutsa ($K_p = 1{,}5$, $K_i = 0{,}0$, $K_d = 0{,}0$, $v_0 = 0{,}2\text{ m/s}$ eta $K_V = 0{,}0$). Probetatik ondorio nagusi hauek atera ditugu:
+Aukeratutako konfigurazio nagusia 1. aldaera da: P kontrolagailu hutsa abiadura lineal konstantearekin ($K_p = 1{,}5$, $K_i = 0{,}0$, $K_d = 0{,}0$, $v_0 = 0{,}2\text{ m/s}$ eta $K_V = 0{,}0$). Neurketa guztien ondoren, bi ondorio nagusi atera ditugu:
 
-\begin{itemize}[leftmargin=1.5em, itemsep=0.25em]
-  \item P kontrola nahikoa da: probatutako konfigurazioen artean, P kontrolagailu hutsa ($K_p = 1{,}5$, $K_V = 0$) izan da emaitzarik orekatuena eman duena. Zuzenetan robotaren orientazio-aldaketa $\dot\theta = -\omega$ denez, biraketak berak murrizten du errorea; perturbazio asimetriko finkorik ezean ez dago errore iraunkorrik eta P hutsak zirkuitua garbi osatzen du.
-  \item I osagaiaren eragina: zirkuituko biraketa guztiak eskuinerantz dira ($\theta < 0$). Integratzaileak errorea pilatzen du kurba bakoitzean; zuzenera irtetean integralak eskuinera biratzen jarraitzera bultzatzen du robota, paretatik urrunduz ($0{,}362\text{ m}$-tik $0{,}393\text{ m}$-ra) eta lerrokatzea motelduz.
-  \item D osagaiaren mugak: kurbetan aurreko pareta bat-batean agertzen denez, deribatuak biraketa-kolpe handiak eragiten ditu ($K_d \cdot \Delta e / \Delta t$) eta laserraren zarata handitzen du. $K_d = 1{,}0$ balioarekin robota desbideratu eta trabatu egiten da.
-  \item Distantzia nola finkatzen den formula gabe: kontrol-legean ez dago distantzia-terminorik ($e = \theta$ soilik da). Distantzia kurbetan finkatzen da berez: $D_{\max} = 0{,}5\text{ m}$ mugak biraketaren hasiera ezartzen du, eta $K_p = 1{,}5$ erabilita, zuzenetan paretarekiko batez besteko distantzia $0{,}307\text{ m}$ izan da.
-  \item Abiadura moldatuaren muga: biraketetan moteltzeak ($K_V = 2$) $K_p = 1{,}0$ bezalako irabazi ahulei laguntzen die (biraketa itxiagoa eginez); baina $K_p = 1{,}5$ kasuan gehiegizko biraketa eragiten du eta robotak pareta galtzen du.
-  \item Arkitektura sinplearen sendotasuna: alferrikako konplexutasunik gabe, paretarekiko paralelotasun-errore garbia ($e = \theta$) P irabazi egoki batekin gidatzea izan da zirkuitua gainditzeko konponbide sinple eta eraginkorrena.
-\end{itemize}
+Alde batetik, paretarekiko paralelotasuna bermatzeko P kontrol hutsa guztiz nahikoa da: $\dot\theta = -\omega$ denez, biraketak berak murrizten du errorea zikloz ziklo eta ez dago errore iraunkorrik. Gainera, paretarainoko distantzia berez finkatzen da kurben sarreran ($D_{\max} = 0{,}5\text{ m}$ atalaseak biraketa hasten du eta $0{,}307\text{ m}$-an egonkortzen da modu naturalean).
+
+Bestetik, kontrolagailua gehiago konplexutzeak ez du portaera hobetzen zirkuitu itxi honetan: I osagaiak errorea pilatzen du eskuineko kurbetan eta robota paretatik aldentzera behartzen du; D osagaiak kurbetako malda-jauziak anplifikatzen ditu ($K_d \cdot \Delta e / \Delta t$); eta kurbetan moteltzeak ($K_V = 2$) gehiegizko biraketa eragiten du $K_p = 1{,}5$ balioan. Ondorioz, paralelotasun-errore garbia ($e = \theta$) P irabazi egoki batekin gidatzea da soluziorik sendo eta eraginkorrena.

@@ -1,44 +1,35 @@
 \section[LiDAR konfigurazioa]{Sentsorearen konfigurazioa eta ezkerreko pareta}\label{sec:geometria}
-Rosmaster robotak 2D RPLidar S2 sentsorea du gainean kokatuta. Ereduaren URDF fitxategiaren arabera (\texttt{rosmaster\_description}), sentsorea robotaren ardatzarekiko $180^\circ$ biratuta dago ($\text{yaw} = \pi$). Jatorrizko nodoak automatikoki zuzentzen du orientazio hori, datuen bektorea 1500 posizio mugituz (\texttt{scan[i - 1500]}). Horrela, \texttt{bearings} bektorea robotaren ardatzekin bat dator: $0^\circ$ aurrera, $+90^\circ$ ezkerrera eta $-90^\circ$ eskuinera.
-
-Pistako geziei jarraituz aurrera egitean, jarraitu beharreko kanpoko pareta robotaren ezkerraldean geratzen da (hasierako pose lehenetsia errespetatuz eta laborategiko gidalerroekin bat etorriz). Horregatik, ezker-aurreko koadranteko izpiak hautatu ditugu erregresiorako: $\beta_i \in [0^\circ, +90^\circ]$ eta $d_i < D_{\max} = 0{,}5\text{ m}$. Eskuineko paretari jarraitu beharko balitz, printzipio matematikoak berdin mantenduko lirateke eskuin-aurreko sektorea ($\beta_i \in [-90^\circ, 0^\circ]$) eta aginduen zeinuak simetrikoki egokituz.
+Rosmaster robotak 2D RPLidar S2 sentsorea du gainean kokatuta. Ereduaren URDF deskribapenaren arabera (\texttt{rosmaster\_description}), sentsorea ardatzarekiko $180^\circ$ biratuta dago ($\text{yaw} = \pi$), eta nodoak automatikoki zuzentzen du hori datuak 1500 posizio mugituz (\texttt{scan[i - 1500]}). Horrela, \texttt{bearings} bektorea robotaren mugimenduarekin lerrokatzen da ($0^\circ$ aurrera, $+90^\circ$ ezkerrera). Pistako geziei jarraituz kanpoko pareta ezkerrean geratzen denez (hasierako posetitik abiatuta), ezker-aurreko koadranteko izpiak hautatu ditugu erregresiorako: $\beta_i \in [0^\circ, +90^\circ]$ eta $d_i < D_{\max} = 0{,}5\text{ m}$. Eskuineko paretari jarraitu beharko balitz, printzipio matematikoak berdinak lirateke simetrikoki egokituta.
 
 \section[Angeluaren kalkulua]{Paretaren angeluaren kalkulua eta zeinuen portaera}\label{sec:erregresioa}
 \noindent\textit{Enuntziatuko galdera: Azaldu nola kalkulatzen duzun robota eta paretaren arteko angelua.}\par\vspace{2pt}
 
-Paretarekiko orientazio-angelua kalkulatzeko urrats hauek jarraitu ditugu:
-\begin{enumerate}[leftmargin=1.5em, itemsep=0.05em, topsep=2pt]
-  \item Proiekzio kartesiarra: Hautatutako izpi bakoitza robotaren plano lokaleko puntu bihurtzen dugu:
-  \[
-    x_i = d_i \cdot \cos(\beta_i), \qquad y_i = d_i \cdot \sin(\beta_i)
-  \]
-  \item Erregresio lineala: Puntu horiekin zuzen bat doitzen dugu \texttt{numpy.polyfit} bidez ($y = c_1 \cdot x + c_0$).
-  \item Angelua eta errorea: Maldaren arkutangenteak robotaren eta paretaren arteko $\theta$ angelua ematen du. Gure helburua paretarekiko paralelotasuna denez ($\theta_{\text{desiatua}} = 0{,}0$), errorea zuzenean $e = \theta$ da:
-  \[
-    \theta = \arctan(c_1), \qquad e = \theta - 0{,}0 = \theta
-  \]
-\end{enumerate}
-
-Zeinuen portaera fisikoa honako hau da:
-\begin{itemize}[leftmargin=1.5em, itemsep=0.05em, topsep=2pt]
-  \item Robota paralelo badoa: $c_1 = 0 \implies \theta = 0^\circ \implies \omega = 0$.
-  \item Robota ezkerreko paretara hurbiltzen ari bada: aurrerago dauden puntuek $y$ txikiagoa dute, beraz malda negatiboa da ($c_1 < 0$). Ondorioz $\theta < 0$, eta agindua $\omega = K_p \theta < 0$ denez, robotak eskuinera biratzen du (paretatik urrunduz).
-  \item Robota paretatik urruntzen ari bada: malda positiboa da ($c_1 > 0$), beraz $\theta > 0$ eta agindua $\omega > 0$ da, robota ezkerrera biraraziz (paretara hurbilduz).
-  \item Kurbetan: aurreko pareta $0{,}5\text{ m}$-ko eremuan sartzen denean, puntuek L itxura hartzen dute, malda nabarmen negatibo bihurtzen da ($c_1 \ll 0$) eta robotak berez biratzen du eskuinera biraketa osatzeko.
+Paretarekiko orientazio-angelua lortzeko, laserraren neurketak plano kartesiarrera proiektatzen ditugu lehenik: izpi bakoitzaren distantzia ($d_i$) eta angelua ($\beta_i$) erabiliz, puntu lokalak kalkulatzen ditugu ($x_i = d_i \cos\beta_i$, $y_i = d_i \sin\beta_i$). Puntu horiekin zuzen bat doitzen dugu karratu txikienen bidez (\texttt{numpy.polyfit}), $y = c_1 x + c_0$ lortuz. Zuzenaren maldaren arkutangenteak ematen du paretaren $\theta$ angelua, eta helburua paralelotasuna denez ($\theta_{\text{desiatua}} = 0{,}0$), errorea $e = \theta$ da:
+\[
+  x_i = d_i \cos\beta_i, \quad y_i = d_i \sin\beta_i, \qquad \theta = \arctan(c_1), \quad e = \theta - 0{,}0 = \theta
+\]
+Kalkulatutako angeluaren zeinuak robotaren portaera fisikoa gidatzen du:
+\begin{itemize}[leftmargin=1.2em, itemsep=0.0em, parsep=0pt, topsep=1pt]
+  \item Robota paretari paralelo badoa: puntu guztiek lerro zuzena osatzen dute ($c_1 = 0 \implies \theta = 0^\circ$), eta kontrolagailuak ez du biraketarik agintzen ($\omega = 0$).
+  \item Robota paretarantz hurbiltzen ari bada: aurrerago dauden puntuak paretatik gertuago daude eta malda negatiboa da ($c_1 < 0$). Ondorioz, $\theta < 0$ denez, agindua $\omega < 0$ da eta robotak eskuinera biratzen du, paretatik aldenduz.
+  \item Robota paretatik urruntzen ari bada: aurreko puntuak urrunago daude ($c_1 > 0$), beraz $\theta > 0$ da eta kontrolagailuak ezkerrerantz birarazten du robota ($\omega > 0$).
+  \item Kurbetan: aurreko pareta $0{,}5\text{ m}$-ko eremuan sartzean erregresioaren malda nabarmen negatibo bihurtzen da ($c_1 \ll 0$), eta robotak biraketa itxiagoa egiten du kurba berez osatzeko.
 \end{itemize}
 
 \section[Kontrol-legeak]{Kontrol-legeak eta abiadura lineala}\label{sec:kontrol-legeak}
-P kontrol hutsean biraketa-abiadura errorekiko proportzionala da ($\omega = K_p \cdot \theta$), eta $\dot\theta = -\omega$ denez ez du errore iraunkorrik uzten zuzenetan. Abiadura lineala formula honekin kudeatzen dugu:
+PID kontrolagailu batek errorearen hiru alderdi osagarri erabiltzen ditu robota gidatzeko: P osagaiak une horretako errorearen arabera zuzentzen du biraketa; I osagaiak denboran pilatutako errorea hartzen du kontuan; D osagaiak, berriz, errorea zenbateko abiaduraz aldatzen den erabiltzen du. Horrela, hiru osagaiek errorearen ikuspegi desberdinei erantzuten diete modu osagarrian.
+
+P kontrol hutsean, biraketa-abiadura unean uneko angeluarekiko proportzionala da soilik ($\omega = K_p \cdot \theta$). Zirkuitu honetan $\dot\theta = -\omega$ denez, biraketak berak murrizten du errorea zuzenetan, eta kanpoko perturbazio finkorik ezean ez da errore iraunkorrik geratzen. Abiadura lineala kurbetan egokitzeko formula hau erabili dugu:
 \[
   v = \frac{v_0}{1 + K_V \cdot |\omega|}, \qquad v_0 = 0{,}2\text{ m/s}
 \]
-$K_V = 0$ denean abiadura konstantea da ($0{,}2\text{ m/s}$), eta $K_V = 2$ denean $|\omega|$-ren alderantziz proportzionala, kurbetan robota motelduz. Kontrol-irabaziak (\texttt{kp}, \texttt{ki}, \texttt{kd}) ROS parametroak dira; $v_0$, $K_V$, $D_{\max} = 0{,}5\text{ m}$ eta $I_{\max} = 0{,}3$, berriz, kodean finkatutako konstanteak.
+$K_V = 0$ denean abiadura konstantea da ($0{,}2\text{ m/s}$); $K_V = 2$ denean, aldiz, abiadura $|\omega|$-ren arabera txikitzen da, biraketa handietan robota motelduz. Kontrol-irabaziak (\texttt{kp}, \texttt{ki}, \texttt{kd}) ROS parametroak dira; oinarrizko abiadura ($v_0$), abiadura-faktorea ($K_V$), distantzia maximoa ($D_{\max} = 0{,}5\text{ m}$) eta integralaren muga ($I_{\max} = 0{,}3\text{ rad}\cdot\text{s}$), berriz, kodean finkatutako konstanteak dira.
 
 \section[PID kodean]{PID osagaiak kodean nola gehitu ditugun}\label{sec:pid-inplementazioa}
-\noindent\textit{Enuntziatuko galdera: Nola gehitu duzue kodean osagai Integral eta Deribatiboa:}\par\vspace{2pt}
+\noindent\textit{Enuntziatuko galdera: Nola gehitu duzue kodean osagai Integral eta Deribatiboa:}\par\vspace{1pt}
 
-PID kontrolagailua \texttt{wall\_follow\_ls.py}-ren \texttt{follow\_wall()} funtzioan inplementatu dugu:
-\vspace{-0.7em}
+PID kontrolagailu osoa \texttt{wall\_follow\_ls.py}-ren \texttt{follow\_wall()} metodoan gehitu dugu:
+\vspace{-0.6em}
 \begin{verbatim}
 dt = (self.timestamps[-1] - self.timestamps[-2]
       if len(self.timestamps) > 1 else 0.0)
@@ -48,10 +39,10 @@ self.prev_error = error
 w = self.kp * error + self.ki * self.error_sum + self.kd * derivative
 v = V0 / (1.0 + KV * abs(w))
 \end{verbatim}
-\vspace{-0.7em}
-Inplementazioan hiru puntu zaindu ditugu:
-\begin{enumerate}[leftmargin=1.5em, itemsep=0.0em, topsep=0pt]
-  \item $\Delta t$ simulazio-denboran: \texttt{self.timestamps}-ek \texttt{self.get\_clock().now()} jasotzen du (\texttt{/clock} topic-etik); $\Delta t$ simulazio-denbora da eta ez du CPU kargak aldatzen ($10\text{ Hz}$ nominala, $7{,}5\text{--}10\text{ Hz}$ neurtuta).
-  \item Integrala (anti-windup): integrala $[-0{,}3, +0{,}3]\text{ rad}\cdot\text{s}$ tartera mugatzen dugu ($I_{\max} = 0{,}3$), kurbetako errore negatiboa mugagabe pila ez dadin.
-  \item Deribatua: $\Delta t > 0$ denean soilik kalkulatzen da aurreko errorearekiko diferentzia hartuz, zero bidezko zatiketarik gabe.
+\vspace{-0.6em}
+Inplementazio horretan hiru xehetasun praktiko zaindu ditugu:
+\begin{enumerate}[leftmargin=1.2em, itemsep=0.0em, parsep=0pt, topsep=1pt]
+  \item Denbora-diferentzia neurtua ($\Delta t$): \texttt{self.timestamps} zerrendak simulazioaren denbora erreala jasotzen du Gazeboko \texttt{/clock} topic-etik, maiztasuna egonkor mantenduz ($10\text{ Hz}$).
+  \item Integratzailearen saturazioa (anti-windup): erroreen baturari $[-0{,}3, +0{,}3]\text{ rad}\cdot\text{s}$ muga jarri diogu (\texttt{np.clip}), kurbetako errore pilatuak robota desbideratu ez dezan.
+  \item Termino deribatua: aurreko zikloko errorearekiko aldaketa-abiadura neurtzen du ($K_d \cdot \Delta e / \Delta t$); $\Delta t > 0$ denean soilik kalkulatzen da, zero bidezko zatiketak saihesteko.
 \end{enumerate}
