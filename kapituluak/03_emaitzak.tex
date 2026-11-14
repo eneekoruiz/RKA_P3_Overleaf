@@ -13,7 +13,7 @@ Pistako seinaleak paretari atxikitako zilindroak dira ($0{,}07\text{ m}$). \ref{
 \section[Kontrol Proportzionala]{Kontrol Proportzionalaren emaitzak}\label{sec:emaitzak-p}
 \noindent\textit{Enuntziatuko galdera: Kpren zein balio tartean da portaera egokia?}\par\vspace{1pt}
 
-Lehen azterketan $K_p$ parametroaren eragina ebaluatu dugu ($K_i = 0$, $K_d = 0$, $v_0 = 0{,}2\text{ m/s}$, $K_V = 0$). Proben helburua 3 buelta oso osatzea izan da ($3{,}32$ buelta abiapuntutik). Emaitzak \ref{tab:kp-sweep} taulan laburbiltzen dira.
+Lehen azterketan $K_p$ parametroaren eragina ebaluatu dugu ($K_i = 0$, $K_d = 0$, $v_0 = 0{,}2\text{ m/s}$, $K_V = 0$). Proben helburua hiru buelta oso osatzea izan da ($3{,}32$ buelta abiapuntutik). Konfigurazio batzuekin, ordea, robotak pareta galdu edo trabatu egin da helburu hori bete aurretik. Emaitzak \ref{tab:kp-sweep} taulan laburbiltzen dira.
 
 \begin{table}[H]
 \centering\footnotesize
@@ -98,7 +98,7 @@ Biraketetan moteltzeak kurbadura efektiboa handitzen du ($\kappa = \omega / v$).
 \section[PID kontrola]{PID kontrolaren emaitzak (Ki eta Kd)}\label{sec:emaitzak-pid}
 \noindent\textit{Enuntziatuko galdera: Ki eta Kdren zein balio tartean da portaera egokia?}\par\vspace{1pt}
 
-$K_i$ eta $K_d$ osagaien azterketa isolatua egiteko $K_p = 2{,}0$ hartu da oinarritzat (\ref{tab:pid-sweep} taula). Probatutako balioen artean, $K_i \le 0{,}2$ eta $K_d \le 0{,}3$ konfigurazioek osatu dute ibilbidea talkarik gabe modu isolatuan; PID osoa ($2{,}0/0{,}05/0{,}1$) aparte ebaluatu da.
+Azterketa honetan parametro bakoitza bananduta aldatu dugu $K_p = 2{,}0$ oinarri hartuta (\ref{tab:pid-sweep} taula). Probatutako balioen artean, $K_i$-ren kasuan $0{,}0$, $0{,}05$ eta $0{,}2$ balioek eta $K_d$-ren kasuan $0{,}05$, $0{,}1$ eta $0{,}3$ balioek osatu dute ibilbidea talkarik gabe parametro bakoitza modu isolatuan aldatuta. Horrek ez du esan nahi balio horien arteko konbinazio guztiak baliozkoak direnik, baizik eta probatutako balio diskretu horietan lortu direla emaitza onak. PID konbinazio osoa ($2{,}0/0{,}05/0{,}1$) aparte ebaluatu da.
 
 \begin{table}[H]
 \centering\footnotesize
@@ -123,7 +123,7 @@ $K_d = 1{,}0$  & Trabatu egiten da  & $1{,}57$ & $4$ & $0{,}420 \pm 0{,}317$ & $
 PID ($2{,}0/0{,}05/0{,}1$) & Ondo & $3{,}32$ & $0$ & $0{,}372 \pm 0{,}033$ & $1{,}8$ \\
 \bottomrule
 \end{tabularx}
-\caption{$K_i$ eta $K_d$ osagaien eta PID konbinazioaren eragina ($K_p = 2{,}0$).}\label{tab:pid-sweep}
+\caption{$K_i$ eta $K_d$ osagaiak bananduta probatutako emaitzak eta PID konbinazioa ($K_p = 2{,}0$).}\label{tab:pid-sweep}
 \end{table}
 
 \noindent PID kontrolagailu osoak ($2{,}0 / 0{,}05 / 0{,}1$) zirkuituko 3 buelta osoak talkarik gabe osatzen ditu, baina P hutsarekin alderatuta ez du hobekuntza neurgarririk ekartzen.
@@ -136,7 +136,7 @@ PID ($2{,}0/0{,}05/0{,}1$) & Ondo & $3{,}32$ & $0$ & $0{,}372 \pm 0{,}033$ & $1{
 
 \noindent\textit{Enuntziatuko galdera: Zein da Kd handitzeak/txikitzeak duen eragina robotak irudikatzen duen bidean? Zergatik?}\par\vspace{1pt}
 \begin{itemize}[leftmargin=1.5em, itemsep=0.2em]
-  \item $K_d$ osagaia: Probatutako D balio txikiekin ($K_d \le 0{,}3$), zuzenetako angelu-errorea P kontrolaren antzekoa izan da ($1{,}7^\circ$). Horregatik, proba hauetan ez dugu hobekuntza argirik ikusi. $K_d = 1{,}0$ erabilita, berriz, robota trabatu egin da: kurbetan aurreko pareta bat-batean laserraren eremuan sartzean doikuntzaren malda jauzika aldatzen da, deribatuak biraketa-kolpe bortitzak sortzen ditu eta laserraren zarata biderkatu egiten du.
+  \item $K_d$ osagaia: Probatutako D balio txikiekin ($K_d \le 0{,}3$), zuzenetako angelu-errorea P kontrolaren antzekoa izan da ($1{,}7^\circ$). Horregatik, proba hauetan ez dugu hobekuntza argirik ikusi. $K_d = 1{,}0$ erabilita, berriz, robota trabatu egin da: kurbetan aurreko pareta bat-batean laserraren eremuan sartzean doikuntzaren malda jauzika aldatzen da, deribatuak biraketa-kolpe bortitzak sortzen ditu ($K_d \cdot \Delta e / \Delta t$) eta laserraren zarata biderkatu egiten du.
 \end{itemize}
 
 \begin{figure}[H]

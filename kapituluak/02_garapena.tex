@@ -1,7 +1,7 @@
 \section[LiDAR konfigurazioa]{Sentsorearen konfigurazioa eta ezkerreko pareta}\label{sec:geometria}
 Rosmaster robotak 2D RPLidar S2 sentsorea du gainean kokatuta. Ereduaren URDF fitxategiaren arabera (\texttt{rosmaster\_description}), sentsorea robotaren ardatzarekiko $180^\circ$ biratuta dago ($\text{yaw} = \pi$). Jatorrizko nodoak automatikoki zuzentzen du orientazio hori, datuen bektorea 1500 posizio mugituz (\texttt{scan[i - 1500]}). Horrela, \texttt{bearings} bektorea robotaren ardatzekin bat dator: $0^\circ$ aurrera, $+90^\circ$ ezkerrera eta $-90^\circ$ eskuinera.
 
-Pistako geziei jarraituz aurrera egitean, jarraitu beharreko kanpoko pareta robotaren ezkerraldean geratzen da. Horregatik, ezker-aurreko koadranteko izpiak hautatu ditugu erregresiorako: $\beta_i \in [0^\circ, +90^\circ]$ eta $d_i < D_{\max} = 0{,}5\text{ m}$.
+Pistako geziei jarraituz aurrera egitean, jarraitu beharreko kanpoko pareta robotaren ezkerraldean geratzen da (hasierako pose lehenetsia errespetatuz eta laborategiko gidalerroekin bat etorriz). Horregatik, ezker-aurreko koadranteko izpiak hautatu ditugu erregresiorako: $\beta_i \in [0^\circ, +90^\circ]$ eta $d_i < D_{\max} = 0{,}5\text{ m}$. Eskuineko paretari jarraitu beharko balitz, printzipio matematikoak berdin mantenduko lirateke eskuin-aurreko sektorea ($\beta_i \in [-90^\circ, 0^\circ]$) eta aginduen zeinuak simetrikoki egokituz.
 
 \section[Angeluaren kalkulua]{Paretaren angeluaren kalkulua eta zeinuen portaera}\label{sec:erregresioa}
 \noindent\textit{Enuntziatuko galdera: Azaldu nola kalkulatzen duzun robota eta paretaren arteko angelua.}\par\vspace{2pt}
@@ -35,7 +35,7 @@ P kontrol hutsean biraketa-abiadura errorekiko proportzionala da ($\omega = K_p 
 $K_V = 0$ denean abiadura konstantea da ($0{,}2\text{ m/s}$), eta $K_V = 2$ denean $|\omega|$-ren alderantziz proportzionala, kurbetan robota motelduz. Kontrol-irabaziak (\texttt{kp}, \texttt{ki}, \texttt{kd}) ROS parametroak dira; $v_0$, $K_V$, $D_{\max} = 0{,}5\text{ m}$ eta $I_{\max} = 0{,}3$, berriz, kodean finkatutako konstanteak.
 
 \section[PID kodean]{PID osagaiak kodean nola gehitu ditugun}\label{sec:pid-inplementazioa}
-\noindent\textit{Enuntziatuko galdera: Nola gehitu duzue kodean osagai Integral eta Deribatiboa.}\par\vspace{2pt}
+\noindent\textit{Enuntziatuko galdera: Nola gehitu duzue kodean osagai Integral eta Deribatiboa:}\par\vspace{2pt}
 
 PID kontrolagailua \texttt{wall\_follow\_ls.py}-ren \texttt{follow\_wall()} funtzioan inplementatu dugu:
 \vspace{-0.7em}
