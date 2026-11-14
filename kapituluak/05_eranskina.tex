@@ -1,5 +1,3 @@
-Eranskin honetan simulazioa eta nodoak exekutatzeko beharrezko aginduak, telemetria grabatzeko jarraibideak eta entregatutako paketearen fitxategi-egitura garbia aurkezten dira.
-
 \section{Exekuzio- eta simulazio-aginduak}\label{sec:exekuzioa}
 Paketea konpilatu eta Gazebon exekutatzeko urratsak:
 \begin{enumerate}[leftmargin=1.5em, itemsep=0.25em]
@@ -31,7 +29,7 @@ ros2 bag record --include-hidden-topics /gz_pose /odom /scan /clock
 \end{enumerate}
 
 \section{Entregatutako paketearen katalogoa}\label{sec:fitxategiak}
-Entregatutako paketearen osagai nagusiak honako hauek dira:
+Entregatutako paketearen osagai nagusiak:
 \begin{itemize}[leftmargin=1.5em, itemsep=0.25em]
   \item \texttt{wall\_following/wall\_follow\_ls.py}: ROS 2 nodo nagusia. Ezkerreko paretaren izpiak hautatu eta plano kartesiarrera proiektatzen ditu, \texttt{np.polyfit} bidez $\theta$ estimatzen du, PID algoritmoa kalkulatzen du eta $\Delta t$ denbora-diferentzia neurtzen du.
   \item \texttt{launch/wf\_ls.launch.py}: Launch fitxategia, komando-lerrotik \texttt{kp}, \texttt{ki} eta \texttt{kd} parametroak jasotzeko gaitasuna ematen duena.

@@ -1,5 +1,3 @@
-Kapitulu honetan Yahboom zirkuituko 17 proba esperimentaletatik ateratako ondorio nagusiak eta gomendio argiak laburbiltzen ditugu.
-
 \section[Hiru aldaerak]{Hiru aldaera nagusien arteko konparaketa}\label{sec:aldaerak}
 Esperimentuen emaitzak laburbiltzeko, \ref{tab:aldaerak} taulan hiru aukera nagusiak konparatu ditugu $K_p = 1{,}5$ oinarri hartuta.
 
@@ -9,22 +7,24 @@ Esperimentuen emaitzak laburbiltzeko, \ref{tab:aldaerak} taulan hiru aukera nagu
 \toprule
 \textbf{Aldaera} & \textbf{Emaitza} & \textbf{Bueltak} & \textbf{Talkak} & \textbf{$d$ zuzenetan [m]} & \textbf{$\theta_{\text{RMS}}$ zuzenetan [$^\circ$]} \\
 \midrule
-1. P hutsa ($K_p = 1{,}5, K_V = 0$) & Ondo (optimoa) & $3{,}32$ & $0$ & $0{,}307 \pm 0{,}013$ & $1{,}7$ \\
-2. PID osoa ($1{,}5/0{,}05/0{,}1, K_V = 0$) & Ondo & $3{,}32$ & $0$ & $0{,}320 \pm 0{,}020$ & $1{,}9$ \\
-3. PID moteldua ($1{,}5/0{,}05/0{,}1, K_V = 2$) & Pareta galtzen du & $0{,}18$ & $5$ & $0{,}778 \pm 0{,}338$ & $33{,}1$ \\
+1. P hutsa\newline ($K_p = 1{,}5, K_V = 0$) & Ondo (aukeratua) & $3{,}32$ & $0$ & $0{,}307 \pm 0{,}013$ & $1{,}7$ \\
+\addlinespace[0.2em]
+2. PID osoa\newline ($1{,}5/0{,}05/0{,}1, K_V = 0$) & Ondo & $3{,}32$ & $0$ & $0{,}320 \pm 0{,}020$ & $1{,}9$ \\
+\addlinespace[0.2em]
+3. PID moteldua\newline ($1{,}5/0{,}05/0{,}1, K_V = 2$) & Pareta galtzen du & $0{,}18$ & $5$ & $0{,}778 \pm 0{,}338$ & $33{,}1$ \\
 \bottomrule
 \end{tabularx}
 \caption{Hiru aldaera nagusien konparaketa Gazeboko \texttt{yahboom\_track} zirkuituan.}\label{tab:aldaerak}
 \end{table}
 
-\section[Ondorio nagusiak]{Gure ondorio nagusiak eta gomendioa}\label{sec:ondorio-nagusiak}
-Aukeratutako konfigurazio nagusia 1. aldaera da: P kontrolagailu hutsa ($K_p = 1{,}5$, $K_i = 0{,}0$, $K_d = 0{,}0$, $v_0 = 0{,}2\text{ m/s}$ eta $K_V = 0{,}0$). Gure probetatik ondorio nagusi hauek atera ditugu:
+\section[Ondorio nagusiak]{Gure ondorio nagusiak}\label{sec:ondorio-nagusiak}
+Aukeratutako konfigurazio nagusia 1. aldaera da: P kontrolagailu hutsa ($K_p = 1{,}5$, $K_i = 0{,}0$, $K_d = 0{,}0$, $v_0 = 0{,}2\text{ m/s}$ eta $K_V = 0{,}0$). Probetatik ondorio nagusi hauek atera ditugu:
 
 \begin{itemize}[leftmargin=1.5em, itemsep=0.25em]
-  \item P kontrola nahikoa eta onena da: zuzenetan robotaren orientazio-aldaketa $\dot\theta = -\omega$ denez, robotaren biraketak berak ezabatzen du errorea; perturbazio finkorik ezean ez dago errore iraunkorrik eta P hutsak zirkuitua garbi osatzen du.
-  \item Zergatik okertzen duen I osagaiak: zirkuituko biraketa guztiak eskuinerantz dira ($\theta < 0$). Integratzaileak errorea pilatzen du kurba bakoitzean; zuzenera irtetean integralak eskuinera biratzen jarraitzera bultzatzen du robota, paretatik urrunduz ($0{,}362\text{ m}$-tik $0{,}393\text{ m}$-ra) eta lerrokatzea motelduz.
-  \item Zergatik ez duen laguntzen D osagaiak: kurbetan aurreko pareta bat-batean agertzen denez, deribatuak biraketa-kolpe handiak eragiten ditu ($K_d / \Delta t$) eta laserraren zarata handitzen du. $K_d = 1{,}0$ balioarekin robota desbideratu eta trabatu egiten da.
-  \item Distantzia nola finkatzen den formula gabe: kontrol-legean ez dago distantzia-terminorik ($e = \theta$ soilik da). Distantzia kurbetan finkatzen da berez: $D_{\max} = 0{,}5\text{ m}$ mugak biraketaren hasiera ezartzen du, eta $K_p = 1{,}5$ irabaziak robota zuzenean errepidearen erdian uzten du ($d = 0{,}307\text{ m}$).
+  \item P kontrola nahikoa da: probatutako konfigurazioen artean, P kontrolagailu hutsa ($K_p = 1{,}5$, $K_V = 0$) izan da emaitzarik orekatuena eman duena. Zuzenetan robotaren orientazio-aldaketa $\dot\theta = -\omega$ denez, biraketak berak murrizten du errorea; perturbazio asimetriko finkorik ezean ez dago errore iraunkorrik eta P hutsak zirkuitua garbi osatzen du.
+  \item I osagaiaren eragina: zirkuituko biraketa guztiak eskuinerantz dira ($\theta < 0$). Integratzaileak errorea pilatzen du kurba bakoitzean; zuzenera irtetean integralak eskuinera biratzen jarraitzera bultzatzen du robota, paretatik urrunduz ($0{,}362\text{ m}$-tik $0{,}393\text{ m}$-ra) eta lerrokatzea motelduz.
+  \item D osagaiaren mugak: kurbetan aurreko pareta bat-batean agertzen denez, deribatuak biraketa-kolpe handiak eragiten ditu ($K_d / \Delta t$) eta laserraren zarata handitzen du. $K_d = 1{,}0$ balioarekin robota desbideratu eta trabatu egiten da.
+  \item Distantzia nola finkatzen den formula gabe: kontrol-legean ez dago distantzia-terminorik ($e = \theta$ soilik da). Distantzia kurbetan finkatzen da berez: $D_{\max} = 0{,}5\text{ m}$ mugak biraketaren hasiera ezartzen du, eta $K_p = 1{,}5$ irabaziak robota zuzenean errepidearen erdian mantentzen du ($d = 0{,}307\text{ m}$).
   \item Abiadura moldatuaren muga: biraketetan moteltzeak ($K_V = 2$) $K_p = 1{,}0$ bezalako irabazi ahulei laguntzen die (biraketa itxiagoa eginez); baina $K_p = 1{,}5$ kasuan gehiegizko biraketa eragiten du eta robotak pareta galtzen du.
-  \item Arkitektura sinplearen sendotasuna: alferrikako kontrol-adabakirik gabe, paretarekiko paralelotasun-errore garbia ($e = \theta$) P irabazi egoki batekin gidatzea izan da zirkuitua gainditzeko konponbiderik sendoena eta eraginkorrena.
+  \item Arkitektura sinplearen sendotasuna: alferrikako konplexutasunik gabe, paretarekiko paralelotasun-errore garbia ($e = \theta$) P irabazi egoki batekin gidatzea izan da zirkuitua gainditzeko konponbide sinple eta eraginkorrena.
 \end{itemize}
