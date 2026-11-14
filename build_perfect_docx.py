@@ -28,8 +28,7 @@ DRIVE_DIR = Path(
 )
 
 LOCAL_DOCX = BASE_DIR / "Praktika_Txostena_RKA_P3.docx"
-DRIVE_DOCX1 = DRIVE_DIR / "Praktika_Txostena_RKA_P3.docx"
-DRIVE_DOCX2 = DRIVE_DIR / "Praktika Txostena.docx"
+DRIVE_DOCX = DRIVE_DIR / "Praktika Txostena.docx"
 
 REF_MAP = {
     # Figures
@@ -432,10 +431,8 @@ def main():
     print(f"[OK] Saved local DOCX: {LOCAL_DOCX} ({LOCAL_DOCX.stat().st_size} bytes)")
 
     if DRIVE_DIR.exists():
-        shutil.copy2(raw_docx, DRIVE_DOCX1)
-        shutil.copy2(raw_docx, DRIVE_DOCX2)
-        print(f"[OK] Copied to Google Drive: {DRIVE_DOCX1}")
-        print(f"[OK] Copied to Google Drive: {DRIVE_DOCX2}")
+        shutil.copy2(raw_docx, DRIVE_DOCX)
+        print(f"[OK] Copied to Google Drive: {DRIVE_DOCX}")
     else:
         print(f"[WARN] Drive directory not found: {DRIVE_DIR}")
 
