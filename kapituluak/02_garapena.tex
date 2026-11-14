@@ -24,21 +24,19 @@ Zeinuen portaera fisikoa honako hau da:
   \item Robota paralelo badoa: $c_1 = 0 \implies \theta = 0^\circ \implies \omega = 0$.
   \item Robota ezkerreko paretara hurbiltzen ari bada: aurrerago dauden puntuek $y$ txikiagoa dute, beraz malda negatiboa da ($c_1 < 0$). Ondorioz $\theta < 0$, eta agindua $\omega = K_p \theta < 0$ denez, robotak eskuinera biratzen du (paretatik urrunduz).
   \item Robota paretatik urruntzen ari bada: malda positiboa da ($c_1 > 0$), beraz $\theta > 0$ eta agindua $\omega > 0$ da, robota ezkerrera biraraziz (paretara hurbilduz).
-  \item Izkinetan: aurreko pareta $0{,}5\text{ m}$-ko eremuan sartzen denean, puntuek L itxura hartzen dute, malda nabarmen negatibo bihurtzen da ($c_1 \ll 0$) eta robotak berez biratzen du eskuinera izkina hartzeko.
+  \item Kurbetan: aurreko pareta $0{,}5\text{ m}$-ko eremuan sartzen denean, puntuek L itxura hartzen dute, malda nabarmen negatibo bihurtzen da ($c_1 \ll 0$) eta robotak berez biratzen du eskuinera biraketa osatzeko.
 \end{itemize}
 
 \section[Kontrol-legeak]{Kontrol-legeak eta abiadura lineala}\label{sec:kontrol-legeak}
-P kontrol hutsean biraketa-abiadura errorekiko proportzionala da: $\omega = K_p \cdot \theta$. Zuzenetan robotaren orientazioaren aldaketa $\dot\theta = -\omega$ denez, P hutsak ez du errore iraunkorrik uzten zuzenetan: pareta zuzen batean $\theta$ berez egonkortzen da $0{,}0^\circ$-an.
-
-Abiadura linealari dagokionez, bi aukerak formula honekin kudeatzen ditugu:
+P kontrol hutsean biraketa-abiadura errorekiko proportzionala da ($\omega = K_p \cdot \theta$), eta $\dot\theta = -\omega$ denez ez du errore iraunkorrik uzten zuzenetan. Abiadura lineala formula honekin kudeatzen dugu:
 \[
   v = \frac{v_0}{1 + K_V \cdot |\omega|}, \qquad v_0 = 0{,}2\text{ m/s}
 \]
-$K_V = 0$ denean abiadura konstantea da ($0{,}2\text{ m/s}$), eta $K_V = 2$ denean $|\omega|$-ren alderantziz proportzionala ($v = v_0 / (1 + K_V |\omega|)$). Kontrol-irabaziak (\texttt{kp}, \texttt{ki}, \texttt{kd}) ROS parametroak dira; $v_0$, $K_V$, $D_{\max} = 0{,}5\text{ m}$ eta $I_{\max} = 0{,}3$, berriz, kodean finkatutako konstanteak.
+$K_V = 0$ denean abiadura konstantea da ($0{,}2\text{ m/s}$), eta $K_V = 2$ denean $|\omega|$-ren alderantziz proportzionala, kurbetan robota motelduz. Kontrol-irabaziak (\texttt{kp}, \texttt{ki}, \texttt{kd}) ROS parametroak dira; $v_0$, $K_V$, $D_{\max} = 0{,}5\text{ m}$ eta $I_{\max} = 0{,}3$, berriz, kodean finkatutako konstanteak.
 
 \section[PID kodean]{PID osagaiak kodean nola gehitu ditugun}\label{sec:pid-inplementazioa}
-Enuntziatuaren galderari erantzunez, PID kontrolagailu osoa \texttt{wall\_follow\_ls.py} fitxategian lerro hauen bidez inplementatu dugu:
-\vspace{-0.5em}
+Enuntziatuari erantzunez, PID kontrolagailua \texttt{wall\_follow\_ls.py}-n inplementatu dugu:
+\vspace{-0.7em}
 \begin{verbatim}
 dt = (self.timestamps[-1] - self.timestamps[-2]
       if len(self.timestamps) > 1 else 0.0)
@@ -48,11 +46,10 @@ self.prev_error = error
 w = self.kp * error + self.ki * self.error_sum + self.kd * derivative
 v = V0 / (1.0 + KV * abs(w))
 \end{verbatim}
-\vspace{-0.5em}
-
-Inplementazioan hiru puntu tekniko zaindu ditugu:
-\begin{enumerate}[leftmargin=1.5em, itemsep=0.0em, topsep=1pt]
-  \item $\Delta t$ simulazio-denboran: \texttt{self.timestamps}-ek \texttt{self.get\_clock().now()} jasotzen du (\texttt{/clock} simulatuari lotua). Horrela $\Delta t$ simulazio-denbora hutsa da eta CPU kargak ez du desitxuratzen ($10\text{ Hz}$ nominala, $7{,}5\text{--}10\text{ Hz}$ neurtuta).
-  \item Integralaren saturazioa (anti-windup): integrala $[-0{,}3, +0{,}3]\text{ rad}\cdot\text{s}$ tartera mugatzen dugu \texttt{np.clip} bidez ($I_{\max} = 0{,}3$), izkinetako errore negatiboa mugagabe pila ez dadin.
+\vspace{-0.7em}
+Inplementazioan hiru puntu zaindu ditugu:
+\begin{enumerate}[leftmargin=1.5em, itemsep=0.0em, topsep=0pt]
+  \item $\Delta t$ simulazio-denboran: \texttt{self.timestamps}-ek \texttt{self.get\_clock().now()} jasotzen du (\texttt{/clock} topic-etik); $\Delta t$ simulazio-denbora da eta ez du CPU kargak aldatzen ($10\text{ Hz}$ nominala, $7{,}5\text{--}10\text{ Hz}$ neurtuta).
+  \item Integrala (anti-windup): integrala $[-0{,}3, +0{,}3]\text{ rad}\cdot\text{s}$ tartera mugatzen dugu ($I_{\max} = 0{,}3$), kurbetako errore negatiboa mugagabe pila ez dadin.
   \item Deribatua: $\Delta t > 0$ denean soilik kalkulatzen da aurreko errorearekiko diferentzia hartuz, zero bidezko zatiketarik gabe.
 \end{enumerate}

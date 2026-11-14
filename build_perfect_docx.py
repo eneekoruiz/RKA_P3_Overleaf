@@ -75,9 +75,9 @@ TABLE_CAPTIONS = {
 }
 
 FIG_CAPTIONS = {
-    "fig:diag-kp2": "3.1. irudia: Laserrak atzemandako puntuak eta doitutako zuzena seinale baten ondoan ($K_p = 2{,}0$). Erregresioak zutoina naturaltasunez iragazten du.",
+    "fig:diag-kp2": "3.1. irudia: Laserrak atzemandako puntuak eta doitutako zuzena seinale baten ondoan ($K_p = 2{,}0$). Erregresioak seinalea naturaltasunez iragazten du.",
     "fig:v-ibilbideak": "3.3. irudia: Abiadura konstantearen ($K_V = 0$) eta moldatuaren ($K_V = 2$) arteko ibilbideak.",
-    "fig:enun-ibilbideak": "3.5. irudia: Enuntziatuko hiru adibideen ibilbideak: hiruretan robotak kanpoko seinaleak jotzen ditu $K_p = 0{,}6$ txikiegia delako izkinak garbi hartzeko.",
+    "fig:enun-ibilbideak": "3.5. irudia: Enuntziatuko hiru adibideen ibilbideak: hiruretan robotak kanpoko seinaleak jotzen ditu $K_p = 0{,}6$ txikiegia delako kurbak garbi hartzeko.",
 }
 
 def extract_braced(text: str, start_pos: int) -> tuple[str, int]:
