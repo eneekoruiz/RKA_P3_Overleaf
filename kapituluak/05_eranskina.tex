@@ -16,7 +16,11 @@ ros2 launch gazebo_worlds gz_robot.launch.py world:=yahboom_track
 \begin{verbatim}
 ros2 launch wall_following wf_ls.launch.py kp:=1.5 ki:=0.0 kd:=0.0
 \end{verbatim}
-  \item Bigarren aldaera abiarazi (PID osoa):
+  \item Bigarren aldaera abiarazi (PID osoa, $K_V = 0$):
+\begin{verbatim}
+ros2 launch wall_following wf_ls.launch.py kp:=1.5 ki:=0.05 kd:=0.1
+\end{verbatim}
+  \item Hirugarren aldaera abiarazi (PID moteldua, $K_V = 2$): \texttt{wall\_follow\_ls.py}-ko \texttt{follow\_wall()} funtzioan \texttt{KV = 2.0} konstantea ezarri eta abiarazi:
 \begin{verbatim}
 ros2 launch wall_following wf_ls.launch.py kp:=1.5 ki:=0.05 kd:=0.1
 \end{verbatim}

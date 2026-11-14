@@ -27,3 +27,6 @@ debug_*.txt
 pdf_pages_dump.txt
 __pycache__/
 *.pyc
+zip_extracted/
+pandoc_combined.tex
+raw_pandoc.docx

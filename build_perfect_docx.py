@@ -128,16 +128,14 @@ def clean_chapter_latex(text: str) -> str:
     # Convert tabularx to standard 6-column tabular
     while r'\begin{tabularx}' in t:
         pos = t.find(r'\begin{tabularx}')
-        b1 = t.find('{', pos)
+        end0 = pos + len(r'\begin{tabularx}')
+        b1 = t.find('{', end0)
         _, end1 = extract_braced(t, b1)
         b2 = t.find('{', end1)
         _, end2 = extract_braced(t, b2)
         t = t[:pos] + r'\begin{tabular}{llllll}' + t[end2:]
 
     t = t.replace(r'\end{tabularx}', r'\end{tabular}')
-
-    # In Table 3.4: replace \newline with space
-    t = t.replace(r'\newline', ' ')
 
     # Unpack subfigures into sequential full-width figures
     kp_subfigs_replacement = (

@@ -5,7 +5,7 @@ Esperimentuen emaitzak laburbiltzeko, \ref{tab:aldaerak} taulan hiru aukera nagu
 
 \begin{table}[H]
 \centering\footnotesize
-\begin{tabularx}{\textwidth}{@{} >{\raggedright\arraybackslash}p{5.0cm} >{\raggedright\arraybackslash}X c c c c @{}}
+\begin{tabularx}{\textwidth}{@{} >{\raggedright\arraybackslash}p{4.0cm} >{\raggedright\arraybackslash}X c c >{\centering\arraybackslash}p{2.5cm} >{\centering\arraybackslash}p{2.0cm} @{}}
 \toprule
 \textbf{Aldaera} & \textbf{Emaitza} & \textbf{Bueltak} & \textbf{Talkak} & \textbf{$d$ zuzenetan [m]} & \textbf{$\theta_{\text{RMS}}$ zuzenetan [$^\circ$]} \\
 \midrule
@@ -22,7 +22,7 @@ Aukeratutako konfigurazio nagusia 1. aldaera da: P kontrolagailu hutsa ($K_p = 1
 
 \begin{itemize}[leftmargin=1.5em, itemsep=0.25em]
   \item P kontrola nahikoa eta onena da: zuzenetan robotaren orientazio-aldaketa $\dot\theta = -\omega$ denez, robotaren biraketak berak ezabatzen du errorea; perturbazio finkorik ezean ez dago errore iraunkorrik eta P hutsak zirkuitua garbi osatzen du.
-  \item Zergatik okertzen duen I osagaiak: zirkuituko biraketa guztiak eskuinerantz dira ($\theta < 0$). Integratzaileak errorea pilatzen du izkina bakoitzean; zuzenera irtetean integralak eskuinera biratzen jarraitzera bultzatzen du robota, paretatik urrunduz ($0{,}31\text{ m}$-tik $0{,}39\text{ m}$-ra) eta lerrokatzea motelduz.
+  \item Zergatik okertzen duen I osagaiak: zirkuituko biraketa guztiak eskuinerantz dira ($\theta < 0$). Integratzaileak errorea pilatzen du izkina bakoitzean; zuzenera irtetean integralak eskuinera biratzen jarraitzera bultzatzen du robota, paretatik urrunduz ($0{,}362\text{ m}$-tik $0{,}393\text{ m}$-ra) eta lerrokatzea motelduz.
   \item Zergatik ez duen laguntzen D osagaiak: izkinetan aurreko pareta bat-batean agertzen denez, deribatuak biraketa-kolpe handiak eragiten ditu ($K_d / \Delta t$) eta laserraren zarata handitzen du. $K_d = 1{,}0$ balioarekin robota desbideratu eta trabatu egiten da.
   \item Distantzia nola finkatzen den formula gabe: kontrol-legean ez dago distantzia-terminorik ($e = \theta$ soilik da). Distantzia izkinetan finkatzen da berez: $D_{\max} = 0{,}5\text{ m}$ mugak biraketaren hasiera ezartzen du, eta $K_p = 1{,}5$ irabaziak robota zuzenean errepidearen erdian uzten du ($d = 0{,}307\text{ m}$).
   \item Abiadura moldatuaren muga: biraketetan moteltzeak ($K_V = 2$) $K_p = 1{,}0$ bezalako irabazi ahulei laguntzen die (biraketa itxiagoa eginez); baina $K_p = 1{,}5$ kasuan gehiegizko biraketa eragiten du eta robotak pareta galtzen du.

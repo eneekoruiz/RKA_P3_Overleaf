@@ -34,11 +34,11 @@ Abiadura linealari dagokionez, bi aukerak formula honekin kudeatzen ditugu:
 \[
   v = \frac{v_0}{1 + K_V \cdot |\omega|}, \qquad v_0 = 0{,}2\text{ m/s}
 \]
-$K_V = 0$ denean abiadura konstantea da ($0{,}2\text{ m/s}$). $K_V = 2$ denean, berriz, abiadura $|\omega|$-ren alderantziz proportzionala da ($v = v_0 / (1 + K_V \cdot |\omega|)$), izkinetan robota motelduz.
+$K_V = 0$ denean abiadura konstantea da ($0{,}2\text{ m/s}$), eta $K_V = 2$ denean $|\omega|$-ren alderantziz proportzionala ($v = v_0 / (1 + K_V |\omega|)$). Kontrol-irabaziak (\texttt{kp}, \texttt{ki}, \texttt{kd}) ROS parametroak dira; $v_0$, $K_V$, $D_{\max} = 0{,}5\text{ m}$ eta $I_{\max} = 0{,}3$, berriz, kodean finkatutako konstanteak.
 
 \section[PID kodean]{PID osagaiak kodean nola gehitu ditugun}\label{sec:pid-inplementazioa}
 Enuntziatuaren galderari erantzunez, PID kontrolagailu osoa \texttt{wall\_follow\_ls.py} fitxategian lerro hauen bidez inplementatu dugu:
-\vspace{-0.4em}
+\vspace{-0.5em}
 \begin{verbatim}
 dt = (self.timestamps[-1] - self.timestamps[-2]
       if len(self.timestamps) > 1 else 0.0)
@@ -48,11 +48,11 @@ self.prev_error = error
 w = self.kp * error + self.ki * self.error_sum + self.kd * derivative
 v = V0 / (1.0 + KV * abs(w))
 \end{verbatim}
-\vspace{-0.4em}
+\vspace{-0.5em}
 
 Inplementazioan hiru puntu tekniko zaindu ditugu:
-\begin{enumerate}[leftmargin=1.5em, itemsep=0.05em, topsep=2pt]
-  \item $\Delta t$ kalkulua: nodoak eskaneo bakoitza jasotzean gehitutako denbora-marken diferentzia da (\texttt{self.timestamps[-1] - self.timestamps[-2]}). Kontrol-maiztasuna $\approx 10\text{ Hz}$-koa da ($\Delta t \approx 0{,}1\text{ s}$).
+\begin{enumerate}[leftmargin=1.5em, itemsep=0.0em, topsep=1pt]
+  \item $\Delta t$ simulazio-denboran: \texttt{self.timestamps}-ek \texttt{self.get\_clock().now()} jasotzen du (\texttt{/clock} simulatuari lotua). Horrela $\Delta t$ simulazio-denbora hutsa da eta CPU kargak ez du desitxuratzen ($10\text{ Hz}$ nominala, $7{,}5\text{--}10\text{ Hz}$ neurtuta).
   \item Integralaren saturazioa (anti-windup): integrala $[-0{,}3, +0{,}3]\text{ rad}\cdot\text{s}$ tartera mugatzen dugu \texttt{np.clip} bidez ($I_{\max} = 0{,}3$), izkinetako errore negatiboa mugagabe pila ez dadin.
   \item Deribatua: $\Delta t > 0$ denean soilik kalkulatzen da aurreko errorearekiko diferentzia hartuz, zero bidezko zatiketarik gabe.
 \end{enumerate}
