@@ -18,9 +18,9 @@ ros2 launch wall_following wf_ls.launch.py kp:=1.5 ki:=0.0 kd:=0.0
 \end{verbatim}
   \item Bigarren aldaera abiarazi (PID osoa):
 \begin{verbatim}
-ros2 launch wall_following wf_ls.launch.py kp:=2.0 ki:=0.05 kd:=0.1
+ros2 launch wall_following wf_ls.launch.py kp:=1.5 ki:=0.05 kd:=0.1
 \end{verbatim}
-  \item Telemetria eta kontaktu-sentsoreak grabatu:
+  \item Ibilbidea eta telemetria grabatu:
 \begin{verbatim}
 ros2 bag record --include-hidden-topics /gz_pose /odom /scan /clock
 \end{verbatim}

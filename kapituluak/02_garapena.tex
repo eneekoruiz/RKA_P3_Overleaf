@@ -1,4 +1,4 @@
-Kapitulu honetan kontrolagailua nola diseinatu eta inplementatu dugun azaltzen dugu: laserraren irakurketak nola prozesatzen ditugun, paretaren angelua nola kalkulatzen dugun eta PID algoritmoa nola gauzatu dugun.
+Kapitulu honetan kontrolagailua nola diseinatu eta inplementatu dugun azaltzen dugu: laserraren irakurketak nola prozesatzen ditugun, paretaren angelua nola kalkulatzen dugun eta PID algoritmoa kodean nola gauzatu dugun.
 
 \section[LiDAR konfigurazioa]{Sentsorearen konfigurazioa eta ezkerreko pareta}\label{sec:geometria}
 Rosmaster robotak 2D RPLidar S2 sentsorea du gainean kokatuta. Ereduaren URDF fitxategiaren arabera (\texttt{rosmaster\_description}), sentsorea robotaren ardatzarekiko $180^\circ$ biratuta dago ($\text{yaw} = \pi$). Jatorrizko nodoak automatikoki zuzentzen du orientazio hori, datuen bektorea 1500 posizio mugituz (\texttt{scan[i - 1500]}). Horrela, \texttt{bearings} bektorea robotaren ardatzekin bat dator: $0^\circ$ aurrera, $+90^\circ$ ezkerrera eta $-90^\circ$ eskuinera.
@@ -7,7 +7,7 @@ Pistako geziei jarraituz aurrera egitean, jarraitu beharreko kanpoko pareta robo
 
 \section[Angeluaren kalkulua]{Paretaren angeluaren kalkulua eta zeinuen portaera}\label{sec:erregresioa}
 Paretarekiko orientazio-angelua kalkulatzeko urrats hauek jarraitu ditugu:
-\begin{enumerate}[leftmargin=1.5em, itemsep=0.15em]
+\begin{enumerate}[leftmargin=1.5em, itemsep=0.05em, topsep=2pt]
   \item Proiekzio kartesiarra: Hautatutako izpi bakoitza robotaren plano lokaleko puntu bihurtzen dugu:
   \[
     x_i = d_i \cdot \cos(\beta_i), \qquad y_i = d_i \cdot \sin(\beta_i)
@@ -20,7 +20,7 @@ Paretarekiko orientazio-angelua kalkulatzeko urrats hauek jarraitu ditugu:
 \end{enumerate}
 
 Zeinuen portaera fisikoa honako hau da:
-\begin{itemize}[leftmargin=1.5em, itemsep=0.15em]
+\begin{itemize}[leftmargin=1.5em, itemsep=0.05em, topsep=2pt]
   \item Robota paralelo badoa: $c_1 = 0 \implies \theta = 0^\circ \implies \omega = 0$.
   \item Robota ezkerreko paretara hurbiltzen ari bada: aurrerago dauden puntuek $y$ txikiagoa dute, beraz malda negatiboa da ($c_1 < 0$). Ondorioz $\theta < 0$, eta agindua $\omega = K_p \theta < 0$ denez, robotak eskuinera biratzen du (paretatik urrunduz).
   \item Robota paretatik urruntzen ari bada: malda positiboa da ($c_1 > 0$), beraz $\theta > 0$ eta agindua $\omega > 0$ da, robota ezkerrera biraraziz (paretara hurbilduz).
@@ -34,16 +34,25 @@ Abiadura linealari dagokionez, bi aukerak formula honekin kudeatzen ditugu:
 \[
   v = \frac{v_0}{1 + K_V \cdot |\omega|}, \qquad v_0 = 0{,}2\text{ m/s}
 \]
-$K_V = 0$ denean abiadura konstantea da ($0{,}2\text{ m/s}$). $K_V = 2$ denean, berriz, abiadura $|\omega|$-ren alderantziz proportzionala da, izkinetan robota motelduz.
+$K_V = 0$ denean abiadura konstantea da ($0{,}2\text{ m/s}$). $K_V = 2$ denean, berriz, abiadura $|\omega|$-ren alderantziz proportzionala da ($v = v_0 / (1 + K_V \cdot |\omega|)$), izkinetan robota motelduz.
 
-\section[PID inplementazioa]{PID osagaiak kodean nola gehitu ditugun}\label{sec:pid-inplementazioa}
-PID algoritmo osoa formula diskretu honekin inplementatu dugu:
-\[
-  \omega = K_p \cdot e + K_i \cdot \sum e \Delta t + K_d \cdot \frac{e - e_{\text{aurrekoa}}}{\Delta t}
-\]
-Inplementazioan hiru puntu zaindu ditugu:
-\begin{enumerate}[leftmargin=1.5em, itemsep=0.15em]
-  \item $\Delta t$ kalkulua: azken bi eskaneoen arteko denbora-diferentzia neurtzen dugu.
-  \item Integralaren saturazioa: integrala $[-0{,}3, +0{,}3]\text{ rad}\cdot\text{s}$ tartera mugatzen dugu \texttt{np.clip} bidez, izkinetan errorea gehiegi pilatu ez dadin.
-  \item Deribatua: $\Delta t > 0$ denean soilik kalkulatzen da. Paretarik ikusten ez denean aurreko errorea berrezarri egiten dugu, deribatu-kolperik ez sortzeko.
+\section[PID kodean]{PID osagaiak kodean nola gehitu ditugun}\label{sec:pid-inplementazioa}
+Enuntziatuaren galderari erantzunez, PID kontrolagailu osoa \texttt{wall\_follow\_ls.py} fitxategian lerro hauen bidez inplementatu dugu:
+\vspace{-0.4em}
+\begin{verbatim}
+dt = (self.timestamps[-1] - self.timestamps[-2]
+      if len(self.timestamps) > 1 else 0.0)
+self.error_sum = float(np.clip(self.error_sum + error * dt, -I_MAX, I_MAX))
+derivative = (error - self.prev_error) / dt if dt > 0.0 else 0.0
+self.prev_error = error
+w = self.kp * error + self.ki * self.error_sum + self.kd * derivative
+v = V0 / (1.0 + KV * abs(w))
+\end{verbatim}
+\vspace{-0.4em}
+
+Inplementazioan hiru puntu tekniko zaindu ditugu:
+\begin{enumerate}[leftmargin=1.5em, itemsep=0.05em, topsep=2pt]
+  \item $\Delta t$ kalkulua: nodoak eskaneo bakoitza jasotzean gehitutako denbora-marken diferentzia da (\texttt{self.timestamps[-1] - self.timestamps[-2]}). Kontrol-maiztasuna $\approx 10\text{ Hz}$-koa da ($\Delta t \approx 0{,}1\text{ s}$).
+  \item Integralaren saturazioa (anti-windup): integrala $[-0{,}3, +0{,}3]\text{ rad}\cdot\text{s}$ tartera mugatzen dugu \texttt{np.clip} bidez ($I_{\max} = 0{,}3$), izkinetako errore negatiboa mugagabe pila ez dadin.
+  \item Deribatua: $\Delta t > 0$ denean soilik kalkulatzen da aurreko errorearekiko diferentzia hartuz, zero bidezko zatiketarik gabe.
 \end{enumerate}
