@@ -1,18 +1,17 @@
-\section[Hiru aldaerak]{Hiru aldaera nagusien arteko konparaketa}\label{sec:aldaerak}
-Esperimentuen emaitzak laburbiltzeko, \ref{tab:aldaerak} taulan hiru aukera nagusiak konparatu ditugu $K_p = 1{,}5$ oinarri hartuta.
+Esperimentuen emaitzak laburbiltzeko, \ref{tab:aldaerak} taulan hiru aldaera nagusiak konparatu ditugu $K_p = 1{,}5$ oinarri hartuta.
 
-\vspace{-0.4em}
+\vspace{-0.6em}
 \begin{table}[H]
 \centering\footnotesize
-\renewcommand{\arraystretch}{0.85}
+\renewcommand{\arraystretch}{0.80}
 \begin{tabularx}{\textwidth}{@{} >{\raggedright\arraybackslash}p{4.0cm} >{\raggedright\arraybackslash}X c c >{\centering\arraybackslash}p{2.5cm} >{\centering\arraybackslash}p{2.0cm} @{}}
 \toprule
 \textbf{Aldaera} & \textbf{Emaitza} & \textbf{Bueltak} & \textbf{Talkak} & \textbf{$d$ zuzenetan [m]} & \textbf{$\theta_{\text{RMS}}$ zuzenetan [$^\circ$]} \\
 \midrule
 1. P hutsa\newline ($K_p = 1{,}5, K_V = 0$) & Ondo (aukeratua) & $3{,}32$ & $0$ & $0{,}307 \pm 0{,}013$ & $1{,}7$ \\
-\addlinespace[0.2em]
+\addlinespace[0.15em]
 2. PID osoa\newline ($1{,}5/0{,}05/0{,}1, K_V = 0$) & Ondo & $3{,}32$ & $0$ & $0{,}320 \pm 0{,}020$ & $1{,}9$ \\
-\addlinespace[0.2em]
+\addlinespace[0.15em]
 3. PID moteldua\newline ($1{,}5/0{,}05/0{,}1, K_V = 2$) & Pareta galtzen du & $0{,}18$ & $5$ & $0{,}778 \pm 0{,}338$ & $33{,}1$ \\
 \bottomrule
 \end{tabularx}
@@ -20,7 +19,8 @@ Esperimentuen emaitzak laburbiltzeko, \ref{tab:aldaerak} taulan hiru aukera nagu
 \end{table}
 \vspace{-0.6em}
 
-\section[Ondorio nagusiak]{Gure ondorio nagusiak}\label{sec:ondorio-nagusiak}
-Aukeratutako konfigurazio nagusia 1. aldaera da: P kontrolagailu hutsa abiadura lineal konstantearekin ($K_p = 1{,}5$, $K_i = 0{,}0$, $K_d = 0{,}0$, $v_0 = 0{,}2\text{ m/s}$ eta $K_V = 0{,}0$). Probatutako konfigurazioen artean, P kontrolagailuak $K_p = 1{,}5$ balioarekin eta abiadura konstantearekin eman du emaitzarik orekatuena. Hiru bueltak kontakturik gabe osatu ditu, eta zuzenetako angelu-errorea txikia izan da ($1{,}7^\circ$). Probatutako I eta D osagaiek ez dute emaitza hori hobetu.
+Probatutako konfigurazioen artean, P kontrolagailuak $K_p = 1{,}5$ balioarekin eta $0{,}2\text{ m/s}$-ko abiadura konstantearekin eman du emaitzarik orekatuena. Hiru bueltak kontakturik gabe osatu ditu, zuzenetako $\theta_{\text{RMS}}$ $1{,}7^\circ$ izan da eta paretarekiko batez besteko distantzia $0{,}307\text{ m}$ izan da.
 
-Zuzenetan orientazio-aldaketa $\dot\theta = -\omega$ denez, biraketak berak murrizten du errorea zikloz ziklo eta ez dago errore iraunkorrik. Aukeratutako konfigurazioarekin, zuzenetan paretarekiko batez besteko distantzia $0{,}307\text{ m}$ izan da. Bestetik, I osagaiak errorea pilatzen du kurbetan eta paretatik aldentzera behartzen du robota zuzenetan; D osagaiak kurbetako malda-jauziak anplifikatzen ditu; eta kurbetan moteltzeak ($K_V = 2$) gehiegizko biraketa eragiten du $K_p = 1{,}5$ balioan.
+Probek erakutsi dute irabazi txikiekin robotak berandu biratzen duela, eta irabazi handiekin, berriz, gehiegi zuzentzen duela norabidea eta pareta galtzen duela. Kurbetan moteltzea lagungarria izan da $K_p = 1{,}0$ balioarekin, baina $K_p = 1{,}5$ eta $2{,}0$ balioekin biraketa gehiegi itxi du. Horregatik, ez dago abiadura-lege bakar bat $K_p$-ren balio guztietarako egokia denik.
+
+I osagaiak kurbetako errorea noranzko berean pilatu du eta robotaren zuzeneko kokapena aldatu du. D osagai txikiek ez dute P kontrolaren emaitza hobetu, eta $K_d = 1{,}0$ balioak biraketa bortitzak sortu ditu. PID konbinazio osoak ibilbidea osatu du, baina P hutsaren antzeko emaitzekin. Ondorioz, zirkuitu eta abiadura hauetan, kontrol sinpleak emaitza bera edo hobea eman du konplexutasun txikiagoarekin.

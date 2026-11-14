@@ -1,44 +1,40 @@
-\section{Exekuzio- eta simulazio-aginduak}\label{sec:exekuzioa}
-Paketea konpilatu eta Gazebon probak modu errepikagarrian exekutatzeko urrats nagusiak hauek dira:
+\section{Exekuzio-aginduak}\label{sec:exekuzioa}
+Paketea konpilatu eta Gazebon probak exekutatzeko urrats nagusiak hauek dira:
 
 \begin{enumerate}[leftmargin=1.5em, itemsep=0.3em]
-  \item Paketea konpilatu eta ROS 2 ingurunea kargatu:
+  \item Paketea konpilatu eta ingurunea kargatu:
 \begin{verbatim}
 colcon build --packages-select wall_following
 source install/setup.bash
 \end{verbatim}
-  \item Gazebo simulazio-ingurunea abiarazi pistan:
+  \item Gazebo abiarazi:
 \begin{verbatim}
 ros2 launch gazebo_worlds gz_robot.launch.py world:=yahboom_track
 \end{verbatim}
-  \item Konfigurazio optimoa abiarazi (P kontrolagailu hutsa):
+  \item Aukeratutako P konfigurazioa abiarazi:
 \begin{verbatim}
 ros2 launch wall_following wf_ls.launch.py kp:=1.5 ki:=0.0 kd:=0.0
 \end{verbatim}
-  \item Bigarren aldaera abiarazi (PID kontrolagailu osoa, $K_V = 0$):
+  \item PID konfigurazioa abiarazi:
 \begin{verbatim}
 ros2 launch wall_following wf_ls.launch.py kp:=1.5 ki:=0.05 kd:=0.1
 \end{verbatim}
-  \item Hirugarren aldaera abiarazi (PID moteldua, $K_V = 2$): \texttt{wall\_follow\_ls.py}-ko \texttt{follow\_wall()} metodoan \texttt{KV = 2.0} parametroa ezarri eta martxan jarri:
-\begin{verbatim}
-ros2 launch wall_following wf_ls.launch.py kp:=1.5 ki:=0.05 kd:=0.1
-\end{verbatim}
-  \item Telemetria eta benetako posizioak grabatu \texttt{ros2 bag} bidez:
+  \item Telemetria grabatu:
 \begin{verbatim}
 ros2 bag record --include-hidden-topics /gz_pose /odom /scan /clock
 \end{verbatim}
 \end{enumerate}
 
 \clearpage
-\section{Entregatutako paketearen katalogoa}\label{sec:fitxategiak}
+\section{Entregatutako paketearen edukia}\label{sec:fitxategiak}
 Entregatutako soluzioak fitxategi eta egitura hauek biltzen ditu:
 
 \begin{itemize}[leftmargin=1.5em, itemsep=0.35em]
-  \item \texttt{wall\_following/wall\_follow\_ls.py}: ROS 2 nodo nagusia. Laser bidezko neurketak ($0^\circ\dots+90^\circ$, $d < 0{,}5\text{ m}$) plano kartesiarrera proiektatzen ditu, \texttt{np.polyfit} erabiliz karratu txikienen zuzena doitzen du, orientazio-angelua ($\theta = \arctan(c_1)$) lortzen du, eta PID formulazio osoa kalkulatzen du anti-windup mugarekin ($I_{\max} = 0{,}3\text{ rad}\cdot\text{s}$) eta $\Delta t$ errealarekin.
-  \item \texttt{launch/wf\_ls.launch.py}: Launch fitxategia, exekuzio-aginduan \texttt{kp}, \texttt{ki} eta \texttt{kd} parametroak zuzenean pasatzeko aukera ematen duena simulazioa berriro konpilatu gabe.
-  \item \texttt{diff\_wall\_follow\_ls\_vs\_original.diff}: Irakasleak emandako hasierako txantiloiaren eta azken bertsioaren arteko aldaketen diff fitxategia. Argigarri uzten du jatorrizko egitura osorik errespetatu dela eta aldaketak \texttt{TODO} blokean bakarrik egin direla.
-  \item \texttt{pruebas/}: Gazebon burututako esperimentuen erregistroak, kalkulatutako telemetria eta grafikoak sortzeko script osagarriak (\texttt{plot\_wf.py}, \texttt{diag.py}).
+  \item \texttt{wall\_following/wall\_follow\_ls.py}: ROS 2 nodo nagusia. Laser-puntuak proiektatu, paretaren angelua kalkulatu eta P/PID aginduak sortzen ditu.
+  \item \texttt{launch/wf\_ls.launch.py}: \texttt{kp}, \texttt{ki} eta \texttt{kd} parametroak komando-lerrotik jasotzen dituen launch fitxategia.
+  \item \texttt{diff\_wall\_follow\_ls\_vs\_original.diff}: Hasierako txantiloiaren eta entregatutako bertsioaren arteko aldaketak jasotzen ditu.
+  \item \texttt{pruebas/}: Gazeboko proben erregistroak eta grafikoak sortzeko scriptak biltzen ditu.
 \end{itemize}
 
-\vspace{1.0em}
-\noindent Pakete osoa ROS 2 Humble eta Gazebo bertsioekin guztiz bateragarria da, eta ikasgelako laborategiko ingurune berean zuzenean exekutatzeko prestatuta dago.
+\vspace{0.8em}
+\noindent Kodeko erabaki nagusiak iruzkinen bidez azaldu dira, bereziki laser-sektorearen hautaketa, angeluaren kalkulua, PID osagaiak eta anti-windup muga. Paketea ROS 2 Humble eta ikasgelan erabilitako Gazebo ingurunerako prestatu da.

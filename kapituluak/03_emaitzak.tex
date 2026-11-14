@@ -1,19 +1,19 @@
 \section[Angeluaren egiaztapena]{Angeluaren egiaztapena eta seinaleen iragazpena}\label{sec:angelu-egiaztapena}
-Ezkerreko paretaren angelua ondo kalkulatzen dela egiaztatzeko, nodoaren log-eko $\theta$ angelua eta Gazeboko \texttt{/gz\_pose} topic-etik jasotako orientazio erreala alderatu ditugu. Zuzenetan neurtutako batez besteko desbideratzea $-0{,}4^\circ$-koa da soilik (desbideratze estandarra $2{,}1^\circ$, $\approx 350$ puntu erregresioan); horrek erakusten du doikuntza lineala fidagarria dela.
+Kalkulatutako angelua egiaztatzeko, nodoaren logeko $\theta$ balioa Gazeboko \texttt{/gz\_pose} datuetatik lortutako orientazioarekin alderatu dugu. Zuzenetan, batez besteko aldea $-0{,}4^\circ$ izan da, eta desbideratze estandarra $2{,}1^\circ$. Emaitza horrek erakusten du erregresioak paretaren norabidea behar adinako zehaztasunez jasotzen duela kontrolerako.
 
-Pistako seinaleak paretari atxikitako zilindro txikiak dira ($0{,}07\text{ m}$-ko erradiokoak). \ref{fig:diag-kp2} irudian ikus daitekeenez, karratu txikienen erregresioak berez iragazten ditu puntu horiek: seinale baten ondotik pasatzean $\pm 5^\circ$-ko fluktuazio txiki bat baino ez da sortzen, eta robotak ez du norabide-aldaketa bortitzik egiten.
+Pistako seinaleak paretaren ondoan dauden $0{,}07\text{ m}$-ko erradioko zilindroak dira. \ref{fig:diag-kp2} irudian ikus daitekeenez, haien laser-puntuak ez datoz paretaren lerroarekin guztiz bat, baina karratu txikienen doikuntzak puntu guztien joera erabiltzen du. Horri esker, seinale baten ondotik pasatzean angeluan $\pm 5^\circ$ inguruko aldaketa laburra baino ez dugu neurtu.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{diag_kp2.png}
-\caption{Laserrak atzemandako puntuak eta doitutako zuzena seinale baten ondoan ($K_p = 2{,}0$). Erregresioak seinalea naturaltasunez iragazten du.}\label{fig:diag-kp2}
+\caption{Laser-puntuak eta doitutako zuzena seinale baten ondoan ($K_p = 2{,}0$).}\label{fig:diag-kp2}
 \end{figure}
 
 \clearpage
 \section[Kontrol Proportzionala]{Kontrol Proportzionalaren emaitzak}\label{sec:emaitzak-p}
 \noindent\textit{Enuntziatuko galdera: Kpren zein balio tartean da portaera egokia?}\par\vspace{1pt}
 
-Lehen azterketan $K_p$ irabaziaren eragina ebaluatu dugu ($K_i = 0$, $K_d = 0$, $v_0 = 0{,}2\text{ m/s}$, $K_V = 0$). Proben helburua hiru buelta oso osatzea izan da ($3{,}32$ buelta abiapuntutik); konfigurazio batzuekin, ordea, robotak pareta galdu edo trabatu egin da helburu hori bete aurretik. Emaitzak \ref{tab:kp-sweep} taulan biltzen dira. Taulan, $d$ balioak robotaren zentrotik kanpoko paretarainoko batez besteko distantzia geometrikoa adierazten du zuzenetan (\texttt{/gz\_pose}-tik neurtua, $d = \min(1{,}4 - |x|, 1{,}6 - |y|)$); $\pm$ ikurrak zuzenetan neurtutako distantzien desbideratze estandarra ($\sigma$) zehazten du; eta $\theta_{\text{RMS}}$ zutabeak paretarekiko angelu-errorearen balio koadratiko ertaina laburbiltzen du ($\sqrt{\frac{1}{N}\sum\theta_i^2}$).
+$K_p$-ren eragina aztertzeko, gainerako parametroak finko mantendu ditugu: $K_i = 0$, $K_d = 0$, $v_0 = 0{,}2\text{ m/s}$ eta $K_V = 0$. Konfigurazio bakoitzarekin hiru buelta osatzen saiatu gara (\ref{tab:kp-sweep} taula). Taulako $d$ balioa robotaren zentrotik kanpoko paretarainoko batez besteko distantzia da zuzenetan; $\pm$ ikurrak distantzia horren desbideratze estandarra adierazten du. $\theta_{\text{RMS}}$ balioak, berriz, angelu-errorearen batez besteko tamaina laburbiltzen du: balioa zenbat eta txikiagoa izan, orduan eta paraleloago joan da robota.
 
 \begin{table}[H]
 \centering\footnotesize
@@ -33,15 +33,18 @@ $K_p = 4{,}0$ & Pareta galtzen du       & $0{,}83$ & $7$  & $0{,}551 \pm 0{,}225
 $K_p = 8{,}0$ & Pareta galtzen du       & $0{,}01$ & $1$  & $0{,}185 \pm 0{,}098$ & $14{,}3$ \\
 \bottomrule
 \end{tabularx}
-\caption{$K_p$ parametroaren eragina Gazebon. Probatutako balioen artean, $K_p = 1{,}5$ eta $K_p = 2{,}0$ balioek soilik osatu dute zirkuitua talkarik gabe.}\label{tab:kp-sweep}
+\caption{$K_p$ parametroaren eragina abiadura konstantearekin.}\label{tab:kp-sweep}
 \end{table}
 
+Probatutako balioen artean, portaera egokia $K_p = 1{,}5$ eta $K_p = 2{,}0$ balioekin lortu dugu: biek osatu dute ibilbidea kontakturik gabe. Emaitza horrek probatutako balioei buruz hitz egiten du; tarteko balio guztiak ez ditugu banan-banan egiaztatu.
+
+\vspace{0.3em}
 \noindent\textit{Enuntziatuko galdera: Zein da Kp handitzeak/txikitzeak duen eragina robotak irudikatzen duen bidean? Zergatik?}\par\vspace{1pt}
 
-Probetan ikusitako portaera parametroen eraginari dagokio: $K_p$ txikitzean ($K_p \le 1{,}0$), sistemaren $\tau = 1/K_p$ denbora-konstantea handiegia da ($\tau \ge 1\text{ s}$) eta biraketa-erradioa zabalegia geratzen da ($R = v/\omega$). Ondorioz, robotak berandu biratzen du kurbetan, kanpoko paretatik hurbilegi igarotzen da ($d \approx 0{,}17\text{ m}$) eta seinaleak jotzen ditu ($14$ eta $10$ talka). Bestalde, $K_p$ handitzean gainbultzada agertzen da: $K_p = 2{,}5$ balioarekin robotak hiru bueltak osatu ditu ($3{,}21$), baina $7$ kontakturekin; probatutako balio handiagoekin ($K_p \ge 3{,}0$), berriz, gainbultzadaren oszilazioek robota paretatik urrundu dute ($d > 0{,}5\text{ m}$), laserrak pareta galdu du eta ez du buelta osoa bete. Beraz, abiadura konstantearekin probatutako balioen artean, $K_p = 1{,}5$ eta $K_p = 2{,}0$ balioek osatu dute ibilbidea talkarik gabe.
+$K_p$ txikiekin robotak berandu zuzentzen du norabidea. Horregatik, $K_p = 0{,}6$ eta $K_p = 1{,}0$ balioekin kurbak zabalegi hartu eta paretako seinaleak jo ditu. $K_p$ handitzean zuzenketa azkarragoa da, baina gehiegizko balioek kontrako arazoa sortzen dute: robotak gehiegi biratzen du, oszilatzen hasten da eta LiDAR-aren eremutik pareta galtzen du. $K_p = 2{,}5$ balioarekin hiru buelta baino gehiago osatu ditu, baina zazpi kontakturekin; $K_p \ge 3{,}0$ balioekin ez du buelta osoa osatu.
 
 \clearpage
-\noindent\textit{Enuntziatuko galdera: Jaso robotaren posizioa denboran zehar eta irudikatu jarraitutako ibilbideak eta orientazio-angelua Kp balio desberdinetarako:}\par\vspace{1pt}
+\noindent\textit{Enuntziatuko galdera: Jaso robotaren posizioa denboran zehar eta irudikatu jarraitutako ibilbideak Kp balio desberdinetarako. Irudikatu ere, beste grafika batean, paretarekiko angelua denboran zehar:}\par\vspace{1pt}
 
 \begin{figure}[H]
 \centering
@@ -56,16 +59,16 @@ Probetan ikusitako portaera parametroen eraginari dagokio: $K_p$ txikitzean ($K_
   \includegraphics[height=7.2cm, keepaspectratio]{kp_angeluak.png}
   \caption{$\theta$ angelua denboran zehar.}\label{fig:kp-angeluak}
 \end{subfigure}
-\caption{$K_p$ parametroaren eragina: $K_p = 1{,}5$ eta $2{,}0$ dira egonkor bakarrak.}\label{fig:kp-grafikoak}
+\caption{$K_p$ parametroaren eragina ibilbidean eta paretarekiko angeluan.}\label{fig:kp-grafikoak}
 \end{figure}
 
-\ref{fig:kp-grafikoak} irudiak taulan aztertutako portaera berresten du: ezkerreko grafikoan ikusten denez, $K_p \le 1{,}0$ denean robotak biraketa zabalegia egiten du eta seinaleen gainetik pasatzen da; $K_p \ge 3{,}0$ balioekin, berriz, robotak biraketa bortitzak egiten ditu eta ibilbidetik irteten da. Eskuineko grafikoan argi ikusten da $K_p = 1{,}5$ eta $2{,}0$ balioekin orientazio-angelua azkar egonkortzen dela zuzenetan ($\theta_{\text{RMS}} = 1{,}7^\circ$).
+\ref{fig:kp-grafikoak} irudian ikusten denez, ibilbideek taulako ondorioa berresten dute. $K_p$ txikiekin robota kanpoko paretara hurbiltzen da kurbetan; $K_p$ handiekin, berriz, ibilbidea ezegonkor bihurtzen da. $K_p = 1{,}5$ eta $K_p = 2{,}0$ balioekin ibilbidea erregularra da eta zuzenetako $\theta_{\text{RMS}}$ $1{,}7^\circ$-koa izan da.
 
 \clearpage
-\section[Abiadura lineala]{Abiadura lineala: konstantea vs alderantziz proportzionala}\label{sec:emaitzak-abiadura}
+\section[Abiadura lineala]{Abiadura linealaren eragina}\label{sec:emaitzak-abiadura}
 \noindent\textit{Enuntziatuko galdera: Abiadura linealaren kasuan, abiadura konstante batekin eta alderantziz proportzionalarekin probatu.}\par\vspace{1pt}
 
-Abiadura konstantea ($K_V = 0$) eta $|\omega|$-ren arabera moteldua ($K_V = 2$) konparatu ditugu hainbat $K_p$ balioetan (\ref{tab:abiadura-sweep} taula eta \ref{fig:v-ibilbideak} irudia).
+Enuntziatuak abiadura konstantea eta biraketaren alderantziz proportzionala den abiadura alderatzeko eskatzen du. Horregatik, $K_V = 0$ eta $K_V = 2$ probatu ditugu $K_p$-ren hainbat baliorekin (\ref{tab:abiadura-sweep} taula eta \ref{fig:v-ibilbideak} irudia). $K_V = 2$ denean robota moteldu egiten da kurbetan, eta horrek biraketa bakoitzean aurreratzen duen distantzia murrizten du.
 
 \begin{table}[H]
 \centering\footnotesize
@@ -83,22 +86,22 @@ $K_p = 2{,}0, K_V = 0$ & Ondo               & $3{,}32$ & $0$  & $0{,}362 \pm 0{,
 $K_p = 2{,}0, K_V = 2$ & Pareta galtzen du  & $0{,}83$ & $3$  & $0{,}674 \pm 0{,}328$ & $32{,}4$ \\
 \bottomrule
 \end{tabularx}
-\caption{Abiadura-legeen konparaketa: konstantea ($K_V = 0$) vs moldatua ($K_V = 2$).}\label{tab:abiadura-sweep}
+\caption{Abiadura konstantearen eta kurbetan moteldutako abiaduraren konparaketa.}\label{tab:abiadura-sweep}
 \end{table}
 
-Biraketetan moteltzeak kurbadura efektiboa handitzen du ($\kappa = \omega / v$). Horregatik, irabazi ahulei ($K_p = 1{,}0$) lagundu egiten die biraketa itxiagoa egiten, talkak $10$etik $0$ra murriztuz. Alabaina, $K_p \ge 1{,}5$ balio egokietan moteltzeak gehiegizko biraketa eragiten du kurbetan: robotak eskuinerantz gehiegi biratzen du, pareta galdu eta pistatik kanpora doa. Ondorioz, $K_p = 1{,}5$ erabilita abiadura konstantea ($K_V = 0$) da irtenbiderik eraginkorrena eta egonkorrena.
+Moteltzeak $K_p = 1{,}0$ balioari lagundu dio: kontaktuak 10etik 0ra jaitsi dira. $K_p = 1{,}5$ eta $K_p = 2{,}0$ balioekin, ordea, moteltzeak biraketa gehiegi ixtea eragin du eta robotak pareta galdu du. Beraz, aukeratutako $K_p = 1{,}5$ balioarekin abiadura konstanteak eman du emaitzarik egonkorrena.
 
 \begin{figure}[H]
 \centering
 \includegraphics[height=6.8cm, keepaspectratio]{v_ibilbideak.png}
-\caption{Abiadura konstantearen ($K_V = 0$) eta moldatuaren ($K_V = 2$) arteko ibilbideak.}\label{fig:v-ibilbideak}
+\caption{$K_V = 0$ eta $K_V = 2$ abiadura-legeekin lortutako ibilbideak.}\label{fig:v-ibilbideak}
 \end{figure}
 
 \clearpage
 \section[PID kontrola]{PID kontrolaren emaitzak (Ki eta Kd)}\label{sec:emaitzak-pid}
-\noindent\textit{Enuntziatuko galdera: Ki eta Kdren zein balio tartean da portaera egokia?}\par\vspace{1pt}
+\noindent\textit{Enuntziatuko galdera: Aurreko ataletik datorren Kpren abiapuntu on bat hartuta, Ki eta Kdren zein balio tartean da portaera egokia?}\par\vspace{1pt}
 
-Parametro bakoitzaren eragina zehaztasunez ulertzeko, $K_i$ eta $K_d$ balioak modu isolatuan aldatu ditugu $K_p = 2{,}0$ erreferentziatzat hartuta (\ref{tab:pid-sweep} taula). Probatutako balioen artean, $K_i$-ren kasuan $0{,}0$, $0{,}05$ eta $0{,}2$ balioek eta $K_d$-ren kasuan $0{,}05$, $0{,}1$ eta $0{,}3$ balioek osatu dute ibilbidea talkarik gabe parametro bakoitza bananduta aztertuta. Horrek erakusten du balio diskretu horietan emaitzak onak direla, baina ez du frogatzen tarte horren barruko edozein konbinazio aldibereko baliagarria denik. PID konbinazio osoa ($2{,}0/0{,}05/0{,}1$) aparte ebaluatu da.
+$K_p = 2{,}0$ hartu dugu abiapuntutzat, P kontrolarekin kontakturik gabe amaitu duelako eta zuzenetako $\theta_{\text{RMS}}$ $1{,}7^\circ$ izan delako. Ondoren, $K_i$ eta $K_d$ banan-banan aldatu ditugu, osagai bakoitzaren eragina bestearekin nahastu gabe ikusteko (\ref{tab:pid-sweep} taula). Probatutakoen artean, portaera egokia $K_i = 0\dots0{,}2$ tartean eta $K_d = 0{,}05\dots0{,}3$ tartean lortu dugu. Hala ere, tarte horietako balio guztiak ez ditugu probatu: taulan agertzen diren balio zehatzak egiaztatu ditugu.
 
 \begin{table}[H]
 \centering\footnotesize
@@ -123,30 +126,27 @@ $K_d = 1{,}0$  & Trabatu egiten da  & $1{,}57$ & $4$ & $0{,}420 \pm 0{,}317$ & $
 PID ($2{,}0/0{,}05/0{,}1$) & Ondo & $3{,}32$ & $0$ & $0{,}372 \pm 0{,}033$ & $1{,}8$ \\
 \bottomrule
 \end{tabularx}
-\caption{$K_i$ eta $K_d$ osagaiak bananduta probatutako emaitzak eta PID konbinazioa ($K_p = 2{,}0$).}\label{tab:pid-sweep}
+\caption{$K_i$ eta $K_d$ bananduta aldatzean lortutako emaitzak eta PID konbinazioa ($K_p = 2{,}0$).}\label{tab:pid-sweep}
 \end{table}
 
-PID kontrolagailu osoak ($2{,}0 / 0{,}05 / 0{,}1$) zirkuituko 3 bueltak talkarik gabe osatzen ditu, baina P hutsaren aldean ez du hobekuntza neurgarririk ekartzen errorean edo ibilbidean.
-
-\clearpage
 \noindent\textit{Enuntziatuko galdera: Zein da Ki handitzeak/txikitzeak duen eragina robotak irudikatzen duen bidean? Zergatik?}\par\vspace{1pt}
 
-Zirkuitu itxian biraketa guztiak eskuinerantz dira ($\theta < 0$), eta integratzaileak errore negatiboa pilatzen du kurba bakoitzean. Ondorioz, kurbatik zuzenera irtetean integralak robota eskuinerantz biratzen jarraitzera bultzatzen du. $K_i = 0{,}05$ balioarekin angelu-errorea ia ez da aldatu ($1{,}7^\circ$), baina paretarekiko batez besteko distantzia zertxobait handitu da ($0{,}362\text{ m}$-tik $0{,}373\text{ m}$-ra). Integralaren eragina mugatua da anti-windup saturazioari esker ($I_{\max} = 0{,}3\text{ rad}\cdot\text{s}$), baina balio handiagoekin ($K_i \ge 0{,}5$) pilatutako desbideratzeak pareta galtzera eramaten du robota. Gainera, zuzenetan $\theta$ berez zerora doanez, ez dago konpentsatu beharreko errore iraunkorrik.
+I osagaiak kurbetako errorea pilatzen du. Zirkuituko kurba guztiak noranzko berekoak direnez, pilatutako ekarpenak robotari eskuinera biratzen jarraitzeko agintzen dio kurba amaitu ondoren ere. $K_i = 0{,}05$ balioarekin angelu-errorea ia ez da aldatu, baina paretarekiko batez besteko distantzia $0{,}362\text{ m}$-tik $0{,}373\text{ m}$-ra igo da. $K_i \ge 0{,}5$ balioekin desbideratzea handiagoa izan da eta robotak pareta galdu du. Anti-windup mugak pilaketa kontrolatzen laguntzen du, baina probatutako I balioek ez dute P kontrolaren emaitza hobetu.
 
 \vspace{0.4em}
 \noindent\textit{Enuntziatuko galdera: Zein da Kd handitzeak/txikitzeak duen eragina robotak irudikatzen duen bidean? Zergatik?}\par\vspace{1pt}
 
-Probatutako $K_d$ balio txikiekin ($K_d \le 0{,}3$), zuzenetako angelu-errorea P hutsaren berdintsua izan da ($1{,}7^\circ$), eta ez dugu hobekuntza nabaririk sumatu. $K_d = 1{,}0$ bezalako balio handiekin, berriz, robota trabatu egin da: kurbetara iristean aurreko pareta bat-batean sartzen da laserraren eremuan, eta erregresioaren malda jauzika aldatzean deribatuak biraketa-kolpe gogorrak agintzen ditu ($K_d \cdot \Delta e / \Delta t$), laserraren zarata biderkatuz eta robota desorekatuz. \ref{fig:pid-grafikoak} irudian ikusten denez, aztertutako PID konbinazioek ez dute P hutsarekiko hobekuntza esanguratsurik ekarri.
+D osagaiak errorearen aldaketa azkarrei erantzuten die. $K_d \le 0{,}3$ balioekin, zuzenetako angelu-errorea P kontrolaren antzekoa izan da, eta ez dugu hobekuntza neurgarririk ikusi. $K_d = 1{,}0$ balioarekin, aldiz, kurbetan paretaren puntu berriak bat-batean sartzeak $\theta$-ren aldaketa handiak sortu ditu. Deribatuak aldaketa horiek handitu ditu eta robotak biraketa-kolpe bortitzak egin eta trabatu egin da.
 
-\vspace{0.4em}
-\noindent\textit{Enuntziatuko galdera: Jaso robotaren posizioa denboran zehar eta irudikatu jarraitutako ibilbideak eta angeluak PID balio desberdinetarako:}\par\vspace{1pt}
+\clearpage
+\noindent\textit{Enuntziatuko galdera: Jaso robotaren posizioa denboran zehar eta irudikatu jarraitutako ibilbideak Kp, Ki eta Kd balio desberdinetarako. Irudikatu ere, beste grafika batean, paretarekiko angelua denboran zehar:}\par\vspace{1pt}
 
 \begin{figure}[H]
 \centering
 \begin{subfigure}[b]{0.48\textwidth}
   \centering
   \includegraphics[height=6.0cm, keepaspectratio]{pid_ibilbideak.png}
-  \caption{Ibilbideak PID konbinazioetarako.}\label{fig:pid-ibilbideak}
+  \caption{PID ibilbideak.}\label{fig:pid-ibilbideak}
 \end{subfigure}
 \hfill
 \begin{subfigure}[b]{0.48\textwidth}
@@ -154,12 +154,14 @@ Probatutako $K_d$ balio txikiekin ($K_d \le 0{,}3$), zuzenetako angelu-errorea P
   \includegraphics[height=6.0cm, keepaspectratio]{pid_angeluak.png}
   \caption{$\theta$ angelua denboran zehar.}\label{fig:pid-angeluak}
 \end{subfigure}
-\caption{PID konbinazioen portaera Gazeboko zirkuituan ($K_p = 2{,}0$).}\label{fig:pid-grafikoak}
+\caption{$K_i$, $K_d$ eta PID konbinazioen eragina ($K_p = 2{,}0$).}\label{fig:pid-grafikoak}
 \end{figure}
 
+\ref{fig:pid-grafikoak} irudian ikusten denez, PID konbinazio osoak ($K_p = 2{,}0$, $K_i = 0{,}05$ eta $K_d = 0{,}1$) hiru bueltak kontakturik gabe osatu ditu. Hala ere, $\theta_{\text{RMS}}$ $1{,}8^\circ$ izan da, P hutsaren $1{,}7^\circ$-ren oso antzekoa. Beraz, proba honetan I eta D gehitzeak ez du hobekuntza neurgarririk ekarri.
+
 \clearpage
-\section[Enuntziatuaren adibideak]{Enuntziatuaren adibideak ($K_p = 0{,}6$)}\label{sec:emaitzak-enuntziatua}
-Enuntziatuan adibide moduan proposatutako hiru komandoak probatu ditugu Gazebon (\ref{tab:enuntziatua-sweep} taula eta \ref{fig:enun-ibilbideak} irudia).
+\section[Enuntziatuko adibideak]{Enuntziatuko hasierako adibideak ($K_p = 0{,}6$)}\label{sec:emaitzak-enuntziatua}
+Enuntziatuan hasierako proba gisa emandako hiru konfigurazioak ere exekutatu ditugu (\ref{tab:enuntziatua-sweep} taula eta \ref{fig:enun-ibilbideak} irudia). Hirurek $K_p = 0{,}6$ erabiltzen dute; balio horrekin robotak berandu biratzen du eta kanpoko seinaleak jotzen ditu. $K_i$ edo $K_d$ gehitzeak ez du arazo hori konpondu probatutako konfigurazioetan.
 
 \begin{table}[H]
 \centering\footnotesize
@@ -174,13 +176,11 @@ Enuntziatuan adibide moduan proposatutako hiru komandoak probatu ditugu Gazebon 
 \texttt{kp:=0.6}\newline \texttt{ki:=0.05}\newline \texttt{kd:=0.1} & Talkak seinaleetan & $3{,}32$ & $13$ & $0{,}189 \pm 0{,}069$ & $7{,}0$ \\
 \bottomrule
 \end{tabularx}
-\caption{Enuntziatuko adibideen ebaluazioa Gazebon: hiruretan seinaleak jotzen ditu.}\label{tab:enuntziatua-sweep}
+\caption{Enuntziatuko hasierako konfigurazioen emaitzak.}\label{tab:enuntziatua-sweep}
 \end{table}
-
-$K_p = 0{,}6$ irabaziarekin biraketa geldoegia da kurbak garaiz hartzeko, eta biraketa zabalegiaren ondorioz robotak kanpoko paretako seinaleak jotzen ditu. Probatutako $K_i$ eta $K_d$ balioak gehituta ere, robotak seinaleak jotzen jarraitu du; oinarrizko irabazi proportzionalaren eskasia ezin izan da osatu kontrolagailu konplexuagoekin kontaktuak eragozteko.
 
 \begin{figure}[H]
 \centering
 \includegraphics[height=7.5cm, keepaspectratio]{enun_ibilbideak.png}
-\caption{Enuntziatuko hiru adibideen ibilbideak: hiruretan robotak kanpoko seinaleak jotzen ditu $K_p = 0{,}6$ txikiegia delako kurbak garbi hartzeko.}\label{fig:enun-ibilbideak}
+\caption{Enuntziatuko hiru konfigurazioekin lortutako ibilbideak.}\label{fig:enun-ibilbideak}
 \end{figure}

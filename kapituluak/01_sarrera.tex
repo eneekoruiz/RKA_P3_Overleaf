@@ -1,15 +1,11 @@
-Praktika honen helburua Rosmaster robota Gazeboko \texttt{yahboom\_track} zirkuituan kanpoko paretari paraleloki gidatzea da, 2D LiDAR laser bidezko erregresio lineala eta PID kontrolagailua erabiliz.
+Praktika honen helburua Rosmaster robota Gazeboko \texttt{yahboom\_track} zirkuituan kanpoko paretari paraleloki gidatzea da. Horretarako, LiDAR sentsorearen irakurketetatik paretaren angelua kalkulatu eta robotaren biraketa P eta PID kontrolagailuen bidez zuzendu dugu. Proben emaitzek erakutsi dute, aztertutako konfigurazioen artean, P kontrol sinpleak eman duela emaitzarik orekatuena.
 
 \section{Gure kontrol-estrategia}\label{sec:estrategia}
-Zirkuituan ibilbide egonkorra lortzeko, kontrol-estrategia sinple eta zuzena definitu dugu:
-\begin{itemize}[leftmargin=1.2em, itemsep=0.0em, parsep=0pt, topsep=1pt]
-  \item Ezkerreko pareta: Enuntziatuaren sarrerak eskuinekoa aipatu arren, pistako geziek erlojuaren norantza markatzen dute. Hasierako posetitik ($(1{,}13, 0{,}33, -\pi/2)$) aurrera egitean, kanpoko pareta ezkerrean geratzen da; kontrolaren ikuspegitik kalkuluak berdinak dira, erreferentziaren zeinua egokituta.
-  \item Errore garbia: Kontrol-errorea $\theta$ orientazio-angelua da soilik ($e = \theta$). Paretarekiko paralelotasuna bilatzen denez, ez dugu distantzia-kontrol gehigarririk txertatu legean.
-  \item Kurben kudeaketa naturala: Ezker-aurreko koadrantea ($0^\circ$-tik $+90^\circ$-ra) hautatuta, aurreko pareta garaiz sartzen da laserraren eremuan eta kurbak berez kudeatzen ditu kontrolagailuak.
-  \item Distantziaren oreka: Laserrak irakurketa hurbilak soilik hartzen ditu ($D_{\max} = 0{,}5\text{ m}$). Robotak paretarekiko distantzia erregularra mantendu du: batez beste $0{,}307\text{ m}$.
-\end{itemize}
+Enuntziatuak eskuineko pareta hartzen du adibide gisa. Gure hasierako posiziotik pistako geziak jarraitzean, ordea, kanpoko pareta robotaren ezkerraldean geratzen da. Horregatik, ezkerreko paretaren puntuak erabili ditugu. Kalkuluaren oinarria bera da, baina angeluen eta biraketa-aginduen zeinuak ezkerreko paretara egokituta daude.
+
+Kontrolaren helburua robotaren norabidea paretarekiko paralelo mantentzea da. Horregatik, errorea paretarekiko orientazio-angelua da, $e = \theta$. Ez dugu distantzia zuzenean kontrolatzen; hala ere, $0{,}5\text{ m}$ baino hurbilago dauden laser-puntuak erabiltzeak eta biraketa egokiak robotari paretarekiko distantzia nahiko erregularra mantentzen laguntzen diote. Aukeratutako konfigurazioarekin, zuzenetako batez besteko distantzia $0{,}307\text{ m}$ izan da.
 
 \section{Esperimentuen prozesua}\label{sec:prozesua}
-Probak Gazebo simulagailuan burutu ditugu banan-banan, ordenagailuaren CPUa ez gainkargatzeko. Proben helburua hiru buelta oso osatzea izan da ($3{,}32$ buelta abiapuntutik); konfigurazio batzuekin, ordea, robotak pareta galdu edo trabatu egin da helburu hori bete aurretik. Hainbat konfigurazio ebaluatu ditugu parametro-miaketa sistematikoan, irabazi bakoitzaren eragina bananduta neurtuz.
+Probak Gazebon egin ditugu banan-banan, ordenagailuaren kargak simulazioan ahalik eta eragin txikiena izan zezan. Konfigurazio bakoitzaren helburua hiru buelta oso osatzea izan da, hau da, $3{,}32$ buelta hasierako posiziora berriro iritsi arte. Zenbait konfiguraziok helburua bete dute; beste batzuekin, robotak pareta galdu edo trabatu egin da lehenago.
 
-Ibilbideak \texttt{ros2 bag} bidez erregistratu ditugu kanpotik (\texttt{/gz\_pose}, \texttt{/odom}, \texttt{/scan}, \texttt{/clock}). Talkak kalkulatzeko, robotaren oinatz osoaren neurriak ($0{,}30\text{ m} \times 0{,}20\text{ m}$) eta Gazeboko oztopoen posizioak erabili dira telemetriatik, kontaktu jarraitu bakoitza talka bakar gisa zenbatuz.
+Ibilbidea eta sentsoreen datuak \texttt{ros2 bag} bidez jaso ditugu (\texttt{/gz\_pose}, \texttt{/odom}, \texttt{/scan} eta \texttt{/clock}). Talkak telemetriatik kalkulatu dira, robotaren $0{,}30\text{ m} \times 0{,}20\text{ m}$-ko oinatza eta Gazeboko oztopoen kokapena alderatuz. Kontaktu jarraitu batek hainbat lagin iraun arren, talka bakar gisa zenbatu dugu.
