@@ -11,7 +11,7 @@
 +        D_MAX = 0.5   # Irakurketa motzen muga (m); 0.5-ekin robota errepidearen erdian doa (~0.3 m paretatik)
 +        V0 = 0.2      # Oinarrizko abiadura lineala (m/s)
 +        KV = 0.0      # 0: abiadura konstantea; >0: |w|-ren alderantziz proportzionala
-+        I_MAX = 0.3   # Integralaren muga (anti-windup), izkinetan pila ez dadin
++        I_MAX = 0.3   # Integralaren muga (anti-windup), kurbetan pila ez dadin
 +
          # 1.- Compute the projection of short readings 
          xpos = []
