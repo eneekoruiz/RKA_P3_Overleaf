@@ -1,11 +1,1 @@
-Praktika honen helburua Rosmaster robota Gazeboko \texttt{yahboom\_track} zirkuituan kanpoko paretari paraleloki gidatzea da. Horretarako, LiDAR sentsorearen irakurketetatik paretaren angelua kalkulatu eta robotaren biraketa P eta PID kontrolagailuen bidez zuzendu dugu. Proben emaitzek erakutsi dute, aztertutako konfigurazioen artean, P kontrol sinpleak eman duela emaitzarik orekatuena.
-
-\section{Gure kontrol-estrategia}\label{sec:estrategia}
-Enuntziatuak eskuineko pareta hartzen du adibide gisa. Gure hasierako posiziotik pistako geziak jarraitzean, ordea, kanpoko pareta robotaren ezkerraldean geratzen da. Horregatik, ezkerreko paretaren puntuak erabili ditugu. Kalkuluaren oinarria bera da, baina angeluen eta biraketa-aginduen zeinuak ezkerreko paretara egokituta daude.
-
-Kontrolaren helburua robotaren norabidea paretarekiko paralelo mantentzea da. Horregatik, errorea paretarekiko orientazio-angelua da, $e = \theta$. Ez dugu distantzia zuzenean kontrolatzen; hala ere, $0{,}5\text{ m}$ baino hurbilago dauden laser-puntuak erabiltzeak eta biraketa egokiak robotari paretarekiko distantzia nahiko erregularra mantentzen laguntzen diote. Aukeratutako konfigurazioarekin, zuzenetako batez besteko distantzia $0{,}307\text{ m}$ izan da.
-
-\section{Esperimentuen prozesua}\label{sec:prozesua}
-Probak Gazebon egin ditugu banan-banan, ordenagailuaren kargak simulazioan ahalik eta eragin txikiena izan zezan. Konfigurazio bakoitzaren helburua hiru buelta oso osatzea izan da, hau da, $3{,}32$ buelta hasierako posiziora berriro iritsi arte. Zenbait konfiguraziok helburua bete dute; beste batzuekin, robotak pareta galdu edo trabatu egin da lehenago.
-
-Ibilbidea eta sentsoreen datuak \texttt{ros2 bag} bidez jaso ditugu (\texttt{/gz\_pose}, \texttt{/odom}, \texttt{/scan} eta \texttt{/clock}). Talkak telemetriatik kalkulatu dira, robotaren $0{,}30\text{ m} \times 0{,}20\text{ m}$-ko oinatza eta Gazeboko oztopoen kokapena alderatuz. Kontaktu jarraitu batek hainbat lagin iraun arren, talka bakar gisa zenbatu dugu.
+Praktika honen helburua Rosmaster robota Gazeboko \texttt{yahboom\_track} zirkuituan kanpoko paretari paraleloki gidatzea da. Horretarako, LiDAR sentsorearen irakurketetatik paretaren angelua kalkulatu eta robotaren biraketa P eta PID kontrolagailuen bidez zuzendu dugu.
