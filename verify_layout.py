@@ -340,7 +340,8 @@ def audit_pdf_layout(pdf_path: Path, tex_dir: Path = None, render: bool = False,
             )
             
         # Check 2: Stranded section heading at or near the bottom of the page
-        if len(lines) >= 3:
+        # Exclude frontmatter (pages 1-3)
+        if page_num > 3 and len(lines) >= 3:
             check_slice = lines[-5:-1] if lines[-1].isdigit() else lines[-4:]
             for candidate in check_slice:
                 if re.match(r"^\d+(\.\d+)*\s+[A-Z]", candidate):

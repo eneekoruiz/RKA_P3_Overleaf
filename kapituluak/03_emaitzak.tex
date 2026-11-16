@@ -101,10 +101,12 @@ Moteltzeak $K_p = 1{,}0$ balioari lagundu dio: kontaktuak 10etik 0ra jaitsi dira
 \section[PID kontrola]{PID kontrolaren emaitzak (Ki eta Kd)}\label{sec:emaitzak-pid}
 \noindent\textit{Enuntziatuko galdera: Aurreko ataletik datorren Kpren abiapuntu on bat hartuta, Ki eta Kdren zein balio tartean da portaera egokia?}\par\vspace{1pt}
 
-$K_p = 2{,}0$ hartu dugu abiapuntutzat, P kontrolarekin kontakturik gabe amaitu duelako eta zuzenetako $\theta_{\text{RMS}}$ $1{,}7^\circ$ izan delako. Ondoren, $K_i$ eta $K_d$ banan-banan aldatu ditugu, osagai bakoitzaren eragina bestearekin nahastu gabe ikusteko (\ref{tab:pid-sweep} taula). Probatutakoen artean, portaera egokia $K_i = 0\dots0{,}2$ tartean eta $K_d = 0{,}05\dots0{,}3$ tartean lortu dugu. Hala ere, tarte horietako balio guztiak ez ditugu probatu: taulan agertzen diren balio zehatzak egiaztatu ditugu.
+$K_p = 2{,}0$ hartu dugu abiapuntutzat, P kontrolarekin talkarik gabe amaitu duelako eta zuzenetako $\theta_{\text{RMS}}$ $1{,}7^\circ$ izan delako. $K_p = 1{,}5$-ekin alderatuta, paretarekiko distantzia gehiago aldatzen da ($\pm 0{,}028\text{ m}$, $\pm 0{,}013\text{ m}$-ren aldean); horregatik aukeratu dugu, I eta D osagaiek aldaketa hori murrizten duten aztertzeko. Ondoren, $K_i$ eta $K_d$ banan-banan aldatu ditugu, osagai bakoitzaren eragina bereiz ikusteko (\ref{tab:pid-sweep} taula). Portaera egokia $K_i = 0\dots0{,}2$ eta $K_d = 0{,}05\dots0{,}3$ tarteetan lortu dugu taulako balio zehatzekin.
 
+\vspace{-0.5em}
 \begin{table}[H]
 \centering\footnotesize
+\renewcommand{\arraystretch}{0.76}
 \begin{tabularx}{\textwidth}{@{} l >{\raggedright\arraybackslash}X c c >{\centering\arraybackslash}p{2.6cm} >{\centering\arraybackslash}p{2.3cm} @{}}
 \toprule
 \textbf{Konfigurazioa} & \textbf{Emaitza} & \textbf{Bueltak} & \textbf{Talkak} & \textbf{$d$ zuzenetan [m]} & \textbf{$\theta_{\text{RMS}}$ zuzenetan [$^\circ$]} \\
@@ -126,17 +128,19 @@ $K_d = 1{,}0$  & Trabatu egiten da  & $1{,}57$ & $4$ & $0{,}420 \pm 0{,}317$ & $
 PID ($2{,}0/0{,}05/0{,}1$) & Ondo & $3{,}32$ & $0$ & $0{,}372 \pm 0{,}033$ & $1{,}8$ \\
 \bottomrule
 \end{tabularx}
+\vspace{-0.4em}
 \caption{$K_i$ eta $K_d$ bananduta aldatzean lortutako emaitzak eta PID konbinazioa ($K_p = 2{,}0$).}\label{tab:pid-sweep}
 \end{table}
+\vspace{-0.5em}
 
 \noindent\textit{Enuntziatuko galdera: Zein da Ki handitzeak/txikitzeak duen eragina robotak irudikatzen duen bidean? Zergatik?}\par\vspace{1pt}
 
-I osagaiak kurbetako errorea pilatzen du. Zirkuituko kurba guztiak noranzko berekoak direnez, pilatutako ekarpenak robotari eskuinera biratzen jarraitzeko agintzen dio kurba amaitu ondoren ere. $K_i = 0{,}05$ balioarekin angelu-errorea ia ez da aldatu, baina paretarekiko batez besteko distantzia $0{,}362\text{ m}$-tik $0{,}373\text{ m}$-ra igo da. $K_i \ge 0{,}5$ balioekin desbideratzea handiagoa izan da eta robotak pareta galdu du. Anti-windup mugak pilaketa kontrolatzen laguntzen du, baina probatutako I balioek ez dute P kontrolaren emaitza hobetu.
+I osagaiak kurbetako errorea pilatzen du. Zirkuituko kurba guztiak noranzko berekoak direnez, pilatutako ekarpenak robotari eskuinera biratzen jarraitzeko agintzen dio kurba amaitu ondoren ere. $K_i = 0{,}05$ balioarekin angelu-errorea ia ez da aldatu, baina paretarekiko batez besteko distantzia $0{,}362\text{ m}$-tik $0{,}373\text{ m}$-ra igo da. $K_i = 0{,}5$ balioarekin robotak pareta tarteka galdu du, baina $3{,}32$ bueltak osatu ditu, talkekin. $K_i = 1{,}0$ balioarekin, berriz, errepidetik atera da eta $0{,}66$ buelta egin ditu. Anti-windup mugak ($\pm 0{,}3\text{ rad}\cdot\text{s}$) pilaketa mugatzen du, baina probatutako I balioek ez dute P kontrola hobetu.
 
-\vspace{0.4em}
+\vspace{0.3em}
 \noindent\textit{Enuntziatuko galdera: Zein da Kd handitzeak/txikitzeak duen eragina robotak irudikatzen duen bidean? Zergatik?}\par\vspace{1pt}
 
-D osagaiak errorearen aldaketa azkarrei erantzuten die. $K_d \le 0{,}3$ balioekin, zuzenetako angelu-errorea P kontrolaren antzekoa izan da, eta ez dugu hobekuntza neurgarririk ikusi. $K_d = 1{,}0$ balioarekin, aldiz, kurbetan paretaren puntu berriak bat-batean sartzeak $\theta$-ren aldaketa handiak sortu ditu. Deribatuak aldaketa horiek handitu ditu eta robotak biraketa-kolpe bortitzak egin eta trabatu egin da.
+D osagaiak errorearen aldaketa azkarrei erantzuten die. $K_d \le 0{,}3$ balioekin angelu-errorea P kontrolaren antzekoa izan da eta ez dugu hobekuntza neurgarririk ikusi. P kontrolarekin angelua oszilazio handirik gabe itzultzen da zerora (\ref{fig:pid-grafikoak} irudia), beraz D osagaiak ez du ia ezer moteldu beharrik. $K_d = 1{,}0$ balioarekin, kurbetan paretaren puntu berriak bat-batean sartzeak $\theta$-ren aldaketa handiak sortu ditu; deribatuak aldaketa horiek handitu ditu eta robotak biraketa bortitzak egin eta trabatu egin da.
 
 \clearpage
 \noindent\textit{Enuntziatuko galdera: Jaso robotaren posizioa denboran zehar eta irudikatu jarraitutako ibilbideak Kp, Ki eta Kd balio desberdinetarako. Irudikatu ere, beste grafika batean, paretarekiko angelua denboran zehar:}\par\vspace{1pt}

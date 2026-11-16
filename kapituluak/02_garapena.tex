@@ -3,6 +3,8 @@ URDF ereduaren arabera, LiDAR sentsorea robotaren aurrealdearekiko $180^\circ$ b
 
 Hasierako posiziotik pistako geziei jarraituz abiatzean, kanpoko pareta ezkerrean geratzen zaigu. Paretaren angelua kalkulatzeko, beraz, aurrealdearen eta ezkerraldearen arteko laser-irakurketak erabiltzen ditugu, hau da, $0^\circ$ eta $+90^\circ$ artekoak. Horietatik $0{,}5\text{ m}$ baino distantzia txikiagoa dutenak soilik hartzen ditugu ($d_i < D_{\max} = 0{,}5\text{ m}$), robotaren ondoan dagoen paretaren puntuekin lan egiteko.
 
+Sektoreak aurrealdea ere hartzen duenez, izkina batera iristean aurreko paretaren puntuak ere erregresioan sartzen dira. Orduan $\theta$ negatibo bihurtzen da eta robotak eskuinera biratzen du; beraz, ez dugu izkinetarako aparteko araurik behar. Kontrolak angelua bakarrik zuzentzen du, ez paretarekiko distantzia; distantzia hori $K_p$-ren eta $0{,}5\text{ m}$-ko mugaren araberakoa da (\ref{tab:kp-sweep} taula).
+
 \section[Angeluaren kalkulua]{Paretaren angeluaren kalkulua eta zeinuen portaera}\label{sec:erregresioa}
 \noindent\textit{Enuntziatuko galdera: Azaldu nola kalkulatzen duzun robota eta paretaren arteko angelua.}\par\vspace{1pt}
 

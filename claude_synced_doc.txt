@@ -1,0 +1,344 @@
+﻿Robotika eta Kontrol Adimendunak
+  
+
+
+
+Paretari jarraitzea atzeraelikadurazko kontrolaren bidez
+Laser bidezko erregresio lineala eta PID kontrolagailua Gazeboko ingurune simulatuan
+Egileak:
+
+
+
+
+Eneko Ruiz
+Eneko Pardavila
+Omar Ouinas
+
+
+
+
+2026ko azaroa
+________________
+
+
+Gaien aurkibidea
+1  Sarrera
+2  Metodologia eta garapena
+2.1  LiDAR konfigurazioa eta erabilitako sektorea
+2.2  Paretaren angeluaren kalkulua
+2.3  Kontrol-legeak eta abiadura lineala
+2.4  I eta D osagaiak kodean
+3  Emaitzak eta ebaluazioa
+3.1  Angeluaren egiaztapena
+3.2  Kontrol proportzionalaren emaitzak
+3.3  Abiadura linealaren eragina
+3.4  PID kontrolaren emaitzak
+3.5  Enuntziatuko hasierako adibideak
+4  Ondorioak
+________________
+
+
+1  Sarrera
+Praktika honen helburua Rosmaster robota Gazeboko yahboom_track zirkuituan kanpoko paretari paraleloki gidatzea da. Horretarako, LiDAR sentsorearen irakurketetatik paretaren angelua kalkulatu eta robotaren biraketa P eta PID kontrolagailuen bidez zuzendu dugu.
+2  Metodologia eta garapena
+2.1  LiDAR konfigurazioa eta erabilitako sektorea
+LiDAR sentsorea robotaren aurrealdearekiko 180° biratuta dago, hau da, atzerantz orientatuta. Horregatik, nodoak laserraren irakurketak berrantolatzen ditu (scan[i - 1500]), datuetako norabideak robotaren norabideekin bat etor daitezen. Zuzenketa horren ondoren, 0° robotaren aurrealdea da, eta +90° ezkerraldea. Hasierako posiziotik pistako geziei jarraitzean, kanpoko pareta robotaren ezkerraldean geratzen da. Paretaren angelua kalkulatzeko, beraz, aurrealdearen eta ezkerraldearen arteko laser-irakurketak erabiltzen ditugu, hau da, 0° eta +90° artekoak. Horietatik 0,5 m baino distantzia txikiagoa dutenak soilik hartzen ditugu, robotaren ondoan dagoen paretaren puntuekin lan egiteko.
+Sektoreak aurrealdea ere hartzen duenez, izkina batera iristean aurreko paretaren puntuak ere erregresioan sartzen dira. Orduan θ negatibo bihurtzen da eta robotak eskuinera biratzen du; beraz, ez dugu izkinetarako beste araurik behar. Kontrolak angelua bakarrik zuzentzen du, ez paretarekiko distantzia. Distantzia hori Kp-ren eta 0,5 m-ko mugaren araberakoa da (3.1 taula).
+2.2  Paretaren angeluaren kalkulua
+Enuntziatuko galdera: Azaldu nola kalkulatzen duzun robota eta paretaren arteko angelua.
+LiDAR sentsoreak izpi bakoitzean bi datu ematen dizkigu: izpiaren norabidea, βᵢ, eta norabide horretan dagoen oztoporainoko distantzia, dᵢ. Datu horiek zuzenean ez dute paretaren malda erakusten. Horrenbestez, lehenengo urratsean irakurketa bakoitza robotaren inguruko puntu bihurtzen dugu. xᵢ koordenatuak puntua robotaren aurrean zenbat distantziara dagoen adierazten du, eta yᵢ koordenatuak ezkerrerantz dagoen distantzia.
+xᵢ = dᵢ · cos(βᵢ)        yᵢ = dᵢ · sin(βᵢ)
+Puntu guztiak plano berean jarri ondoren, numpy.polyfit erabiliz ahalik eta ondoen doitzen zaien zuzena kalkulatzen dugu: y = c₁x + c₀. Zuzen horrek paretaren norabidea laburbiltzen du. c₁ maldaren arkutangentea hartuta, robotaren eta paretaren arteko θ angelua lortzen dugu. Robota paralelo joatea nahi dugunez, nahi den angelua 0° da; ondorioz, kontrol-errorea kalkulatutako angelua bera da.
+θ = arctan(c₁)        e = θ − 0 = θ
+Gure interpretazioa hau da: θ zero inguruan badago, robota paretarekiko paralelo doa. θ negatiboa bada, robota ezkerreko paretarantz orientatuta dago eta eskuinera biratu behar du; θ positiboa bada, paretatik urruntzen ari da eta ezkerrera biratu behar du. P kontrol hutsean, laser-puntuetatik lortutako angeluak zuzenean erabakitzen du biraketaren noranzkoa.
+2.3  Kontrol-legeak eta abiadura lineala
+PID kontrolagailuak errorearen hiru alor erabiltzen ditu. Hasteko, P osagaiak une horretako erroreari erantzuten dio. Horrez gain, I osagaiak errorea denboran pilatu den aztertzen du; D osagaiak, berriz, errorea zein abiaduratan aldatzen ari den hartzen du kontuan. Hiru ekarpenak batuta robotari bidaltzen zaion biraketa-abiadura lortzen da.
+P kontrol hutsean, biraketa-abiadura angelu-errorearekiko proportzionala da: ω = Kp · θ. Kp txikia bada, robotak poliki zuzentzen du norabidea; Kp handia bada, zuzenketa bortitzagoa da. Abiadura linealerako bi aukera alderatu ditugu: abiadura konstantea eta biraketaren arabera moteltzen den abiadura.
+v = v₀ / (1 + KV · |ω|)        v₀ = 0,2 m/s
+KV = 0 denean, robota 0,2 m/s-ko abiadura konstantean doa. KV = 2 denean, aldiz, |ω| handitu ahala v txikitzen da; beraz, robotak kurbetan motelago egiten du aurrera. Nodoak kp, ki eta kd parametroak abiarazteko fitxategitik (launch) jasotzen ditu. v₀, KV, Dmax = 0,5 m eta Imax = 0,3 rad·s kodean definitutako konstanteak dira.
+2.4  I eta D osagaiak kodean
+Enuntziatuko galdera: Nola gehitu duzue kodean osagai Integral eta Deribatiboa.
+P kontrolari I eta D osagaiak follow_wall() metodoan gehitu dizkiogu. LiDAR irakurketa berri bat jasotzean, metodoa berriro exekutatzen da. Exekuzio bakoitzari kontrol-ziklo bat deritzo, eta ziklo bakoitzean, aurreko neurketatik igarotako denbora kalkulatzen dugu. Ondoren, errorearen metaketa eguneratzen dugu I osagaia lortzeko, eta uneko errorea aurrekoarekin alderatzen dugu D osagaia kalkulatzeko. Azken biraketa-agindua hiru ekarpen horien batura da:
+
+dt = (self.timestamps[-1] - self.timestamps[-2]
+      if len(self.timestamps) > 1 else 0.0)
+self.error_sum = float(np.clip(self.error_sum + error * dt, -I_MAX, I_MAX))
+derivative = (error - self.prev_error) / dt if dt > 0.0 else 0.0
+self.prev_error = error
+w = self.kp * error + self.ki * self.error_sum + self.kd * derivative
+v = V0 / (1.0 + KV * abs(w))
+
+Δt nodoaren erlojuarekin neurtzen dugu (self.get_clock()): azken bi LiDAR irakurketen artean igarotako denbora da. Launch fitxategiak ez du use_sim_time aktibatzen; beraz, ordenagailuaren denbora da, ez simulaziokoa. Horrela, integralak eta deribatuak ziklo bakoitzean benetan igarotako denbora erabiltzen dute. Gainera, errore metatua [−0,3, +0,3] rad·s tartera mugatzen dugu, kurbetan gehiegi pilatu ez dadin. Muga hori kontrol-ziklo bakoitzean aplikatzen da. Ki = 0 denean, I osagaiaren ekarpena ere zero da, errore metatua Ki-rekin biderkatzen dugulako. Deribatua, berriz, Δt > 0 denean soilik kalkulatzen dugu, zeroz zatitzea saihesteko.
+3  Emaitzak eta ebaluazioa
+3.1  Angeluaren egiaztapena
+Kalkulatutako angelua egiaztatzeko, nodoak emandako θ balioa Gazeboko orientaziotik (/gz_pose) ateratako erreferentzia-angeluarekin alderatu dugu. Kp = 2,0 balioarekin, zuzenetan bien arteko batez besteko aldea −0,4° izan da, eta desbideratze estandarra 2,1°. Zuzenetan, beraz, kalkulatutako angelua erreferentziatik gertu ibili da.
+Paretaren ondoan dauden seinaleek LiDAR irakurketa batzuk aldatzen dituzte, eta horrek angeluaren kalkuluan eragina izan dezake. Hala ere, erregresioak puntu guztien joerari jarraitzen dio, 3.1 irudian ikus daitekeen bezala. Irudian erakutsitako laginetan, kalkulatutako angelua −2° eta +5° artean dago. Seinaleek paretaren lerrotik kanpoko puntu batzuk sortu arren, puntu gehienak paretaren gainean daude, eta horregatik kalkulatutako θ zerotik gertu geratzen da.
+
+
+  
+
+3.1 irudia. Erregresioan erabilitako laser-puntuak hiru seinaleren inguruan (Kp = 2,0). Kolore bakoitza une bat da: puntu txikiak laser-puntuak dira eta puntu handia robotaren zentroa. Karratu beltza seinalea da eta lerro beltza benetako pareta. Legendan, une bakoitzeko θ eta puntu kopurua (n).
+3.2  Kontrol proportzionalaren emaitzak
+Enuntziatuko galdera: Kp-ren zein balio tartean da portaera egokia?
+Kp-ren eragina aztertzeko, gainerako parametroak finko mantendu ditugu: Ki = 0, Kd = 0, v₀ = 0,2 m/s eta KV = 0. Konfigurazio guztietan 3,32 buelta egitea izan da helburua.
+Tauletako d balioa robotaren zentrotik kanpoko paretarainoko batez besteko distantzia da (zuzenetan). ± ikurraren ondoko balioa distantzia horren desbideratze estandarra da. θRMS balioak angelu-errorea adierazten du: zenbat eta txikiagoa izan, orduan eta paraleloago joan da robota. Tauletako θRMS zuzenetako datuekin kalkulatu dugu. Grafikoetan ageri den θRMS balioak proba osoa hartzen du, kurbak barne, nahiz eta grafikoan lehen 100 s bakarrik marraztu.
+3.1 taula. Kp parametroaren eragina abiadura konstantearekin.
+Proba
+	Emaitza
+	Bueltak
+	Talkak
+	d zuzenetan [m]
+	θRMS [°]
+	Kp = 0,3
+	Pareta galtzen du
+	0,77
+	4
+	0,160 ± 0,065
+	19,7
+	Kp = 0,6
+	Bueltak osatu, talkekin
+	3,32
+	14
+	0,172 ± 0,060
+	6,8
+	Kp = 1,0
+	Bueltak osatu, talkekin
+	3,32
+	10
+	0,180 ± 0,047
+	3,4
+	Kp = 1,5
+	Ondo, aukeratua
+	3,32
+	0
+	0,307 ± 0,013
+	1,7
+	Kp = 2,0
+	Ondo
+	3,32
+	0
+	0,362 ± 0,028
+	1,7
+	Kp = 2,5
+	Helburua ia osatu, talkekin
+	3,21
+	7
+	0,502 ± 0,270
+	14,9
+	Kp = 3,0
+	Pareta galtzen du
+	0,60
+	10
+	0,621 ± 0,295
+	32,5
+	Kp = 4,0
+	Pareta galtzen du
+	0,83
+	7
+	0,551 ± 0,225
+	32,9
+	Kp = 8,0
+	Pareta galtzen du
+	0,01
+	1
+	0,185 ± 0,098
+	14,3
+	
+
+Probatutako balioen artean, portaera egokia 1,5 ≤ Kp ≤ 2,0 tartean lortu dugu: bi balioekin robotak ibilbidea talkarik gabe osatu du. Ez dugu 1,0 eta 1,5 artean ezta 2,0 eta 2,5 artean ere baliorik probatu; beraz, tartearen muga zehatzak bi tarte horien barruan daude.
+Enuntziatuko galdera: Zein da Kp handitzeak/txikitzeak duen eragina robotak irudikatzen duen bidean? Zergatik?
+Kp txikiekin robotak berandu zuzentzen du norabidea. Horregatik, Kp = 0,6 eta Kp = 1,0 balioekin kurbak zabalegi hartzen ditu, kanpoko paretatik gertuegi geratzen da eta paretako seinaleak jotzen ditu. Kp handitzean zuzenketa azkarragoa da, baina gehiegizko balioek kontrako arazoa sortzen dute: robotak gehiegi biratzen du, oszilatzen hasten da eta paretatik urruntzen da. Pareta 0,5 m baino urrunago geratzen denean ez da erregresioan sartzen, eta robotak pareta galtzen du. Kp = 2,5 balioarekin robotak 3,21 buelta egin ditu, baina ez da 3,32 bueltako helburura iritsi eta talkak izan ditu. Probatutako Kp ≥ 3,0 balioekin, ez du lehen buelta osatu.
+Enuntziatuko galdera: Jaso robotaren posizioa denboran zehar eta irudikatu jarraitutako ibilbideak Kp balio desberdinetarako. Irudikatu ere, beste grafika batean, paretarekiko angelua denboran zehar.
+Robotaren posizioa Gazeboko /gz_pose topic-etik grabatu dugu (ros2 bag), eta θ nodoak log-ean idazten duen balioetatik hartu dugu.
+  
+
+(a) Ibilbideak zirkuituan.
+  
+
+(b) θ angelua denboran zehar.
+3.2 irudia. Kp parametroaren eragina ibilbidean (a) eta paretarekiko angeluan (b, lehen 100 s).
+3.2(b) irudian ikusten denez, Kp = 1,5 eta Kp = 2,0 balioekin angelua zero ingurura itzultzen da kurben ondoren. Biekin, zuzenetako θRMS 1,7° izan da. Kp = 1,5 aukeratu dugu, zuzenetan paretarekiko distantzia gutxiago aldatu delako eta robotaren zentroak errepideari jarraitu diolako (3.2(a) irudia).
+3.3  Abiadura linealaren eragina
+Enuntziatuak abiadura konstantea eta biraketaren alderantziz proportzionala den abiadura alderatzeko eskatzen du. Horregatik, KV = 0 eta KV = 2 probatu ditugu Kp-ren hainbat baliorekin. KV = 2 denean robota moteldu egiten da kurbetan, eta horrek biraketa bakoitzean aurreratzen duen distantzia murrizten du (3.2 taula eta 3.3 irudia).
+3.2 taula. Abiadura konstantearen eta kurbetan moteldutako abiaduraren konparaketa.
+Konfigurazioa
+	Emaitza
+	Bueltak
+	Talkak
+	d zuzenetan [m]
+	θRMS [°]
+	Kp=0,6, KV=0
+	Talkak seinaleetan
+	3,32
+	14
+	0,172 ± 0,060
+	6,8
+	Kp=0,6, KV=2
+	Talkak seinaleetan
+	3,24
+	14
+	0,166 ± 0,050
+	7,0
+	Kp=1,0, KV=0
+	Talkak seinaleetan
+	3,32
+	10
+	0,180 ± 0,047
+	3,4
+	Kp=1,0, KV=2
+	Ondo
+	3,32
+	0
+	0,384 ± 0,037
+	2,6
+	Kp=1,5, KV=0
+	Ondo, aukeratua
+	3,32
+	0
+	0,307 ± 0,013
+	1,7
+	Kp=1,5, KV=2
+	Pareta galtzen du
+	0,20
+	4
+	0,646 ± 0,340
+	26,1
+	Kp=2,0, KV=0
+	Ondo
+	3,32
+	0
+	0,362 ± 0,028
+	1,7
+	Kp=2,0, KV=2
+	Pareta galtzen du
+	0,83
+	3
+	0,674 ± 0,328
+	32,4
+	
+
+Kurbetan abiadura txikitzearen eragina Kp-ren balioaren araberakoa izan da. Kp = 1,0 balioarekin, robota berandu biratzen zen abiadura konstantean. Biraketaren arabera moteltzea lagungarria izan da, eta robotak ibilbidea talkarik gabe osatu du. Kp = 1,5 eta Kp = 2,0 balioekin, robotak nahikoa biratzen zuen jada. Moteltzean, kurba gehiegi itxi eta pareta galdu du. Horregatik, aukeratutako Kp = 1,5 balioarekin abiadura konstanteak eman du emaitzarik onena.
+  
+
+3.3 irudia. KV = 0 eta KV = 2 abiadura-legeekin lortutako ibilbideak.
+3.4  PID kontrolaren emaitzak
+Enuntziatuko galdera: Aurreko ataletik datorren Kp-ren abiapuntu on bat hartuta, Ki eta Kd-ren zein balio tartean da portaera egokia?
+Kp = 2,0 hartu dugu abiapuntutzat, P kontrolarekin talkarik gabe amaitu duelako eta zuzenetako θRMS 1,7° izan delako. Kp = 1,5 balioarekin ere antzeko emaitzak lortu ditugu, baina Kp = 2,0 balioarekin paretarekiko distantzia gehiago aldatzen da (±0,028 m, ±0,013 m-ren aldean); horregatik hartu dugu, I eta D osagaiek aldaketa hori murrizten duten ikusteko. Ondoren, Ki probatzean Kd = 0 ezarri dugu, eta Kd probatzean Ki = 0. Horrela, osagai bakoitzaren eragina bereiz ikusi dugu. 0 eta 0,2 arteko Ki balio probatuekin eta 0,05 eta 0,3 arteko Kd balio probatuekin, robotak ibilbidea talkarik gabe osatu du. 3.3 taulan daude probatutako balioak.
+3.3 taula. Ki eta Kd bananduta aldatzean lortutako emaitzak eta PID konbinazioa.
+Konfigurazioa
+	Emaitza
+	Bueltak
+	Talkak
+	d zuzenetan [m]
+	θRMS [°]
+	Ki=0,0
+	Ondo
+	3,32
+	0
+	0,362 ± 0,028
+	1,7
+	Ki=0,05
+	Ondo
+	3,32
+	0
+	0,373 ± 0,033
+	1,7
+	Ki=0,2
+	Ondo
+	3,32
+	0
+	0,393 ± 0,046
+	2,5
+	Ki=0,5
+	Pareta tarteka galtzen du
+	3,32
+	4
+	0,443 ± 0,248
+	14,3
+	Ki=1,0
+	Pareta galtzen du
+	0,66
+	2
+	0,542 ± 0,228
+	38,8
+	Kd=0,05
+	Ondo
+	3,32
+	0
+	0,362 ± 0,031
+	1,7
+	Kd=0,1
+	Ondo
+	3,32
+	0
+	0,368 ± 0,031
+	1,7
+	Kd=0,3
+	Ondo
+	3,32
+	0
+	0,377 ± 0,038
+	1,7
+	Kd=1,0
+	Trabatu egiten da
+	1,57
+	4
+	0,420 ± 0,317
+	20,3
+	PID 2,0/0,05/0,1
+	Ondo
+	3,32
+	0
+	0,372 ± 0,033
+	1,8
+	
+
+Enuntziatuko galdera: Zein da Ki handitzeak/txikitzeak duen eragina robotak irudikatzen duen bidean? Zergatik?
+I osagaiak kurbetako errorea pilatzen du. Zirkuituko kurba guztiak noranzko berekoak direnez, pilatutako ekarpenak robotari eskuinera biratzen jarraitzeko agintzen dio kurba amaitu ondoren ere. Ki = 0,05 balioarekin angelu-errorea ia ez da aldatu, baina paretarekiko batez besteko distantzia 0,362 m-tik 0,373 m-ra igo da. Ki = 0,5 balioarekin robotak pareta tarteka galdu du, baina 3,32 bueltak osatu ditu, talkekin. Ki = 1,0 balioarekin, berriz, errepidetik atera da eta 0,66 buelta egin ditu. Anti-windup mugak (2.4 ataleko ±0,3 rad·s muga) pilaketa kontrolatzen laguntzen du, baina probatutako I balioek ez dute P kontrolaren emaitza hobetu.
+Enuntziatuko galdera: Zein da Kd handitzeak/txikitzeak duen eragina robotak irudikatzen duen bidean? Zergatik?
+D osagaiak errorearen aldaketa azkarrei erantzuten die. Kd = 0,05, 0,1 eta 0,3 balioekin, zuzenetako angelu-errorea P kontrolaren antzekoa izan da, eta ez dugu hobekuntza neurgarririk ikusi. P kontrolarekin, angelua kurba ondoren oszilazio handirik gabe itzultzen da zerora (3.4(b) irudia); beraz, D osagaiak ez du ia ezer moteldu beharrik. Kd = 1,0 balioarekin, aldiz, kurbetan paretaren puntu berriak bat-batean sartzeak θ-ren aldaketa handiak sortu ditu. Kd handiarekin, aldaketa horiek biraketa-aginduan gehiago igarri dira eta robotak biraketa-kolpe bortitzak egin eta trabatu egin da.
+Enuntziatuko galdera: Jaso robotaren posizioa denboran zehar eta irudikatu jarraitutako ibilbideak Kp, Ki eta Kd balio desberdinetarako. Irudikatu ere, beste grafika batean, paretarekiko angelua denboran zehar.
+  
+
+(a) PID ibilbideak.
+  
+
+(b) θ angelua denboran zehar.
+3.4 irudia. Ki eta Kd probak Kp = 2,0 balioarekin. Ibilbideak (a) eta angelua (b, lehen 100 s).
+PID konbinazio osoak (Kp = 2,0, Ki = 0,05 eta Kd = 0,1) 3,32 buelta egin ditu talkarik gabe. Hala ere, θRMS 1,8° izan da, Kp = 2,0 duen P kontrol hutseko 1,7°-tik gertu. Beraz, proba honetan I eta D gehitzeak ez du hobekuntzarik ekarri neurtutako adierazleetan.
+3.5  Enuntziatuko hasierako adibideak
+Enuntziatuan hasierako proba gisa emandako hiru konfigurazioak ere exekutatu ditugu (3.4 taula eta 3.5 irudia). Hirurek Kp = 0,6 erabiltzen dute; balio horrekin robotak berandu biratzen du eta kanpoko seinaleak jotzen ditu. Ki edo Kd gehitzeak ez du arazo hori konpondu probatutako konfigurazioetan.
+3.4 taula. Enuntziatuko hasierako konfigurazioen emaitzak.
+Agindua
+	Emaitza
+	Bueltak
+	Talkak
+	d zuzenetan [m]
+	θRMS [°]
+	kp=0.6, ki=0.0, kd=0.0
+	Talkak seinaleetan
+	3,32
+	14
+	0,172 ± 0,060
+	6,8
+	kp=0.6, ki=0.05, kd=0.0
+	Talkak seinaleetan
+	3,32
+	13
+	0,167 ± 0,048
+	6,9
+	kp=0.6, ki=0.05, kd=0.1
+	Talkak seinaleetan
+	3,32
+	13
+	0,189 ± 0,069
+	7,0
+	
+
+  
+
+3.5 irudia. Enuntziatuko hiru konfigurazioekin lortutako ibilbideak.
+4  Ondorioak
+Probatutako konfigurazioen artean, P kontrolagailuak Kp = 1,5 balioarekin eta 0,2 m/s-ko abiadura konstantearekin eman du emaitzarik orekatuena. Robotak 3,32 buelta egin ditu talkarik gabe, zuzenetako θRMS 1,7° izan da eta paretarekiko batez besteko distantzia 0,307 m izan da. Kp = 2,0 balioarekin ere 3,32 buelta egin ditu talkarik gabe, eta zuzenetako θRMS berdina izan da. Hala ere, Kp = 1,5 aukeratu dugu, paretarekiko distantzia egonkorragoa izan delako zuzenetan, desbideratze estandarra 0,013 m izan baita, beste konfigurazioko 0,028 m-ren aldean.
+Probek erakutsi dute irabazi txikiekin robotak berandu biratzen duela, eta irabazi handiekin, berriz, gehiegi zuzentzen duela norabidea eta pareta galtzen duela. Kurbetan moteltzea lagungarria izan da Kp = 1,0 balioarekin, baina Kp = 1,5 eta 2,0 balioekin biraketa gehiegi itxi du. Horregatik, aukeratutako Kp = 1,5 balioarekin abiadura konstantea mantendu dugu.
+I osagaiak kurbetako errorea noranzko berean pilatu du. Horren ondorioz, kurba amaitu ondoren ere robotak biratzen jarraitu du eta zuzenetan paretatik gehiago urrundu da. D osagai txikiek ez dute P kontrolaren emaitza hobetu, eta Kd = 1,0 balioak biraketa bortitzak sortu ditu. Kp = 2,0 finkatuta, P kontrolak eta probatutako PID konbinazioak ibilbidea talkarik gabe osatu dute, eta zuzenetako angelu-errorea antzekoa izan da. Proba horretan I eta D gehitzeak hobekuntza argirik ekarri ez duenez, P kontrolarekin geratu gara.
