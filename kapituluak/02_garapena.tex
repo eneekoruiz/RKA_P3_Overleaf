@@ -1,8 +1,7 @@
 \enlargethispage{3\baselineskip}
-\setlength{\abovedisplayskip}{1pt}
-\setlength{\belowdisplayskip}{1pt}
-\setlength{\abovedisplayshortskip}{0pt}
-\setlength{\belowdisplayshortskip}{0pt}
+\setlength{\parskip}{2.5pt plus 1pt minus 1pt}
+\setlength{\abovedisplayskip}{3pt plus 1pt minus 1pt}
+\setlength{\belowdisplayskip}{3pt plus 1pt minus 1pt}
 
 \section[LiDAR konfigurazioa]{LiDAR konfigurazioa eta erabilitako sektorea}\label{sec:lidar-konfigurazioa}
 LiDAR sentsorea robotaren aurrealdearekiko $180^\circ$ biratuta dago, hau da, atzerantz orientatuta. Horregatik, nodoak laserraren irakurketak berrantolatzen ditu (\texttt{scan[i - 1500]}), datuetako norabideak robotaren norabideekin bat etor daitezen. Zuzenketa horren ondoren, $0^\circ$ robotaren aurrealdea da, eta $+90^\circ$ ezkerraldea. Hasierako posiziotik pistako geziei jarraitzean, kanpoko pareta robotaren ezkerraldean geratzen da. Paretaren angelua kalkulatzeko, beraz, aurrealdearen eta ezkerraldearen arteko laser-irakurketak erabiltzen ditugu, hau da, $0^\circ$ eta $+90^\circ$ artekoak. Horietatik $0{,}5\text{ m}$ baino distantzia txikiagoa dutenak soilik hartzen ditugu, robotaren ondoan dagoen paretaren puntuekin lan egiteko.
@@ -10,41 +9,34 @@ LiDAR sentsorea robotaren aurrealdearekiko $180^\circ$ biratuta dago, hau da, at
 Sektoreak aurrealdea ere hartzen duenez, izkina batera iristean aurreko paretaren puntuak ere erregresioan sartzen dira. Orduan $\theta$ negatibo bihurtzen da eta robotak eskuinera biratzen du; beraz, ez dugu izkinetarako beste araurik behar. Kontrolak angelua bakarrik zuzentzen du, ez paretarekiko distantzia. Distantzia hori $K_p$-ren eta $0{,}5\text{ m}$-ko mugaren araberakoa da (\ref{tab:kp-sweep} taula).
 
 \section{Paretaren angeluaren kalkulua}\label{sec:angeluaren-kalkulua}
-\noindent\textit{Enuntziatuko galdera: Azaldu nola kalkulatzen duzun robota eta paretaren arteko angelua.}\par\vspace{1pt}
+\noindent\textit{Enuntziatuko galdera: Azaldu nola kalkulatzen duzun robota eta paretaren arteko angelua.}\par
 
-LiDAR sentsoreak izpi bakoitzean bi datu ematen dizkigu: izpiaren norabidea, $\beta_i$, eta norabide horretan dagoen oztoporainoko distantzia, $d_i$. Datu horiek zuzenean ez dute paretaren malda erakusten. Horrenbestez, lehenengo urratsean irakurketa bakoitza robotaren inguruko puntu bihurtzen dugu. $x_i$ koordenatuak puntua robotaren aurrean zenbat distantziara dagoen adierazten du, eta $y_i$ koordenatuak ezkerrerantz dagoen distantzia:
-\vspace{-0.7em}
+LiDAR sentsoreak izpi bakoitzean bi datu ematen dizkigu: izpiaren norabidea, $\beta_i$, eta norabide horretan dagoen oztoporainoko distantzia, $d_i$. Datu horiek zuzenean ez dute paretaren malda erakusten. Horrenbestez, lehenengo urratsean irakurketa bakoitza robotaren inguruko puntu bihurtzen dugu. $x_i$ koordenatuak puntua robotaren aurrean zenbat distantziara dagoen adierazten du, eta $y_i$ koordenatuak ezkerrerantz dagoen distantzia.
 \[
   x_i = d_i \cdot \cos(\beta_i), \qquad y_i = d_i \cdot \sin(\beta_i)
 \]
-\vspace{-0.7em}
-Puntu guztiak plano berean jarri ondoren, \texttt{numpy.polyfit} erabiliz ahalik eta ondoen doitzen zaien zuzena kalkulatzen dugu: $y = c_1 x + c_0$. Zuzen horrek paretaren norabidea laburbiltzen du. $c_1$ maldaren arkutangentea hartuta, robotaren eta paretaren arteko $\theta$ angelua lortzen dugu. Robota paralelo joatea nahi dugunez, nahi den angelua $0^\circ$ da; ondorioz, kontrol-errorea kalkulatutako angelua bera da:
-\vspace{-0.7em}
+Puntu guztiak plano berean jarri ondoren, \texttt{numpy.polyfit} erabiliz ahalik eta ondoen doitzen zaien zuzena kalkulatzen dugu: $y = c_1 x + c_0$. Zuzen horrek paretaren norabidea laburbiltzen du. $c_1$ maldaren arkutangentea hartuta, robotaren eta paretaren arteko $\theta$ angelua lortzen dugu. Robota paralelo joatea nahi dugunez, behar dugun angelua $0^\circ$ da; ondorioz, kontrol-errorea kalkulatutako angelua bera da.
 \[
   \theta = \arctan(c_1), \qquad e = \theta - 0 = \theta
 \]
-\vspace{-0.7em}
 Gure interpretazioa hau da: $\theta$ zero inguruan badago, robota paretarekiko paralelo doa. $\theta$ negatiboa bada, robota ezkerreko paretarantz orientatuta dago eta eskuinera biratu behar du; $\theta$ positiboa bada, paretatik urruntzen ari da eta ezkerrera biratu behar du. P kontrol hutsean, laser-puntuetatik lortutako angeluak zuzenean erabakitzen du biraketaren noranzkoa.
 
 \clearpage
-\enlargethispage{\baselineskip}
+\enlargethispage{2\baselineskip}
 \section{Kontrol-legeak eta abiadura lineala}\label{sec:kontrol-legeak}
 PID kontrolagailuak errorearen hiru alor erabiltzen ditu. Hasteko, P osagaiak une horretako erroreari erantzuten dio. Horrez gain, I osagaiak errorea denboran pilatu den aztertzen du; D osagaiak, berriz, errorea zein abiaduratan aldatzen ari den hartzen du kontuan. Hiru ekarpenak batuta robotari bidaltzen zaion biraketa-abiadura lortzen da.
 
-P kontrol hutsean, biraketa-abiadura angelu-errorearekiko proportzionala da: $\omega = K_p \cdot \theta$. $K_p$ txikia bada, robotak poliki zuzentzen du norabidea; $K_p$ handia bada, zuzenketa bortitzagoa da. Abiadura linealerako bi aukera alderatu ditugu: abiadura konstantea eta biraketaren arabera moteltzen den abiadura:
-\vspace{-0.5em}
+P kontrol hutsean, biraketa-abiadura angelu-errorearekiko proportzionala da: $\omega = K_p \cdot \theta$. $K_p$ txikia bada, robotak poliki zuzentzen du norabidea; $K_p$ handia bada, zuzenketa bortitzagoa da. Abiadura linealerako bi aukera alderatu ditugu: abiadura konstantea eta biraketaren arabera moteltzen den abiadura.
 \[
   v = \frac{v_0}{1 + K_V \cdot |\omega|}, \qquad v_0 = 0{,}2\text{ m/s}
 \]
-\vspace{-0.5em}
 $K_V = 0$ denean, robota $0{,}2\text{ m/s}$-ko abiadura konstantean doa. $K_V = 2$ denean, aldiz, $|\omega|$ handitu ahala $v$ txikitzen da; beraz, robotak kurbetan motelago egiten du aurrera. Nodoak \texttt{kp}, \texttt{ki} eta \texttt{kd} parametroak abiarazteko fitxategitik (\texttt{launch}) jasotzen ditu. $v_0$, $K_V$, $D_{\max} = 0{,}5\text{ m}$ eta $I_{\max} = 0{,}3\text{ rad}\cdot\text{s}$ kodean definitutako konstanteak dira.
 
 \section{I eta D osagaiak kodean}\label{sec:pid-kodean}
-\noindent\textit{Enuntziatuko galdera: Nola gehitu duzue kodean osagai Integral eta Deribatiboa.}\par\vspace{1pt}
+\noindent\textit{Enuntziatuko galdera: Nola gehitu duzue kodean osagai Integral eta Deribatiboa.}\par
 
 P kontrolari I eta D osagaiak \texttt{follow\_wall()} metodoan gehitu dizkiogu. LiDAR irakurketa berri bat jasotzean, metodoa berriro exekutatzen da. Exekuzio bakoitzari kontrol-ziklo bat deritzo, eta ziklo bakoitzean, aurreko neurketatik igarotako denbora kalkulatzen dugu. Ondoren, errorearen metaketa eguneratzen dugu I osagaia lortzeko, eta uneko errorea aurrekoarekin alderatzen dugu D osagaia kalkulatzeko. Azken biraketa-agindua hiru ekarpen horien batura da:
-\vspace{-0.6em}
-{\small
+{\footnotesize
 \begin{verbatim}
 dt = (self.timestamps[-1] - self.timestamps[-2]
       if len(self.timestamps) > 1 else 0.0)
@@ -55,5 +47,4 @@ w = self.kp * error + self.ki * self.error_sum + self.kd * derivative
 v = V0 / (1.0 + KV * abs(w))
 \end{verbatim}
 }
-\vspace{-0.6em}
 $\Delta t$ nodoaren erlojuarekin neurtzen dugu (\texttt{self.get\_clock()}): azken bi LiDAR irakurketen artean igarotako denbora da. Irakasleak emandako kodeak nodoaren erlojuarekin gordetzen zituen jada irakurketa bakoitzaren denbora-markak (\texttt{self.timestamps}); horiek berrerabili ditugu $\Delta t$ kalkulatzeko, kodea ahalik eta gutxien aldatzeko. Launch fitxategiak ez du \texttt{use\_sim\_time} aktibatzen; beraz, ordenagailuaren denbora da, ez simulaziokoa. Horrek ahulezia bat du: simulazioa denbora erreala baino motelago badoa, $\Delta t$ simulazioko denbora baino handiagoa da, eta orduan I osagaiak gehiago pilatzen du eta D osagaiak gutxiago eragiten du. Aukeratutako P kontrolean, ordea, $\Delta t$-k ez du eraginik ($K_i = K_d = 0$). Hori konpontzeko, nahikoa litzateke launch fitxategian \texttt{use\_sim\_time} aktibatzea. Gainera, errore metatua $[-0{,}3, +0{,}3]\text{ rad}\cdot\text{s}$ tartera mugatzen dugu, kurbetan gehiegi pilatu ez dadin. Muga hori kontrol-ziklo bakoitzean aplikatzen da. $K_i = 0$ denean, I osagaiaren ekarpena ere zero da, errore metatua $K_i$-rekin biderkatzen dugulako. Deribatua, berriz, $\Delta t > 0$ denean soilik kalkulatzen dugu, zeroz zatitzea saihesteko.
