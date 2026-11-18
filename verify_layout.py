@@ -293,6 +293,35 @@ def audit_source_typography(tex_dir: Path) -> list[str]:
     return defects
 
 
+def audit_code_cleanliness(root_dir: Path) -> list[str]:
+    """Scans student code directories for residual placeholders, fake values, or unfinished TODOs."""
+    defects = []
+    code_dirs = [root_dir / d for d in ["kodea", "src", "code"] if (root_dir / d).exists()]
+    for cd in code_dirs:
+        for py_file in cd.rglob("*.py"):
+            # Skip initial teacher templates
+            if "hasierakoa" in str(py_file.as_posix()) or "template" in str(py_file.as_posix()):
+                continue
+            try:
+                content = py_file.read_text(encoding="utf-8")
+            except Exception:
+                continue
+            lines = content.splitlines()
+            for idx, line in enumerate(lines, 1):
+                lower = line.lower()
+                if any(w in lower for w in ["fake value", "todo:", "## todo", "needs to be defined", "replace by calculated"]):
+                    defects.append(
+                        f"[CODE LINT] {py_file.name}:{idx}: RESIDUAL PLACEHOLDER DETECTED: '{line.strip()[:60]}'. "
+                        f"Replace placeholder with real implementation before delivery."
+                    )
+                if re.search(r'\.append\(\s*8\.97\s*\)', line):
+                    defects.append(
+                        f"[CODE LINT] {py_file.name}:{idx}: DUMMY TELEMETRY FLOAT 8.97 DETECTED! "
+                        f"Replace hardcoded placeholder with real error variable (e.g. self.data_angular_error.append(error))."
+                    )
+    return defects
+
+
 def audit_cover_spacing(page) -> list[str]:
     """Audits page 1 (cover) to verify vertical line spacing uniformity in author/title blocks."""
     defects = []
@@ -447,6 +476,8 @@ def audit_pdf_layout(
     if tex_dir and tex_dir.exists():
         src_defects = audit_source_typography(tex_dir)
         defects.extend(src_defects)
+        code_defects = audit_code_cleanliness(tex_dir.parent if tex_dir.is_dir() else tex_dir)
+        defects.extend(code_defects)
 
     # 3. PDF Page-by-page layout & collision checks
     for i, page in enumerate(doc):
