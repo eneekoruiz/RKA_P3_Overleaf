@@ -84,7 +84,7 @@ class Robot(Node):
             self.scan = [self.scan[self.scan_mid-i] for i in range(self.scan_count)]
        
         
-        ## TODO Add code here
+        # Follow wall control logic
         # Doikuntza-konstanteak (aldaerak probatzeko, hemen aldatu)
         # Pareta robotaren EZKERRALDEAN: pistako geziak (erlojuaren norantza) eta hasierako pose lehenetsia
         SEKTORE_MIN = m.radians(0.0)    # Sektorearen muga: aurrera (0 gradu)
@@ -112,6 +112,7 @@ class Robot(Node):
         self.timestamps.append(elapsed)
 
         # 2.- Linear regression: compute the line from the selected points   
+        error = 0.0
         if len(xpos) > 5: 
             # Note: The len(xpos) value indicates the number of points used in the regression!!
             xcoord = np.array(xpos)
@@ -120,7 +121,6 @@ class Robot(Node):
             # Use Numpy polifyt for liner regression
             c1, c0 = np.polyfit(xcoord, ycoord, 1) # c1: slope; c0:intercept
 
-	        # Fake value, needs to be defined
             desired_theta = 0.0     # Helburua: paretarekiko paralelo joatea
             # Calculate the angle between the robot and the wall
             # theta < 0: robota ezkerreko paretara hurbiltzen ari da, eskuinera biratu behar du (w < 0)
@@ -143,7 +143,7 @@ class Robot(Node):
             # Abiadura lineala: konstantea (KV = 0) edo |w|-ren alderantziz proportzionala (KV > 0)
             v = V0 / (1.0 + KV * abs(w))
             self.get_logger().info("Velocities: v = %.2f w = %.2f"%(v, w))
-            ## END TODO
+            # End control logic
 
             cmd_vel_msg.linear.x  = v
             cmd_vel_msg.linear.y  = 0.0
@@ -155,8 +155,7 @@ class Robot(Node):
             cmd_vel_msg.linear.y  = 0.0
             cmd_vel_msg.angular.z = 0.0
 
-        # Fake value, replace by calculated angular value
-        self.data_angular_error.append(8.97) 
+        self.data_angular_error.append(error) 
         self.data_angular_w.append(cmd_vel_msg.angular.z)   
         self.data_linear_v.append(cmd_vel_msg.linear.x)
         self.vel_pub.publish( cmd_vel_msg)
