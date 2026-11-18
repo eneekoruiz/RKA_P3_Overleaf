@@ -1,0 +1,86 @@
+name: Strict Layout & Typography Gate
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  layout-gate:
+    name: Mandatory Layout & Collision Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: 1. Source Typography & Code Quality Lint
+        run: |
+          echo "🔍 [Phase 1] Auditing LaTeX source code against typography traps..."
+          python -c '
+          from pathlib import Path
+          from verify_layout import audit_source_typography
+          defects = audit_source_typography(Path("."))
+          if defects:
+              print("\n" + "="*60)
+              print(f"❌ [FAIL] {len(defects)} source typography defect(s) detected:")
+              for d in defects:
+                  print(f"  - {d}")
+              print("="*60 + "\n")
+              exit(1)
+          else:
+              print("✅ [PASS] All source files passed strict typographical audit cleanly (0 defects)!")
+          '
+
+      - name: 2. Mandatory Google Doc vs Overleaf Line-by-Line Reconciliation Audit
+        run: |
+          echo "🔍 [Phase 2] Executing strict line-by-line & metadata reconciliation audit..."
+          python audit_reconciliation.py --doc Praktika_Txostena_RKA_P3.docx
+          echo "🔍 Running formal Python unittest suite..."
+          python -m unittest tests/test_reconciliation.py
+
+      - name: 3. Compile on Overleaf & Run 2D Collision Audit
+        env:
+          OVERLEAF_PROJECT_ID: ${{ secrets.OVERLEAF_PROJECT_ID }}
+          OVERLEAF_COOKIE: ${{ secrets.OVERLEAF_COOKIE }}
+        run: |
+          echo "🚀 [Phase 3] Compiling document and executing 2D collision detector..."
+          if [ -n "$OVERLEAF_PROJECT_ID" ] && [ -n "$OVERLEAF_COOKIE" ]; then
+            echo "-> Compiling remotely on Overleaf CLSI build cluster..."
+            python verify_layout.py --project-id "$OVERLEAF_PROJECT_ID" --cookie-val "$OVERLEAF_COOKIE" --doc Praktika_Txostena_RKA_P3.docx --render
+          else
+            echo "⚠️ Overleaf secrets missing, compiling locally with TeX Live fallback..."
+            sudo apt-get update -qq
+            sudo apt-get install -y --no-install-recommends texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-lang-european
+            pdflatex -interaction=nonstopmode main.tex
+            bibtex main || true
+            pdflatex -interaction=nonstopmode main.tex
+            pdflatex -interaction=nonstopmode main.tex
+            python verify_layout.py --pdf main.pdf --doc Praktika_Txostena_RKA_P3.docx --render
+          fi
+
+      - name: 4. Upload Verified PDF & Rendered Pages Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: layout-audit-artifacts
+          path: |
+            *.pdf
+            ol_page_*.png
+          retention-days: 7

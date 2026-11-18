@@ -585,26 +585,53 @@ def main():
     parser.add_argument("--pdf", type=str, default="overleaf_downloaded.pdf", help="Path to PDF file to audit.")
     parser.add_argument("--project-id", type=str, default="", help="Overleaf Project ID to compile and download.")
     parser.add_argument("--cookie-file", type=str, default=".olauth", help="Path to .olauth session cookie file.")
+    parser.add_argument("--cookie-val", type=str, default="", help="Literal session cookie value (for CI).")
     parser.add_argument("--render", action="store_true", help="Render PDF pages as PNG images for visual inspection.")
     parser.add_argument("--min-lines", type=int, default=10, help="Minimum non-empty lines on content pages.")
     parser.add_argument("--expected-pages", type=int, default=13, help="Expected total page count.")
     parser.add_argument("--std-margin", type=float, default=516.0, help="Standard right text margin limit in pt.")
     parser.add_argument("--tex-dir", type=str, default=".", help="Directory containing LaTeX source files for linting.")
+    parser.add_argument("--doc", type=str, default="Praktika_Txostena_RKA_P3.docx", help="Path to reference Google Doc / DOCX.")
     
     args = parser.parse_args()
     pdf_path = Path(args.pdf)
     tex_dir = Path(args.tex_dir)
 
     if args.project_id:
-        cookie_p = Path(args.cookie_file)
-        if not cookie_p.exists():
-            print(f"[ERROR] Cookie file '{args.cookie_file}' not found.")
-            sys.exit(1)
-        cookie_val = cookie_p.read_text(encoding="utf-8").strip().removeprefix("overleaf_session2=")
+        if args.cookie_val:
+            cookie_val = args.cookie_val.strip().removeprefix("overleaf_session2=")
+        else:
+            cookie_p = Path(args.cookie_file)
+            if not cookie_p.exists():
+                print(f"[ERROR] Cookie file '{args.cookie_file}' not found.")
+                sys.exit(1)
+            cookie_val = cookie_p.read_text(encoding="utf-8").strip().removeprefix("overleaf_session2=")
         pdf_path = compile_overleaf_and_download(args.project_id, cookie_val, pdf_path)
     elif not pdf_path.exists():
         print(f"[ERROR] PDF file '{pdf_path}' does not exist. Specify --pdf or --project-id.")
         sys.exit(1)
+
+    # Document Reconciliation Audit (Google Doc <-> Overleaf)
+    doc_file = Path(args.doc)
+    if doc_file.exists() or Path("Praktika_Txostena_RKA_P3.docx").exists():
+        target_doc = doc_file if doc_file.exists() else Path("Praktika_Txostena_RKA_P3.docx")
+        try:
+            from audit_reconciliation import audit_document_reconciliation
+            print("\n" + "=" * 60)
+            print("🔍 [Phase 2] Auditing Line-by-Line Reconciliation with Google Doc...")
+            print("=" * 60)
+            rec_defects = audit_document_reconciliation(target_doc, tex_dir, pdf_path)
+            if rec_defects:
+                print("\n" + "=" * 60)
+                print(f"❌ [FAIL] {len(rec_defects)} reconciliation defect(s) detected:")
+                for d in rec_defects:
+                    print(f"  - {d}")
+                print("=" * 60 + "\n")
+                sys.exit(1)
+            else:
+                print("✅ [PASS] 100% line-by-line & metadata reconciliation verified!\n")
+        except Exception as e:
+            print(f"[WARN] Error running document reconciliation audit: {e}")
         
     success = audit_pdf_layout(
         pdf_path=pdf_path,

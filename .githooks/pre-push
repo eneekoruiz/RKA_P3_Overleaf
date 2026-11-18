@@ -1,0 +1,34 @@
+#!/bin/sh
+# Git pre-push hook: Enforce strict layout, typography and Google Doc reconciliation
+echo "============================================================"
+echo "🔍 [Quality Gate 1/2] Auditing Google Doc <-> Overleaf reconciliation..."
+echo "============================================================"
+python audit_reconciliation.py
+STATUS_REC=$?
+
+if [ $STATUS_REC -ne 0 ]; then
+    echo "============================================================"
+    echo "❌ [BLOCK] Push rejected! Google Doc <-> Overleaf text mismatch detected."
+    echo "Resolve all line-by-line differences before pushing."
+    echo "============================================================"
+    exit 1
+fi
+
+echo "============================================================"
+echo "🔍 [Quality Gate 2/2] Running strict layout & typography audit..."
+echo "============================================================"
+python verify_layout.py
+STATUS_LAY=$?
+
+if [ $STATUS_LAY -ne 0 ]; then
+    echo "============================================================"
+    echo "❌ [BLOCK] Push rejected! Layout or typography defects detected."
+    echo "Fix all defects listed above before pushing to the repository."
+    echo "============================================================"
+    exit 1
+fi
+
+echo "============================================================"
+echo "✅ [PASS] All Quality Gates clean. Proceeding with push."
+echo "============================================================"
+exit 0

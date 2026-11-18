@@ -4,6 +4,7 @@
 cookies.txt
 *.zip
 *.docx
+!Praktika_Txostena_RKA_P3.docx
 
 # LaTeX build artifacts
 *.aux
