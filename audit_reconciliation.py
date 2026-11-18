@@ -31,13 +31,15 @@ def clean_text(text: str) -> str:
     t = t.replace("·", " ")
     t = t.replace('θ', 'theta').replace('β', 'beta').replace('ω', 'omega')
     t = re.sub(r'\\(?:theta|beta|omega)\b', lambda m: m.group(0)[1:], t)
-    t = re.sub(r'\\(?:cos|sin|arctan|frac)\b', lambda m: m.group(0)[1:], t)
+    t = re.sub(r'\\(?:cos|sin|arctan|frac|cdot|qquad|quad|dots)\b', '', t)
+    t = re.sub(r'\\(?:begin|end)\{[^}]+\}', '', t)
     t = re.sub(r'\{,\}', ',', t)
     t = re.sub(r'\\cite\{[^}]+\}', '', t)
     t = re.sub(r'\[\d+(?:[,\s]+\d+)*\]', '', t)
     t = re.sub(r'\\text(?:it|bf|tt|sl)\{([^}]+)\}', r'\1', t)
-    t = re.sub(r'\\(?:label|ref|needspace)\{[^}]+\}', '', t)
+    t = re.sub(r'\\(?:label|ref|subcaption|caption|needspace)\{[^}]+\}', '', t)
     t = t.replace('$', '')
+    t = t.replace('_', ' ')
     t = re.sub(r'(\d+)\s*hz\b', r'\1 hz', t, flags=re.IGNORECASE)
     t = re.sub(r'\s+', ' ', t).strip()
     return t
@@ -160,9 +162,22 @@ def audit_document_reconciliation(
     print("\n--- [Fase 3] Reconciliación Textual Párrafo a Párrafo ---")
     
     docx_paras: List[Tuple[int, str]] = []
+    in_toc = False
     for idx, p in enumerate(doc.paragraphs):
-        t = clean_text(p.text)
-        if not t or p.style.name.startswith("Heading"):
+        raw_t = p.text.strip()
+        t = clean_text(raw_t)
+        if not t:
+            continue
+        if "gaien aurkibidea" in raw_t.lower():
+            in_toc = True
+            continue
+        if in_toc:
+            if p.style.name.startswith("Heading") and not "aurkibidea" in raw_t.lower():
+                in_toc = False
+            elif re.match(r'^\d+(?:\.\d+)*\s+', raw_t) or raw_t in ["Gaien aurkibidea", "Aurkibidea"]:
+                continue
+
+        if p.style.name.startswith("Heading"):
             continue
         if any(t.startswith(prefix) for prefix in ["3. Proiektua:", "Egileak:", "Informatika Ingeniaritzako", "Irakaslea:"]):
             continue
@@ -170,6 +185,9 @@ def audit_document_reconciliation(
 
     tex_tokens = tokenize(tex_all_sources)
     tex_token_str = " " + " ".join(tex_tokens) + " "
+
+    if not pdf_path and (tex_dir / "overleaf_downloaded.pdf").exists():
+        pdf_path = tex_dir / "overleaf_downloaded.pdf"
 
     pdf_token_str = ""
     if pdf_path and pdf_path.exists() and pypdfium2:
