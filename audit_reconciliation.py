@@ -30,17 +30,20 @@ def clean_text(text: str) -> str:
     t = t.replace("–", "-").replace("—", "-").replace("−", "-")
     t = t.replace("·", " ")
     t = t.replace('θ', 'theta').replace('β', 'beta').replace('ω', 'omega')
-    t = re.sub(r'\\(?:theta|beta|omega)\b', lambda m: m.group(0)[1:], t)
-    t = re.sub(r'\\(?:cos|sin|arctan|frac|cdot|qquad|quad|dots)\b', '', t)
+    t = re.sub(r'\\(?:theta|beta|omega|cos|sin|arctan)\b', lambda m: m.group(0)[1:], t)
+    t = re.sub(r'\\(?:frac|cdot|qquad|quad|dots)\b', '', t)
     t = re.sub(r'\\(?:begin|end)\{[^}]+\}', '', t)
+    t = re.sub(r'\\(?:caption|subcaption)(?:\[[^\]]*\])?\{([^}]+)\}', r' \1 ', t)
+    t = re.sub(r'\\(?:label|ref|needspace)\{[^}]+\}', '', t)
     t = re.sub(r'\{,\}', ',', t)
     t = re.sub(r'\\cite\{[^}]+\}', '', t)
     t = re.sub(r'\[\d+(?:[,\s]+\d+)*\]', '', t)
     t = re.sub(r'\\text(?:it|bf|tt|sl)\{([^}]+)\}', r'\1', t)
-    t = re.sub(r'\\(?:label|ref|subcaption|caption|needspace)\{[^}]+\}', '', t)
     t = t.replace('$', '')
-    t = t.replace('_', ' ')
+    t = t.replace('_', '')
     t = re.sub(r'(\d+)\s*hz\b', r'\1 hz', t, flags=re.IGNORECASE)
+    t = re.sub(r'^\d+\.\d+\s+(?:taula|irudia)\.?\s*', '', t, flags=re.IGNORECASE)
+    t = re.sub(r'^\([a-z]\)\s*', '', t, flags=re.IGNORECASE)
     t = re.sub(r'\s+', ' ', t).strip()
     return t
 
@@ -186,9 +189,6 @@ def audit_document_reconciliation(
     tex_tokens = tokenize(tex_all_sources)
     tex_token_str = " " + " ".join(tex_tokens) + " "
 
-    if not pdf_path and (tex_dir / "overleaf_downloaded.pdf").exists():
-        pdf_path = tex_dir / "overleaf_downloaded.pdf"
-
     pdf_token_str = ""
     if pdf_path and pdf_path.exists() and pypdfium2:
         try:
@@ -234,7 +234,7 @@ def main():
     parser = argparse.ArgumentParser(description="Auditoría de Reconciliación Google Doc <-> Overleaf (RKA 3).")
     parser.add_argument("--doc", type=str, default="Praktika_Txostena_RKA_P3.docx", help="Ruta al documento .docx de referencia.")
     parser.add_argument("--tex-dir", type=str, default=".", help="Directorio con las fuentes LaTeX.")
-    parser.add_argument("--pdf", type=str, default="", help="Ruta opcional al PDF descargado de Overleaf.")
+    parser.add_argument("--pdf", type=str, nargs="?", default="", help="Ruta opcional al PDF descargado de Overleaf.")
     args = parser.parse_args()
 
     doc_path = Path(args.doc)
